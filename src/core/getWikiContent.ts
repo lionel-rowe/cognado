@@ -33,8 +33,13 @@ const getDefinitionDomForLanguage = (sections: Section[], language: string) => {
 				'verb',
 				'adjective',
 				'adverb',
+				'pronoun',
 				'preposition',
+				'conjunction',
 				'interjection',
+				'numeral',
+				'article',
+				'determiner',
 			].includes(x.line.toLowerCase()),
 		) ?? { text: '' }
 

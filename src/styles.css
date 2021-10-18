@@ -11,8 +11,16 @@ main {
 	margin: auto;
 }
 
+details summary {
+	cursor: pointer;
+}
+
 pre {
 	tab-size: 4;
+
+	background: #eee8;
+	padding: 1em 1.5em;
+	border-radius: 5px;
 }
 
 a {

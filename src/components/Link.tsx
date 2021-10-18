@@ -19,6 +19,7 @@ export const Link = ({
 
 	const { styles, attributes } = usePopper(referenceElement, popperElement, {
 		placement: 'auto',
+		strategy: 'fixed',
 		modifiers: [
 			{
 				name: 'preventOverflow',
