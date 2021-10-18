@@ -38,8 +38,16 @@ export const makeWiktionaryUrl = ({
     return url.href
 }
 
-const toWordData = (etyTreeUrl: string): WordData => {
-    const { pathname } = new URL(etyTreeUrl)
+const getEtyTreePathname = (etyTreeUrl: string) => {
+    try {
+        return new URL(etyTreeUrl, urls.etyTreeNamespace).pathname
+    } catch {
+        return etyTreeUrl
+    }
+}
+
+const toWordData = (etyTreePathname: string): WordData => {
+    const { pathname } = new URL(etyTreePathname, urls.etyTreeNamespace)
     const [_word, code] = pathname.split('/').reverse()
 
     const langName = getLangName(code)
@@ -53,7 +61,13 @@ const toWordData = (etyTreeUrl: string): WordData => {
     }
 }
 
-export type Cognate = {
+export type CognateRaw = {
+    ancestor: string
+    src: string[]
+    trg: string[]
+}
+
+export type CognateHydrated = {
     ancestor: WordData
     src: WordData[]
     trg: WordData[]
@@ -61,7 +75,7 @@ export type Cognate = {
 
 type CognateResult = {
     query: string
-    cognates: Cognate[]
+    cognates: CognateRaw[]
 }
 
 type CognateError = {
@@ -93,10 +107,12 @@ export const buildSparqlQuery = ({
     const uri = toUri(word, srcLang)
 
     const sparql = `SELECT DISTINCT * {
+	BIND (<${uri}> as ?source)
+
 	{
         ?ancestor1a dbetym:etymologicallyRelatedTo? ?ancestor0 .
         ?ancestor2a dbetym:etymologicallyRelatedTo? ?ancestor1a .
-        <${uri}> dbetym:etymologicallyRelatedTo? ?ancestor2a .
+        ?source dbetym:etymologicallyRelatedTo? ?ancestor2a .
 
         ?ancestor1b dbetym:etymologicallyRelatedTo? ?ancestor0 .
         ?ancestor2b dbetym:etymologicallyRelatedTo? ?ancestor1b .
@@ -163,18 +179,21 @@ export const fetchCognates = async (
                 ancestor2b,
             }) => {
                 return {
-                    ancestor: ancestor0.value,
+                    ancestor: getEtyTreePathname(ancestor0.value),
                     src: pipe(
-                        [ancestor0, ancestor1a, ancestor2a, { value: uri }].map(
-                            (x) => x?.value,
-                        ),
+                        [
+                            ancestor0,
+                            ancestor1a,
+                            ancestor2a,
+                            { value: uri },
+                        ].map((x) => getEtyTreePathname(x.value)),
                         uniq(),
                     )
                         .slice(1) // rm ancestor0
                         .filter(Boolean),
                     trg: pipe(
-                        [ancestor0, ancestor1b, ancestor2b, target].map(
-                            (x) => x?.value,
+                        [ancestor0, ancestor1b, ancestor2b, target].map((x) =>
+                            getEtyTreePathname(x.value),
                         ),
                         uniq(),
                     )
@@ -188,23 +207,27 @@ export const fetchCognates = async (
             etymologies,
 
             (x) =>
-                x
-                    .map(({ src, trg, ancestor }) => ({
-                        ancestor: toWordData(ancestor),
-                        src: src.map(toWordData),
-                        trg: trg.map(toWordData),
-                    }))
-                    .sort(
-                        rank([
-                            ({ trg }) => trg.length,
-                            ({ src }) => src.length,
-                            ({ trg }) => trg[trg.length - 1].url.length,
-                        ]),
-                    ),
+                x.sort(
+                    rank([
+                        ({ trg }) => trg.length,
+                        ({ src }) => src.length,
+                        ({ trg }) => trg[trg.length - 1].length,
+                    ]),
+                ),
 
-            uniq(({ trg }) => trg[trg.length - 1].url),
+            uniq(({ trg }) => trg[trg.length - 1]),
         )
 
         return { query: sparql, cognates }
     }
 }
+
+export const hydrate = (raw: CognateRaw[]) =>
+    pipe(
+        raw.map(({ src, trg, ancestor }) => ({
+            ancestor: toWordData(ancestor),
+            src: src.map(toWordData),
+            trg: trg.map(toWordData),
+        })),
+        uniq(({ trg }) => trg[trg.length - 1].url),
+    )

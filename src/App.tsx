@@ -1,9 +1,10 @@
-import { FC, useEffect, useState, Fragment } from 'react'
+import { FC, useEffect, useState, Fragment, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import {
     buildSparqlQuery,
-    Cognate,
+    CognateRaw,
     fetchCognates,
+    hydrate,
     isCognateError,
 } from './core/cognates'
 import { Link } from './components/Link'
@@ -52,7 +53,7 @@ export const App: FC = () => {
     const [error, setError] = useState<Error | null>(null)
     const [loading, setLoading] = useState<boolean>(false)
 
-    const [cognates, setCognates] = useState<Cognate[]>(ls.cognates ?? [])
+    const [cognates, setCognates] = useState<CognateRaw[]>(ls.cognates ?? [])
     const [lastSubmitted, setLastSubmitted] = useState<FormValues | null>(
         ls.values ?? null,
     )
@@ -105,6 +106,8 @@ export const App: FC = () => {
         }
     }, [])
 
+    const hydrated = useMemo(() => hydrate(cognates), [cognates])
+
     return (
         <main>
             <h1>Cognate finder</h1>
@@ -114,8 +117,8 @@ export const App: FC = () => {
                     Word{' '}
                     <input
                         id='word'
-						// type='search'
-						autoCapitalize='none'
+                        // type='search'
+                        autoCapitalize='none'
                         defaultValue='test'
                         {...register('word')}
                     />
@@ -219,7 +222,7 @@ export const App: FC = () => {
                             </div>
                         ) : cognates.length ? (
                             <ul>
-                                {cognates
+                                {hydrated
                                     .slice(pageStart, pageEnd)
                                     .map(({ ancestor, trg, src }) => {
                                         return (

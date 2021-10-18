@@ -1,10 +1,14 @@
 import { FormValues } from '../App'
-import { Cognate } from '../core/cognates'
+import { CognateRaw } from '../core/cognates'
 
 export const ls = new Proxy(
-    {} as Partial<{
+    {
+		get values() { return undefined },
+		get cognates() { return undefined },
+		get query() { return undefined },
+	} as Partial<{
         values: FormValues
-        cognates: Cognate[]
+        cognates: CognateRaw[]
         query: string
     }>,
     {
@@ -28,3 +32,10 @@ export const ls = new Proxy(
         },
     },
 )
+
+if ((ls.cognates?.[0]?.ancestor as any)?.langName) {
+    // incompatible data format
+    ls.cognates = []
+}
+
+;(window as any).ls = ls
