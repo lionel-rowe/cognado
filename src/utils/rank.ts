@@ -18,7 +18,7 @@ export function rank<T>(
         ? rankFn
         : [rankFn]
 
-    order = order || Order.Asc
+    order ??= Order.Asc
 
     const rankers = rankFns.map(toRanker)
 

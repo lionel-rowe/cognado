@@ -5,24 +5,7 @@ import { pipe } from 'fp-ts/function'
 import { uniq } from '../utils/uniq'
 import { escapeForSparqlUrl } from './escapeForSparqlUrl'
 import { urls } from '../config'
-
-const createSparqlClient = (endpoint: string) => {
-    return {
-        fetch: async (sparql: string) => {
-            const url = new URL(endpoint)
-
-            url.searchParams.set('query', sparql)
-
-            const headers = [['Accept', 'application/sparql-results+json']]
-
-            const res = await fetch(url.href, { headers })
-
-            if (!res.ok) return { status: res.status, error: await res.text() }
-
-            return await res.json()
-        },
-    }
-}
+import { sparqlClient } from './sparql'
 
 const toLangPathSegments = (lang: LangCode) =>
     lang === baseLang ? baseLang : [baseLang, lang].join('/')
@@ -69,11 +52,6 @@ const toWordData = (etyTreeUrl: string): WordData => {
         langCode: code as LangCode,
     }
 }
-
-const sparqlClient = createSparqlClient(urls.etyTreeSparql)
-
-// for debug/quick testing
-;(window as any).sparqlClient = sparqlClient
 
 export type Cognate = {
     ancestor: WordData

@@ -5,7 +5,7 @@ const disallowedAsciis = new RegExp(
     '[' +
         Array.from({ length: 0x80 }, (_, i) => String.fromCodePoint(i))
             .filter((x) => encodeURIComponent(x) !== x)
-            .map((x) => x.codePointAt(0) || 0)
+            .map((x) => x.codePointAt(0) ?? 0)
             .reduce((acc, cur) => {
                 const last = acc[acc.length - 1]
 

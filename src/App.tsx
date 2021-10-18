@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect, useState, Fragment } from 'react'
 import { useForm } from 'react-hook-form'
 import {
     buildSparqlQuery,
@@ -11,6 +11,7 @@ import { usePagination } from './hooks/usePagination'
 import { getLangName, LangCode, langNames } from './utils/langNames'
 import { ls } from './utils/ls'
 import { urls } from './config'
+import { Spinner } from './components/Spinner'
 
 const defaultValues = {
     word: 'dedo',
@@ -37,21 +38,23 @@ export const App: FC = () => {
         handleSubmit,
         // formState: { errors },
         watch,
-    } = useForm<FormValues>({ defaultValues: ls.values || defaultValues })
+    } = useForm<FormValues>({ defaultValues: ls.values ?? defaultValues })
 
     const allowPrefixesAndSuffixes = watch('allowPrefixesAndSuffixes')
     const word = watch('word')
 
     const [query, setQuery] = useState(
         () =>
-            ls.query ||
+            ls.query ??
             buildSparqlQuery({ ...defaultValues, allowPrefixesAndSuffixes })
                 .sparql,
     )
     const [error, setError] = useState<Error | null>(null)
-    const [cognates, setCognates] = useState<Cognate[]>(ls.cognates || [])
+    const [loading, setLoading] = useState<boolean>(false)
+
+    const [cognates, setCognates] = useState<Cognate[]>(ls.cognates ?? [])
     const [lastSubmitted, setLastSubmitted] = useState<FormValues | null>(
-        ls.values || null,
+        ls.values ?? null,
     )
 
     const {
@@ -65,12 +68,16 @@ export const App: FC = () => {
     const onSubmit = async (values: FormValues) => {
         const { word, srcLang, trgLang } = values
 
+        setLoading(true)
+
         const result = await fetchCognates(
             word,
             srcLang,
             trgLang,
             allowPrefixesAndSuffixes,
         )
+
+        setLoading(false)
 
         if (isCognateError(result)) {
             setError(new Error(result.error))
@@ -99,7 +106,7 @@ export const App: FC = () => {
     }, [])
 
     return (
-        <div>
+        <main>
             <h1>Cognate finder</h1>
 
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -107,6 +114,8 @@ export const App: FC = () => {
                     Word{' '}
                     <input
                         id='word'
+						// type='search'
+						autoCapitalize='none'
                         defaultValue='test'
                         {...register('word')}
                     />
@@ -167,98 +176,109 @@ export const App: FC = () => {
                 </>
             ) : null}
 
-            {cognates.length ? (
+            {loading ? (
+                <Spinner />
+            ) : (
                 <>
-                    <br />
-                    <div>
-                        Total {cognates.length} results | Page{' '}
-                        {Array.from({ length: maxPageNo }, (_, i) => {
-                            return (
-                                <>
-                                    {page === i + 1 ? (
-                                        i + 1
-                                    ) : (
-                                        <a
-                                            href={`#page-${i + 1}`}
-                                            onClick={(e) => {
-                                                e.preventDefault()
+                    {cognates.length ? (
+                        <>
+                            <br />
+                            <div>
+                                Total {cognates.length} results | Page{' '}
+                                {Array.from({ length: maxPageNo }, (_, i) => {
+                                    return (
+                                        <Fragment key={i}>
+                                            {page === i + 1 ? (
+                                                i + 1
+                                            ) : (
+                                                <a
+                                                    href={`#page-${i + 1}`}
+                                                    onClick={(e) => {
+                                                        e.preventDefault()
 
-                                                setPage(i + 1)
-                                            }}
-                                        >
-                                            {i + 1}
-                                        </a>
-                                    )}
-                                    {'\xa0'}
-                                </>
-                            )
-                        })}
+                                                        setPage(i + 1)
+                                                    }}
+                                                >
+                                                    {i + 1}
+                                                </a>
+                                            )}
+                                            {'\xa0'}
+                                        </Fragment>
+                                    )
+                                })}
+                            </div>
+                        </>
+                    ) : null}
+
+                    <br />
+
+                    <div>
+                        {error ? (
+                            <div>
+                                <strong>Error:</strong> {error.message}
+                            </div>
+                        ) : cognates.length ? (
+                            <ul>
+                                {cognates
+                                    .slice(pageStart, pageEnd)
+                                    .map(({ ancestor, trg, src }) => {
+                                        return (
+                                            <li
+                                                className='top-level-li'
+                                                key={trg[trg.length - 1].url}
+                                            >
+                                                <Link {...ancestor} />
+
+                                                <ul>
+                                                    <li>
+                                                        {src.flatMap((x, i) => [
+                                                            ' → ',
+                                                            <Link
+                                                                key={i}
+                                                                {...x}
+                                                            />,
+                                                        ])}
+                                                    </li>
+                                                    <li>
+                                                        {trg.flatMap(
+                                                            (x, i, a) => [
+                                                                ' → ',
+                                                                i ===
+                                                                a.length - 1 ? (
+                                                                    <Link
+                                                                        key={i}
+                                                                        className='bold'
+                                                                        {...x}
+                                                                    />
+                                                                ) : (
+                                                                    <Link
+                                                                        key={i}
+                                                                        {...x}
+                                                                    />
+                                                                ),
+                                                            ],
+                                                        )}
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        )
+                                    })}
+                            </ul>
+                        ) : word === lastSubmitted?.word ? (
+                            `No ${getLangName(
+                                lastSubmitted.trgLang,
+                            )} cognates found for ${getLangName(
+                                lastSubmitted.srcLang,
+                            )} "${word}"`
+                        ) : (
+                            'Click "Search" to find cognates'
+                        )}
+                        <br />
+                        <br />
+                        <br />
                     </div>
                 </>
-            ) : null}
-
-            <br />
-
-            <div>
-                {error ? (
-                    <div>
-                        <strong>Error:</strong> {error.message}
-                    </div>
-                ) : cognates.length ? (
-                    <ul>
-                        {cognates
-                            .slice(pageStart, pageEnd)
-                            .map(({ ancestor, trg, src }) => {
-                                // const srcWordData = lastSubmitted || defaultValues
-
-                                // const target = trg[trg.length - 1]
-
-                                return (
-                                    <li
-                                        className='top-level-li'
-                                        key={trg[trg.length - 1].url}
-                                    >
-                                        <Link {...ancestor} />
-
-                                        <ul>
-                                            <li>
-                                                {src.flatMap((x, i) => [
-                                                    ' → ',
-                                                    <Link key={i} {...x} />,
-                                                ])}
-                                            </li>
-                                            <li>
-                                                {trg.flatMap((x, i, a) => [
-                                                    ' → ',
-                                                    i === a.length - 1 ? (
-                                                        <Link
-                                                            key={i}
-                                                            className='bold'
-                                                            {...x}
-                                                        />
-                                                    ) : (
-                                                        <Link key={i} {...x} />
-                                                    ),
-                                                ])}
-                                            </li>
-                                        </ul>
-                                    </li>
-                                )
-                            })}
-                    </ul>
-                ) : word === lastSubmitted?.word ? (
-                    `No ${getLangName(
-                        lastSubmitted.trgLang,
-                    )} cognates found for ${getLangName(
-                        lastSubmitted.srcLang,
-                    )} "${word}"`
-                ) : (
-                    'Click "Search" to find cognates'
-                )}
-                <br />
-                <br />
-                <br />
-            </div>
-        </div>
+            )}
+        </main>
     )
 }

@@ -2,6 +2,7 @@ import { HTMLProps, useState } from 'react'
 import { usePopper } from 'react-popper'
 import { WordData } from '../core/cognates'
 import { fetchWiktionaryDefinitionHtml } from '../core/getWikiContent'
+import { Spinner } from './Spinner'
 
 export const Link = ({
     url,
@@ -22,7 +23,9 @@ export const Link = ({
 
     const [popoverHtml, setPopoverHtml] = useState<string | null>(null)
 
-	const title = `${word} (${langName})`
+    const [loading, setLoading] = useState<boolean>(false)
+
+    const title = `${word} (${langName})`
 
     return (
         <span ref={setReferenceElement}>
@@ -32,13 +35,18 @@ export const Link = ({
                 rel='noreferrer noopener'
                 href={url}
                 onMouseEnter={async () => {
-                    if (!popoverHtml)
-                        setPopoverHtml(
-                            (await fetchWiktionaryDefinitionHtml(
-                                word,
-                                langCode,
-                            )) || '',
+                    if (!popoverHtml) {
+                        setLoading(true)
+
+                        const html = await fetchWiktionaryDefinitionHtml(
+                            word,
+                            langCode,
                         )
+
+                        setLoading(false)
+
+                        setPopoverHtml(html ?? '')
+                    }
                 }}
             >
                 {title}
@@ -51,17 +59,24 @@ export const Link = ({
                     {...attributes.popper}
                     className='popover'
                 >
-                    <div>
-                        <strong>{title}</strong>
-                    </div>
-					<br />
-                    <div
-                        dangerouslySetInnerHTML={{
-                            __html:
-                                popoverHtml ||
-                                '<span class="grayed-out">No definitions found</span>',
-                        }}
-                    />
+                    {loading ? (
+                        <Spinner />
+                    ) : (
+                        <>
+                            <div>
+                                <strong>{title}</strong>
+                            </div>
+                            <br />
+                            <div
+                                dangerouslySetInnerHTML={{
+                                    __html:
+                                        popoverHtml === ''
+                                            ? '<span class="grayed-out">No definitions found</span>'
+                                            : popoverHtml ?? '',
+                                }}
+                            />
+                        </>
+                    )}
                 </div>
             }
         </span>

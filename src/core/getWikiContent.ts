@@ -36,7 +36,7 @@ const getDefinitionDomForLanguage = (sections: Section[], language: string) => {
                 'preposition',
                 'interjection',
             ].includes(x.line.toLowerCase()),
-        ) || { text: '' }
+        ) ?? { text: '' }
 
     const parsed = new DOMParser().parseFromString(text, 'text/html')
 
@@ -76,7 +76,7 @@ export const fetchWiktionaryDefinitionHtml = async (
             getDefinitionDomForLanguage(
                 sections,
                 getLangName(langCode),
-            ).querySelector('ol')?.outerHTML || ''
+            ).querySelector('ol')?.outerHTML ?? ''
     } catch (e) {
         console.error(e)
         result = ''

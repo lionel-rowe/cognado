@@ -2,6 +2,11 @@ body {
     font-family: sans-serif;
 }
 
+main {
+	max-width: 800px;
+	margin:auto;
+}
+
 pre {
     tab-size: 4;
 }
