@@ -1,0 +1,54 @@
+body {
+    font-family: sans-serif;
+}
+
+pre {
+    tab-size: 4;
+}
+
+a {
+    color: rgb(0, 110, 101);
+}
+
+li a {
+    text-decoration: none;
+}
+
+li a:hover {
+    text-decoration: underline;
+}
+
+.top-level-li {
+    margin: 1em 0;
+}
+
+.popover {
+    position: absolute;
+    max-width: 500px;
+    background: white;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    padding: 0.7em;
+    filter: drop-shadow(4px 4px 4px #0006);
+}
+
+body.suppress-popovers .popover {
+    display: none !important;
+}
+
+.popover {
+    display: none;
+}
+
+a:hover + .popover,
+.popover:hover {
+    display: block;
+}
+
+.grayed-out {
+    color: #888;
+}
+
+.bold {
+    font-weight: bold;
+}
