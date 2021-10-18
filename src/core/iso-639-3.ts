@@ -1,73 +1,87 @@
 /**
- * # Scraped from the following resources:
- *
- * ## Step 1 - Wiktionary frequent languages
- *
- * https://en.wiktionary.org/wiki/Wiktionary:Statistics
- *
- * ```js
- * const rows = [...document.querySelector('tbody').querySelectorAll('tr')]
- *
- * const x = rows
- *     .map((row) =>
- *         [...row.querySelectorAll('td')]
- *             .slice(0, 2)
- *             .map((x) => x.textContent.replace(/\(.*\d.*\)\s*$/, '').trim()),
- *     )
- *     .map(([lang, num]) => ({ lang, num: +num }))
- *     .sort((a, b) => b.num - a.num)
- *     .map((x) => x.lang)
- *     .slice(0, 350)
- *
- * JSON.stringify(x)
- * ```
- *
- * ## Step 2 - EtyTree source for ISO 639-3 codes
- *
- * https://raw.githubusercontent.com/esterpantaleo/etymology/ad2062ee3714ab0845d00388b29a052ad26021c8/resources/data/iso-639-3.tab
- *
- * ```js
- * const frequentLangs = [[[PASTE FROM ABOVE RESULTS]]]
- *
- * const _langNames = document
- *     .querySelector('pre')
- *     .textContent.split('\n')
- *     .filter((x) => x.trim())
- *     .map((x) => x.split('\t'))
- *     .map((x) => {
- *         const codes = x.slice(0, 1).filter((x) => x.trim())
- *         const name = x[6]
- *
- *         return { codes, name }
- *     })
- *     .reduce((acc, { codes, name }) => {
- *         for (const code of codes) {
- *             acc[code] = name.replace(/\(.*\d.*\)$/, '').trim()
- *         }
- *
- *         return acc
- *     }, Object.create(null))
- *
- * const langNames = Object.fromEntries(
- *     Object.entries(_langNames).sort(([kA, a], [kB, b]) =>
- *         kA === 'eng' ? -Infinity : kB === 'eng' ? Infinity : a.localeCompare(b),
- *     ),
- * )
- *
- * const langNamesReverse = Object.fromEntries(
- *     Object.entries(langNames).map((x) => x.reverse()),
- * )
- *
- * Object.fromEntries(
- *     frequentLangs
- *         .map((lang) => [langNamesReverse[lang], lang])
- *         .filter(([x]) => x),
- * )
- * ```
- *
- */
 
-export const langNames = {
+# Scraped from the following resources:
+
+## Step 1 - Wiktionary frequent languages
+
+https://en.wiktionary.org/wiki/Wiktionary:Statistics
+
+```js
+const rows = [...document.querySelector('tbody').querySelectorAll('tr')]
+
+const x = rows
+	.map((row) =>
+		[...row.querySelectorAll('td')]
+			.slice(0, 2)
+			.map((x) => x.textContent.replace(/\(.*\d.*\)\s*$/, '').trim()),
+	)
+	.map(([lang, num]) => ({ lang, num: +num }))
+	.sort((a, b) => b.num - a.num)
+	.map((x) => x.lang)
+	.slice(0, 350)
+
+JSON.stringify(x)
+```
+
+## Step 2 - EtyTree source for ISO 639-3 codes
+
+https://raw.githubusercontent.com/esterpantaleo/etymology/ad2062ee3714ab0845d00388b29a052ad26021c8/resources/data/iso-639-3.tab
+
+```js
+const frequentLangs = [[[PASTE FROM ABOVE RESULTS]]]
+
+const _langNames = document
+	.querySelector('pre')
+	.textContent.split('\n')
+	.filter((x) => x.trim())
+	.map((x) => x.split('\t'))
+	.map((x) => {
+		const codes = x.slice(0, 1).filter((x) => x.trim())
+		const name = x[6]
+
+		return { codes, name }
+	})
+	.reduce((acc, { codes, name }) => {
+		for (const code of codes) {
+			acc[code] = name.replace(/\(.*\d.*\)$/, '').trim()
+		}
+
+		return acc
+	}, Object.create(null))
+
+const overrides = {
+	ell: 'Greek', // not "Modern Greek"
+}
+
+const langNames = Object.assign(
+	Object.fromEntries(
+		Object.entries(_langNames).sort(([kA, a], [kB, b]) =>
+			kA === 'eng'
+				? -Infinity
+				: kB === 'eng'
+				? Infinity
+				: a.localeCompare(b),
+		),
+	),
+	overrides,
+)
+
+langNames.ell = 'Greek' // hard code - not "Modern Greek"
+
+const langNamesReverse = Object.fromEntries(
+	Object.entries(langNames).map((x) => x.reverse()),
+)
+
+Object.fromEntries(
+	frequentLangs
+		.map((lang) => [langNamesReverse[lang], lang])
+		.filter(([x]) => x),
+)
+```
+
+*/
+
+export const langCodesToNames = {
     eng: 'English',
     zho: 'Chinese',
     ita: 'Italian',
@@ -89,6 +103,7 @@ export const langNames = {
     hun: 'Hungarian',
     mkd: 'Macedonian',
     ara: 'Arabic',
+    ell: 'Greek',
     vie: 'Vietnamese',
     swe: 'Swedish',
     grc: 'Ancient Greek',

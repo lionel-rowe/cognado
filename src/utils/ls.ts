@@ -3,10 +3,16 @@ import { CognateRaw } from '../core/cognates'
 
 export const ls = new Proxy(
     {
-		get values() { return undefined },
-		get cognates() { return undefined },
-		get query() { return undefined },
-	} as Partial<{
+        get values() {
+            return undefined
+        },
+        get cognates() {
+            return undefined
+        },
+        get query() {
+            return undefined
+        },
+    } as Partial<{
         values: FormValues
         cognates: CognateRaw[]
         query: string

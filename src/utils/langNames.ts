@@ -1,13 +1,23 @@
-import { langNames } from '../core/iso-639-3'
+import { langCodesToNames } from '../core/iso-639-3'
 
-export type LangNames = typeof langNames
+export type LangCodesToNames = typeof langCodesToNames
 
-export { langNames }
+export { langCodesToNames }
 
-export type LangCode = keyof LangNames
+export type LangCode = keyof LangCodesToNames
+export const langCodes = Object.keys(langCodesToNames) as LangCode[]
+
+export type LangName = LangCodesToNames[LangCode]
+export const langNames = Object.values(langCodesToNames) as LangName[]
+
+export const langNamesToCodes = Object.fromEntries(
+    Object.entries(langCodesToNames).map((x) => x.reverse()),
+) as {
+    [key in LangCodesToNames[keyof LangCodesToNames]]: LangCode
+}
 
 export const baseLang: LangCode = 'eng'
 
 export const getLangName = (code: string): string => {
-    return langNames[code as LangCode] ?? code
+    return langCodesToNames[code as LangCode] ?? code
 }

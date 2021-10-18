@@ -3,7 +3,7 @@ import { wikify, unwikify } from '../utils/formatters'
 import { baseLang, getLangName, LangCode } from '../utils/langNames'
 import { pipe } from 'fp-ts/function'
 import { uniq } from '../utils/uniq'
-import { escapeForSparqlUrl } from './escapeForSparqlUrl'
+import { escapeForSparqlUrl } from './escapeSparqlUrlSegment'
 import { urls } from '../config'
 import { sparqlClient } from './sparql'
 
@@ -118,6 +118,10 @@ export const buildSparqlQuery = ({
         ?ancestor2b dbetym:etymologicallyRelatedTo? ?ancestor1b .
 		?target dbetym:etymologicallyRelatedTo? ?ancestor2b .
 	}
+
+	FILTER (
+		?source != ?target
+	)
 
     FILTER (
         regex(?target, "${trgLangMatcher}", '')${

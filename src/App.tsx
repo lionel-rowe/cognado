@@ -9,10 +9,11 @@ import {
 } from './core/cognates'
 import { Link } from './components/Link'
 import { usePagination } from './hooks/usePagination'
-import { getLangName, LangCode, langNames } from './utils/langNames'
+import { getLangName, LangCode } from './utils/langNames'
 import { ls } from './utils/ls'
 import { urls } from './config'
 import { Spinner } from './components/Spinner'
+import { LangSelect } from './components/LangSelect'
 
 const defaultValues = {
     word: 'dedo',
@@ -39,10 +40,14 @@ export const App: FC = () => {
         handleSubmit,
         // formState: { errors },
         watch,
+        setValue,
     } = useForm<FormValues>({ defaultValues: ls.values ?? defaultValues })
 
     const allowPrefixesAndSuffixes = watch('allowPrefixesAndSuffixes')
     const word = watch('word')
+
+    const srcLang = watch('srcLang')
+    const trgLang = watch('trgLang')
 
     const [query, setQuery] = useState(
         () =>
@@ -126,24 +131,20 @@ export const App: FC = () => {
                 <br />
                 <label htmlFor='srcLang'>
                     Source language{' '}
-                    <select id='srcLang' {...register('srcLang')}>
-                        {Object.entries(langNames).map(([code, name]) => (
-                            <option key={code} value={code}>
-                                {name}
-                            </option>
-                        ))}
-                    </select>
+                    <LangSelect
+                        id='srcLang'
+                        defaultValue={getLangName(srcLang)}
+                        setValue={setValue}
+                    />
                 </label>
                 <br />
                 <label htmlFor='trgLang'>
-                    Target language{' '}
-                    <select id='trgLang' {...register('trgLang')}>
-                        {Object.entries(langNames).map(([code, name]) => (
-                            <option key={code} value={code}>
-                                {name}
-                            </option>
-                        ))}
-                    </select>
+                    Source language{' '}
+                    <LangSelect
+                        id='trgLang'
+                        defaultValue={getLangName(trgLang)}
+                        setValue={setValue}
+                    />
                 </label>
                 <br />
                 <label htmlFor='allowPrefixesAndSuffixes'>
