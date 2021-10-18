@@ -1,3 +1,7 @@
+* {
+	box-sizing: border-box;
+}
+
 body {
 	font-family: sans-serif;
 }
@@ -29,25 +33,33 @@ li a:hover {
 
 .popover {
 	position: absolute;
-	max-width: 500px;
+	max-width: min(500px, calc(100vw - 16px));
 	background: white;
 	border: 1px solid #aaa;
 	border-radius: 5px;
 	padding: 0.7em;
 	filter: drop-shadow(4px 4px 4px #0006);
+	z-index: 1;
 }
 
 body.suppress-popovers .popover {
-	display: none !important;
+	visibility: hidden !important;
+	pointer-events: none !important;
 }
 
 .popover {
-	display: none;
+	visibility: hidden;
+	pointer-events: none;
 }
 
-a:hover + .popover,
+.popover-parent:hover .popover,
 .popover:hover {
-	display: block;
+	visibility: visible;
+	pointer-events: all;
+}
+
+.popover-reference {
+	position: relative;
 }
 
 .grayed-out {

@@ -119,12 +119,9 @@ export const buildSparqlQuery = ({
 		?target dbetym:etymologicallyRelatedTo? ?ancestor2b .
 	}
 
-	FILTER (
-		?source != ?target
-	)
-
     FILTER (
-        regex(?target, "${trgLangMatcher}", '')${
+		?source != ?target
+        && regex(?target, "${trgLangMatcher}", '')${
 		allowPrefixesAndSuffixes
 			? ''
 			: `

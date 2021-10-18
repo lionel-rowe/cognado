@@ -35,13 +35,9 @@ const unsuppressPopovers = () => {
 }
 
 export const App: FC = () => {
-	const {
-		register,
-		handleSubmit,
-		// formState: { errors },
-		watch,
-		setValue,
-	} = useForm<FormValues>({ defaultValues: ls.values ?? defaultValues })
+	const { register, handleSubmit, watch, setValue } = useForm<FormValues>({
+		defaultValues: ls.values ?? defaultValues,
+	})
 
 	const allowPrefixesAndSuffixes = watch('allowPrefixesAndSuffixes')
 	const word = watch('word')
@@ -122,7 +118,6 @@ export const App: FC = () => {
 					Word{' '}
 					<input
 						id='word'
-						// type='search'
 						autoCapitalize='none'
 						defaultValue='test'
 						{...register('word')}

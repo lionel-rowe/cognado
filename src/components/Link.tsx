@@ -18,7 +18,26 @@ export const Link = ({
 	const [popperElement, setPopperElement] = useState<HTMLElement | null>(null)
 
 	const { styles, attributes } = usePopper(referenceElement, popperElement, {
-		placement: 'bottom',
+		placement: 'auto',
+		modifiers: [
+			{
+				name: 'preventOverflow',
+				options: {
+					rootBoundary: 'viewport',
+				},
+			},
+			{
+				name: 'flip',
+				options: {
+					rootBoundary: 'viewport',
+
+					mainAxis: true,
+					altAxis: true,
+					flipVariations: true,
+					padding: 8,
+				},
+			},
+		],
 	})
 
 	const [popoverHtml, setPopoverHtml] = useState<string | null>(null)
@@ -28,57 +47,57 @@ export const Link = ({
 	const title = `${word} (${langName})`
 
 	return (
-		<span ref={setReferenceElement}>
-			<a
-				{...htmlProps}
-				target='_blank'
-				rel='noreferrer noopener'
-				href={url}
-				onMouseEnter={async () => {
-					if (!popoverHtml) {
-						setLoading(true)
+		<span className='popover-parent'>
+			<span ref={setReferenceElement}>
+				<a
+					{...htmlProps}
+					target='_blank'
+					rel='noreferrer noopener'
+					href={url}
+					onMouseEnter={async () => {
+						if (!popoverHtml) {
+							setLoading(true)
 
-						const html = await fetchWiktionaryDefinitionHtml(
-							word,
-							langCode,
-						)
+							const html = await fetchWiktionaryDefinitionHtml(
+								word,
+								langCode,
+							)
 
-						setLoading(false)
+							setLoading(false)
 
-						setPopoverHtml(html ?? '')
-					}
-				}}
-			>
-				{title}
-			</a>
-
-			{
-				<div
-					ref={setPopperElement}
-					style={styles.popper}
-					{...attributes.popper}
-					className='popover'
+							setPopoverHtml(html ?? '')
+						}
+					}}
 				>
-					{loading ? (
-						<Spinner />
-					) : (
-						<>
-							<div>
-								<strong>{title}</strong>
-							</div>
-							<br />
-							<div
-								dangerouslySetInnerHTML={{
-									__html:
-										popoverHtml === ''
-											? '<span class="grayed-out">No definitions found</span>'
-											: popoverHtml ?? '',
-								}}
-							/>
-						</>
-					)}
-				</div>
-			}
+					{title}
+				</a>
+			</span>
+
+			<div
+				ref={setPopperElement}
+				{...attributes.popper}
+				style={styles.popper}
+				className='popover'
+			>
+				{loading ? (
+					<Spinner />
+				) : (
+					<>
+						<div>
+							<strong>{title}</strong>
+						</div>
+						<br />
+						<div
+							dangerouslySetInnerHTML={{
+								__html:
+									popoverHtml === ''
+										? '<span class="grayed-out">No definitions found</span>'
+										: popoverHtml ?? '',
+							}}
+						/>
+					</>
+				)}
+			</div>
 		</span>
 	)
 }

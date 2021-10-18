@@ -44,4 +44,5 @@ if ((ls.cognates?.[0]?.ancestor as any)?.langName) {
 	ls.cognates = []
 }
 
+// for debug/quick testing
 ;(window as any).ls = ls
