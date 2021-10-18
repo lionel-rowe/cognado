@@ -6,4 +6,6 @@ export const urls = {
 
 	wiktionaryApi: 'https://en.wiktionary.org/api',
 	wiktionaryWeb: 'https://en.wiktionary.org',
+
+	github: 'https://github.com/lionel-rowe/cognate-finder',
 }

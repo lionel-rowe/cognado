@@ -40,7 +40,7 @@ const getDefinitionDomForLanguage = (sections: Section[], language: string) => {
 				'numeral',
 				'article',
 				'determiner',
-			].includes(x.line.toLowerCase()),
+			].includes(x.line.trim().toLowerCase()),
 		) ?? { text: '' }
 
 	const parsed = new DOMParser().parseFromString(text, 'text/html')
