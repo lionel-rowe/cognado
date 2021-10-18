@@ -1,59 +1,59 @@
 body {
-    font-family: sans-serif;
+	font-family: sans-serif;
 }
 
 main {
-    max-width: 800px;
-    margin: auto;
+	max-width: 800px;
+	margin: auto;
 }
 
 pre {
-    tab-size: 4;
+	tab-size: 4;
 }
 
 a {
-    color: rgb(0, 110, 101);
+	color: rgb(0, 110, 101);
 }
 
 li a {
-    text-decoration: none;
+	text-decoration: none;
 }
 
 li a:hover {
-    text-decoration: underline;
+	text-decoration: underline;
 }
 
 .top-level-li {
-    margin: 1em 0;
+	margin: 1em 0;
 }
 
 .popover {
-    position: absolute;
-    max-width: 500px;
-    background: white;
-    border: 1px solid #aaa;
-    border-radius: 5px;
-    padding: 0.7em;
-    filter: drop-shadow(4px 4px 4px #0006);
+	position: absolute;
+	max-width: 500px;
+	background: white;
+	border: 1px solid #aaa;
+	border-radius: 5px;
+	padding: 0.7em;
+	filter: drop-shadow(4px 4px 4px #0006);
 }
 
 body.suppress-popovers .popover {
-    display: none !important;
+	display: none !important;
 }
 
 .popover {
-    display: none;
+	display: none;
 }
 
 a:hover + .popover,
 .popover:hover {
-    display: block;
+	display: block;
 }
 
 .grayed-out {
-    color: #888;
+	color: #888;
 }
 
 .bold {
-    font-weight: bold;
+	font-weight: bold;
 }
