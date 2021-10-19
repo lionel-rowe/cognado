@@ -14,14 +14,13 @@ export const CognatesList = ({
 		<ul>
 			{cognates
 				.slice(pageStart, pageEnd)
-				.map(({ ancestor, trg, src }) => {
+				.map(({ ancestor, trg, src }, i) => {
 					return (
 						<li
 							className='top-level-li'
-							key={trg[trg.length - 1].url}
+							key={`${i}-${trg[trg.length - 1]?.url}`}
 						>
 							<Link {...ancestor} />
-
 							<ul>
 								<li>
 									{src.flatMap((x, i) => [

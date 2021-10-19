@@ -1,4 +1,4 @@
-import { FC, useEffect, useState, useMemo, useCallback } from 'react'
+import React, { FC, useEffect, useState, useMemo, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import {
 	buildSparqlQuery,
@@ -16,6 +16,7 @@ import { LangSelect } from './components/LangSelect'
 import { Pagination } from './components/Pagination'
 import { CognatesList } from './components/CognatesList'
 import { GitHubCorner } from './components/GitHubCorner'
+import { RootErrorBoundary } from './components/RootErrorBoundary'
 
 const defaultValues = {
 	word: 'dedo',
@@ -109,132 +110,157 @@ export const App: FC = () => {
 		}
 	}, [])
 
+	const swap = useCallback(
+		(e: React.MouseEvent<HTMLElement>) => {
+			e.preventDefault()
+
+			const trgLang = watch('trgLang')
+			const srcLang = watch('srcLang')
+
+			setValue('srcLang', trgLang)
+			setValue('trgLang', srcLang)
+		},
+		[setValue, watch],
+	)
+
 	const hydrated = useMemo(() => hydrate(cognates), [cognates])
 
 	return (
 		<>
-			<GitHubCorner
-				target='_blank'
-				title='See project on GitHub'
-				rel='noreferrer noopener'
-				href={urls.github}
-			/>
+			<RootErrorBoundary>
+				<GitHubCorner
+					target='_blank'
+					title='See project on GitHub'
+					rel='noreferrer noopener'
+					href={urls.github}
+				/>
 
-			<main>
-				<h1>Cognate finder</h1>
-				<form onSubmit={handleSubmit(onSubmit)}>
-					<label htmlFor='word'>
-						Word{' '}
-						<input
-							id='word'
-							autoCapitalize='none'
-							defaultValue='test'
-							{...register('word')}
-						/>
-					</label>
-					<br />
-					<label htmlFor='srcLang'>
-						Source language{' '}
-						<LangSelect
-							id='srcLang'
-							defaultValue={getLangName(srcLang)}
-							setValue={setValue}
-						/>
-					</label>
-					<br />
-					<label htmlFor='trgLang'>
-						Source language{' '}
-						<LangSelect
-							id='trgLang'
-							defaultValue={getLangName(trgLang)}
-							setValue={setValue}
-						/>
-					</label>
-					<br />
-					<label htmlFor='allowPrefixesAndSuffixes'>
-						Allow prefixes and suffixes{' '}
-						<input
-							type='checkbox'
-							id='allowPrefixesAndSuffixes'
-							{...register('allowPrefixesAndSuffixes')}
-						/>
-					</label>
-					<br />
-					<br />
-					<button type='submit'>Search</button>{' '}
-					<small>
-						Etymology search powered by{' '}
-						<a
-							target='_blank'
-							rel='noreferrer noopener'
-							href={urls.etytreeWeb}
-						>
-							etytree
-						</a>
-					</small>
-				</form>
-				{query ? (
-					<>
+				<main>
+					<h1>Cognate finder</h1>
+					<form onSubmit={handleSubmit(onSubmit)}>
+						<label htmlFor='word'>
+							Word{' '}
+							<input
+								id='word'
+								autoCapitalize='none'
+								defaultValue='test'
+								{...register('word')}
+							/>
+						</label>
 						<br />
-						<details>
-							<summary>Show raw query</summary>
+						<label htmlFor='srcLang'>
+							Source{' '}
+							<LangSelect
+								id='srcLang'
+								langCode={srcLang}
+								setLangCode={setValue}
+							/>
+						</label>{' '}
+						<button type='button' onClick={swap} aria-label='Swap'>
+							<span aria-hidden='true'>⇄</span>
+						</button>{' '}
+						<label htmlFor='trgLang'>
+							target{' '}
+							<LangSelect
+								id='trgLang'
+								langCode={trgLang}
+								setLangCode={setValue}
+							/>
+						</label>
+						<br />
+						<label htmlFor='allowPrefixesAndSuffixes'>
+							Allow prefixes and suffixes{' '}
+							<input
+								type='checkbox'
+								id='allowPrefixesAndSuffixes'
+								{...register('allowPrefixesAndSuffixes')}
+							/>
+						</label>
+						<br />
+						<br />
+						<button type='submit'>Search</button>{' '}
+						<small>
+							Etymology search powered by{' '}
+							<a
+								target='_blank'
+								rel='noreferrer noopener'
+								href={urls.etytreeWeb}
+							>
+								etytree
+							</a>
+						</small>
+					</form>
+					{query ? (
+						<>
+							<br />
+							<details>
+								<summary>Show raw query</summary>
 
-							<pre>{query}</pre>
-						</details>
-					</>
-				) : null}
-				{loading ? (
-					<Spinner />
-				) : (
-					<>
-						{cognates.length ? (
-							<>
+								<pre>{query}</pre>
+							</details>
+						</>
+					) : null}
+					{loading ? (
+						<Spinner />
+					) : (
+						<>
+							{cognates.length ? (
+								<>
+									<br />
+									<div>
+										Total {cognates.length} results | Page{' '}
+										{
+											<Pagination
+												{...{
+													page,
+													maxPageNo,
+													setPage,
+												}}
+											/>
+										}
+									</div>
+								</>
+							) : null}
+
+							<br />
+
+							<div>
+								{error ? (
+									<div>
+										<strong>Error:</strong> {error.message}
+									</div>
+								) : cognates.length ? (
+									<CognatesList
+										{...{
+											cognates: hydrated,
+											pageStart,
+											pageEnd,
+										}}
+									/>
+								) : word === lastSubmitted?.word ? (
+									`No ${getLangName(
+										lastSubmitted.trgLang,
+									)} cognates found for ${getLangName(
+										lastSubmitted.srcLang,
+									)} "${word}"`
+								) : (
+									'Click "Search" to find cognates'
+								)}
 								<br />
-								<div>
-									Total {cognates.length} results | Page{' '}
-									{
-										<Pagination
-											{...{ page, maxPageNo, setPage }}
-										/>
-									}
-								</div>
-							</>
-						) : null}
-
-						<br />
-
-						<div>
-							{error ? (
-								<div>
-									<strong>Error:</strong> {error.message}
-								</div>
-							) : cognates.length ? (
-								<CognatesList
-									{...{
-										cognates: hydrated,
-										pageStart,
-										pageEnd,
-									}}
-								/>
-							) : word === lastSubmitted?.word ? (
-								`No ${getLangName(
-									lastSubmitted.trgLang,
-								)} cognates found for ${getLangName(
-									lastSubmitted.srcLang,
-								)} "${word}"`
-							) : (
-								'Click "Search" to find cognates'
-							)}
-							<br />
-							Page{' '}
-							{<Pagination {...{ page, maxPageNo, setPage }} />}
-							<br />
-							<br />
-							<br />
-						</div>
-					</>
-				)}
-			</main>
+								Page{' '}
+								{
+									<Pagination
+										{...{ page, maxPageNo, setPage }}
+									/>
+								}
+								<br />
+								<br />
+								<br />
+							</div>
+						</>
+					)}
+				</main>
+			</RootErrorBoundary>
 		</>
 	)
 }

@@ -77,3 +77,8 @@ body.suppress-popovers .popover {
 .bold {
 	font-weight: bold;
 }
+
+label[for='srcLang'],
+label[for='trgLang'] {
+	display: inline-block;
+}

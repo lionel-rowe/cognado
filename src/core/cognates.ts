@@ -51,7 +51,7 @@ const toWordData = (etytreePathname: string): WordData => {
 	const [_word, code] = pathname.split('/').reverse()
 
 	const langName = getLangName(code)
-	const word = unwikify(_word.replace(/^__ee_(?:\d_)?/, ''))
+	const word = unwikify(_word.replace(/^__ee_(?:\d_+)?/, ''))
 
 	return {
 		url: makeWiktionaryUrl({ word, langCode: code as LangCode }),
@@ -212,7 +212,7 @@ export const fetchCognates = async (
 					rank([
 						({ trg }) => trg.length,
 						({ src }) => src.length,
-						({ trg }) => trg[trg.length - 1].length,
+						({ trg }) => trg[trg.length - 1]?.length,
 					]),
 				),
 
@@ -230,5 +230,5 @@ export const hydrate = (raw: CognateRaw[]): CognateHydrated[] =>
 			src: src.map(toWordData),
 			trg: trg.map(toWordData),
 		})),
-		uniq(({ trg }) => trg[trg.length - 1].url),
+		uniq(({ trg }) => trg[trg.length - 1]?.url),
 	)
