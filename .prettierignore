@@ -2,3 +2,4 @@ node_modules
 build
 README.md
 package-lock.json
+src/vendor

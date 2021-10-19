@@ -1,4 +1,4 @@
-import { FC, useEffect, useState, Fragment, useMemo, useCallback } from 'react'
+import { FC, useEffect, useState, useMemo, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import {
 	buildSparqlQuery,
@@ -13,9 +13,9 @@ import { ls } from './utils/ls'
 import { urls } from './config'
 import { Spinner } from './components/Spinner'
 import { LangSelect } from './components/LangSelect'
-import GithubCorner from 'react-github-corner'
 import { Pagination } from './components/Pagination'
 import { CognatesList } from './components/CognatesList'
+import { GitHubCorner } from './components/GitHubCorner'
 
 const defaultValues = {
 	word: 'dedo',
@@ -113,7 +113,7 @@ export const App: FC = () => {
 
 	return (
 		<>
-			<GithubCorner
+			<GitHubCorner
 				target='_blank'
 				title='See project on GitHub'
 				rel='noreferrer noopener'

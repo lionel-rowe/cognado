@@ -77,7 +77,3 @@ body.suppress-popovers .popover {
 .bold {
 	font-weight: bold;
 }
-
-a.github-corner:focus svg {
-	outline: 2px solid black;
-}
