@@ -1,48 +1,52 @@
 import { FormValues } from '../App'
 import { CognateRaw } from '../core/cognates'
 
-export const ls = new Proxy(
-	{
-		get values() {
-			return undefined
-		},
-		get cognates() {
-			return undefined
-		},
-		get query() {
-			return undefined
-		},
-	} as Partial<{
-		values: FormValues
-		cognates: CognateRaw[]
-		query: string
-	}>,
-	{
-		get(_t, p) {
-			const raw = localStorage.getItem(p as string)
-
-			try {
-				return raw ? JSON.parse(raw) : raw
-			} catch {
-				return raw
-			}
-		},
-		set(_t, p, v) {
-			try {
-				localStorage.setItem(p as string, JSON.stringify(v))
-
-				return true
-			} catch {
-				return false
-			}
-		},
+const pseudoTarget = {
+	get values() {
+		return undefined
 	},
-)
+	get cognates() {
+		return undefined
+	},
+	get query() {
+		return undefined
+	},
+} as Partial<{
+	values: FormValues
+	cognates: CognateRaw[]
+	query: string
+}>
+
+export const ls = new Proxy(pseudoTarget, {
+	get(_t, p: string) {
+		const raw = localStorage.getItem(p)
+
+		try {
+			return raw ? JSON.parse(raw) : undefined
+		} catch {
+			return undefined
+		}
+	},
+	set(_t, p: string, v) {
+		try {
+			localStorage.setItem(p, JSON.stringify(v))
+
+			return true
+		} catch {
+			return false
+		}
+	},
+	deleteProperty(_t, p: string) {
+		localStorage.removeItem(p)
+
+		return true
+	},
+})
 
 if ((ls.cognates?.[0]?.ancestor as any)?.langName) {
 	// incompatible data format
-	ls.cognates = []
-}
 
-// for debug/quick testing
-;(window as any).ls = ls
+	for (const key of Object.keys(pseudoTarget)) {
+		delete ls[key as keyof typeof pseudoTarget]
+	}
+}
