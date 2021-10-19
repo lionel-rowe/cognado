@@ -110,29 +110,29 @@ export const buildSparqlQuery = ({
 	BIND (<${uri}> as ?source)
 
 	{
-        ?ancestor1a dbetym:etymologicallyRelatedTo? ?ancestor0 .
-        ?ancestor2a dbetym:etymologicallyRelatedTo? ?ancestor1a .
-        ?source dbetym:etymologicallyRelatedTo? ?ancestor2a .
+		?ancestor1a dbetym:etymologicallyRelatedTo? ?ancestor0 .
+		?ancestor2a dbetym:etymologicallyRelatedTo? ?ancestor1a .
+		?source dbetym:etymologicallyRelatedTo? ?ancestor2a .
 
-        ?ancestor1b dbetym:etymologicallyRelatedTo? ?ancestor0 .
-        ?ancestor2b dbetym:etymologicallyRelatedTo? ?ancestor1b .
+		?ancestor1b dbetym:etymologicallyRelatedTo? ?ancestor0 .
+		?ancestor2b dbetym:etymologicallyRelatedTo? ?ancestor1b .
 		?target dbetym:etymologicallyRelatedTo? ?ancestor2b .
 	}
 
-    FILTER (
+	FILTER (
 		?source != ?target
-        && regex(?target, "${trgLangMatcher}", '')${
+		&& regex(?target, "${trgLangMatcher}", '')${
 		allowPrefixesAndSuffixes
 			? ''
 			: `
-        && !regex(?ancestor0, "_-|-$", '')
-        && !regex(?ancestor1a, "_-|-$", '')
-        && !regex(?ancestor2a, "_-|-$", '')
-        && !regex(?ancestor1b, "_-|-$", '')
-        && !regex(?ancestor2b, "_-|-$", '')
-        && !regex(?target, "_-|-$", '')`
+		&& !regex(?ancestor0, "_-|-$", '')
+		&& !regex(?ancestor1a, "_-|-$", '')
+		&& !regex(?ancestor2a, "_-|-$", '')
+		&& !regex(?ancestor1b, "_-|-$", '')
+		&& !regex(?ancestor2b, "_-|-$", '')
+		&& !regex(?target, "_-|-$", '')`
 	}
-    ) .
+	) .
 }
 GROUP BY ?target
 LIMIT 500`
@@ -223,7 +223,7 @@ export const fetchCognates = async (
 	}
 }
 
-export const hydrate = (raw: CognateRaw[]) =>
+export const hydrate = (raw: CognateRaw[]): CognateHydrated[] =>
 	pipe(
 		raw.map(({ src, trg, ancestor }) => ({
 			ancestor: toWordData(ancestor),

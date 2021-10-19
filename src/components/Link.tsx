@@ -43,12 +43,19 @@ export const Link = ({
 
 	const [popoverHtml, setPopoverHtml] = useState<string | null>(null)
 
+	const [open, setOpen] = useState<boolean>(false)
 	const [loading, setLoading] = useState<boolean>(false)
 
 	const title = `${word} (${langName})`
 
 	return (
-		<span className='popover-parent'>
+		<span
+			className='popover-parent'
+			onMouseLeave={() => {
+				setOpen(false)
+				setPopoverHtml('')
+			}}
+		>
 			<span ref={setReferenceElement}>
 				<a
 					{...htmlProps}
@@ -57,6 +64,7 @@ export const Link = ({
 					href={url}
 					onMouseEnter={async () => {
 						if (!popoverHtml) {
+							setOpen(true)
 							setLoading(true)
 
 							const html = await fetchWiktionaryDefinitionHtml(
@@ -74,31 +82,33 @@ export const Link = ({
 				</a>
 			</span>
 
-			<div
-				ref={setPopperElement}
-				{...attributes.popper}
-				style={styles.popper}
-				className='popover'
-			>
-				{loading ? (
-					<Spinner />
-				) : (
-					<>
-						<div>
-							<strong>{title}</strong>
-						</div>
-						<br />
-						<div
-							dangerouslySetInnerHTML={{
-								__html:
-									popoverHtml === ''
-										? '<span class="grayed-out">No definitions found</span>'
-										: popoverHtml ?? '',
-							}}
-						/>
-					</>
-				)}
-			</div>
+			{open && (
+				<div
+					ref={setPopperElement}
+					{...attributes.popper}
+					style={styles.popper}
+					className='popover'
+				>
+					{loading ? (
+						<Spinner />
+					) : (
+						<>
+							<div>
+								<strong>{title}</strong>
+							</div>
+							<br />
+							<div
+								dangerouslySetInnerHTML={{
+									__html:
+										popoverHtml === ''
+											? '<span class="grayed-out">No definitions found</span>'
+											: popoverHtml ?? '',
+								}}
+							/>
+						</>
+					)}
+				</div>
+			)}
 		</span>
 	)
 }

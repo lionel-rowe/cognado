@@ -7,7 +7,6 @@ import {
 	hydrate,
 	isCognateError,
 } from './core/cognates'
-import { Link } from './components/Link'
 import { usePagination } from './hooks/usePagination'
 import { getLangName, LangCode } from './utils/langNames'
 import { ls } from './utils/ls'
@@ -15,6 +14,8 @@ import { urls } from './config'
 import { Spinner } from './components/Spinner'
 import { LangSelect } from './components/LangSelect'
 import GithubCorner from 'react-github-corner'
+import { Pagination } from './components/Pagination'
+import { CognatesList } from './components/CognatesList'
 
 const defaultValues = {
 	word: 'dedo',
@@ -121,7 +122,6 @@ export const App: FC = () => {
 
 			<main>
 				<h1>Cognate finder</h1>
-
 				<form onSubmit={handleSubmit(onSubmit)}>
 					<label htmlFor='word'>
 						Word{' '}
@@ -183,7 +183,6 @@ export const App: FC = () => {
 						</details>
 					</>
 				) : null}
-
 				{loading ? (
 					<Spinner />
 				) : (
@@ -193,32 +192,11 @@ export const App: FC = () => {
 								<br />
 								<div>
 									Total {cognates.length} results | Page{' '}
-									{Array.from(
-										{ length: maxPageNo },
-										(_, i) => {
-											return (
-												<Fragment key={i}>
-													{page === i + 1 ? (
-														i + 1
-													) : (
-														<a
-															href={`#page-${
-																i + 1
-															}`}
-															onClick={(e) => {
-																e.preventDefault()
-
-																setPage(i + 1)
-															}}
-														>
-															{i + 1}
-														</a>
-													)}
-													{'\xa0'}
-												</Fragment>
-											)
-										},
-									)}
+									{
+										<Pagination
+											{...{ page, maxPageNo, setPage }}
+										/>
+									}
 								</div>
 							</>
 						) : null}
@@ -231,61 +209,13 @@ export const App: FC = () => {
 									<strong>Error:</strong> {error.message}
 								</div>
 							) : cognates.length ? (
-								<ul>
-									{hydrated
-										.slice(pageStart, pageEnd)
-										.map(({ ancestor, trg, src }) => {
-											return (
-												<li
-													className='top-level-li'
-													key={
-														trg[trg.length - 1].url
-													}
-												>
-													<Link {...ancestor} />
-
-													<ul>
-														<li>
-															{src.flatMap(
-																(x, i) => [
-																	' → ',
-																	<Link
-																		key={i}
-																		{...x}
-																	/>,
-																],
-															)}
-														</li>
-														<li>
-															{trg.flatMap(
-																(x, i, a) => [
-																	' → ',
-																	i ===
-																	a.length -
-																		1 ? (
-																		<Link
-																			key={
-																				i
-																			}
-																			className='bold'
-																			{...x}
-																		/>
-																	) : (
-																		<Link
-																			key={
-																				i
-																			}
-																			{...x}
-																		/>
-																	),
-																],
-															)}
-														</li>
-													</ul>
-												</li>
-											)
-										})}
-								</ul>
+								<CognatesList
+									{...{
+										cognates: hydrated,
+										pageStart,
+										pageEnd,
+									}}
+								/>
 							) : word === lastSubmitted?.word ? (
 								`No ${getLangName(
 									lastSubmitted.trgLang,
@@ -295,6 +225,9 @@ export const App: FC = () => {
 							) : (
 								'Click "Search" to find cognates'
 							)}
+							<br />
+							Page{' '}
+							{<Pagination {...{ page, maxPageNo, setPage }} />}
 							<br />
 							<br />
 							<br />
