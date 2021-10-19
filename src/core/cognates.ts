@@ -12,7 +12,7 @@ const toLangPathSegments = (lang: LangCode) =>
 
 const toUri = (word: string, lang: LangCode) =>
 	[
-		urls.etyTreeNamespace,
+		urls.etytreeNamespace,
 		toLangPathSegments(lang),
 		`__ee_1_${escapeForSparqlUrl(word)}`,
 	].join('/')
@@ -38,16 +38,16 @@ export const makeWiktionaryUrl = ({
 	return url.href
 }
 
-const getEtyTreePathname = (etyTreeUrl: string) => {
+const getEtyTreePathname = (etytreeUrl: string) => {
 	try {
-		return new URL(etyTreeUrl, urls.etyTreeNamespace).pathname
+		return new URL(etytreeUrl, urls.etytreeNamespace).pathname
 	} catch {
-		return etyTreeUrl
+		return etytreeUrl
 	}
 }
 
-const toWordData = (etyTreePathname: string): WordData => {
-	const { pathname } = new URL(etyTreePathname, urls.etyTreeNamespace)
+const toWordData = (etytreePathname: string): WordData => {
+	const { pathname } = new URL(etytreePathname, urls.etytreeNamespace)
 	const [_word, code] = pathname.split('/').reverse()
 
 	const langName = getLangName(code)

@@ -18,7 +18,7 @@ export const createSparqlClient = (endpoint: string) => {
 	}
 }
 
-export const sparqlClient = createSparqlClient(urls.etyTreeSparql)
+export const sparqlClient = createSparqlClient(urls.etytreeSparql)
 
 // for debug/quick testing
 ;(window as any).sparqlClient = sparqlClient

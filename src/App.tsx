@@ -163,13 +163,13 @@ export const App: FC = () => {
 					<br />
 					<button type='submit'>Search</button>{' '}
 					<small>
-						Etymology tree search by{' '}
+						Etymology search powered by{' '}
 						<a
 							target='_blank'
 							rel='noreferrer noopener'
-							href={urls.etyTreeWeb}
+							href={urls.etytreeWeb}
 						>
-							EtyTree
+							etytree
 						</a>
 					</small>
 				</form>
