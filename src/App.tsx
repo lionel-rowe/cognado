@@ -1,4 +1,4 @@
-import { FC, useEffect, useState, Fragment, useMemo } from 'react'
+import { FC, useEffect, useState, Fragment, useMemo, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import {
 	buildSparqlQuery,
@@ -69,8 +69,8 @@ export const App: FC = () => {
 		maxPageNo,
 	} = usePagination(cognates, { pageSize: 50 })
 
-	const onSubmit = async (values: FormValues) => {
-		const { word, srcLang, trgLang } = values
+	const onSubmit = useCallback(async (values: FormValues) => {
+		const { word, srcLang, trgLang, allowPrefixesAndSuffixes } = values
 
 		setLoading(true)
 
@@ -97,7 +97,7 @@ export const App: FC = () => {
 			ls.cognates = cognates
 			ls.query = query
 		}
-	}
+	}, [])
 
 	useEffect(() => {
 		document.addEventListener('keydown', suppressPopovers)
