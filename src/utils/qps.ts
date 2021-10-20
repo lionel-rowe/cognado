@@ -83,7 +83,10 @@ export const createQps = <T extends Record<keyof T, QueryOpts<any, any, any>>>(
 			const url = new URL(window.location.href)
 
 			for (const [k, v] of Object.entries(updates)) {
-				updateUrl(url, k, v, init[k as keyof T].serialize)
+				// if unrecognized query param, just convert to string
+				const serialize = init[k as keyof T]?.serialize ?? String
+
+				updateUrl(url, k, v, serialize)
 			}
 
 			window.history[method]({}, document.title, url.href)
@@ -186,7 +189,7 @@ export const qpType = {
 		return applyOptions(
 			{
 				parse: (x: string) => x === 'true',
-				serialize: (x: boolean) => (x ? 'true' : 'false'),
+				serialize: String,
 				defaultValue,
 			},
 			opts,

@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState, useMemo, useCallback } from 'react'
+import { FC, useEffect, useState, useMemo, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import {
 	buildSparqlQuery,
@@ -8,58 +8,27 @@ import {
 	isCognateError,
 } from './core/cognates'
 import { usePagination } from './hooks/usePagination'
-import { getLangName, LangCode } from './utils/langNames'
+import { getLangName } from './utils/langNames'
 import { ls } from './utils/ls'
 import { urls } from './config'
 import { Spinner } from './components/Spinner'
-import { LangSelect } from './components/LangSelect'
 import { Pagination } from './components/Pagination'
 import { CognatesList } from './components/CognatesList'
 import { GitHubCorner } from './components/GitHubCorner'
 import { RootErrorBoundary } from './components/RootErrorBoundary'
-import { createQps, qpType } from './utils/qps'
-
-const qpInit = {
-	word: qpType.string(''),
-	srcLang: qpType.string<LangCode>('spa'),
-	trgLang: qpType.string<LangCode>('eng'),
-	allowPrefixesAndSuffixes: qpType.boolean(false, { omitIfDefault: true }),
-
-	page: qpType.number(1, { omitIfDefault: true }),
-}
-
-export const qps = createQps(qpInit)
-
-const { page: pageNum, ...formValues } = qps.getAll()
-
-export type FormValues = typeof formValues
-
-const suppressPopovers = (e: KeyboardEvent) => {
-	if (e.key === 'Escape') {
-		document.body.classList.add('suppress-popovers')
-	}
-}
-
-const unsuppressPopovers = () => {
-	document.body.classList.remove('suppress-popovers')
-}
+import { FormValues, formValues, pageNum, qps } from './utils/setupQps'
+import { suppressPopovers, unsuppressPopovers } from './utils/dom'
+import { CognateSearchForm } from './components/CognateSearchForm'
 
 export const App: FC = () => {
-	const {
-		register,
-		handleSubmit,
-		watch,
-		setValue,
-		reset,
-	} = useForm<FormValues>({
+	const form = useForm<FormValues>({
 		defaultValues: formValues,
 	})
 
+	const { watch, reset } = form
+
 	const allowPrefixesAndSuffixes = watch('allowPrefixesAndSuffixes')
 	const word = watch('word')
-
-	const srcLang = watch('srcLang')
-	const trgLang = watch('trgLang')
 
 	const [query, setQuery] = useState(
 		() =>
@@ -178,19 +147,6 @@ export const App: FC = () => {
 		}
 	}, [])
 
-	const swap = useCallback(
-		(e: React.MouseEvent<HTMLElement>) => {
-			e.preventDefault()
-
-			const trgLang = watch('trgLang')
-			const srcLang = watch('srcLang')
-
-			setValue('srcLang', trgLang)
-			setValue('trgLang', srcLang)
-		},
-		[setValue, watch],
-	)
-
 	const hydrated = useMemo(() => hydrate(cognates), [cognates])
 
 	return (
@@ -205,59 +161,8 @@ export const App: FC = () => {
 
 				<main>
 					<h1>Cognate finder</h1>
-					<form onSubmit={handleSubmit(onSubmit)}>
-						<label htmlFor='word'>
-							Word{' '}
-							<input
-								id='word'
-								autoCapitalize='none'
-								value={word}
-								{...register('word')}
-							/>
-						</label>
-						<br />
-						<label htmlFor='srcLang'>
-							Source{' '}
-							<LangSelect
-								id='srcLang'
-								langCode={srcLang}
-								setLangCode={setValue}
-							/>
-						</label>{' '}
-						<button type='button' onClick={swap} aria-label='Swap'>
-							<span aria-hidden='true'>⇄</span>
-						</button>{' '}
-						<label htmlFor='trgLang'>
-							target{' '}
-							<LangSelect
-								id='trgLang'
-								langCode={trgLang}
-								setLangCode={setValue}
-							/>
-						</label>
-						<br />
-						<label htmlFor='allowPrefixesAndSuffixes'>
-							Allow prefixes and suffixes{' '}
-							<input
-								type='checkbox'
-								id='allowPrefixesAndSuffixes'
-								{...register('allowPrefixesAndSuffixes')}
-							/>
-						</label>
-						<br />
-						<br />
-						<button type='submit'>Search</button>{' '}
-						<small>
-							Etymology search powered by{' '}
-							<a
-								target='_blank'
-								rel='noreferrer noopener'
-								href={urls.etytreeWeb}
-							>
-								etytree
-							</a>
-						</small>
-					</form>
+
+					<CognateSearchForm {...{ form, onSubmit }} />
 
 					{loading ? (
 						<Spinner />

@@ -1,7 +1,7 @@
 import { sparqlClient } from './core/sparql'
 import { getLangName } from './utils/langNames'
 import { ls } from './utils/ls'
-import { qps } from './App'
+import { qps } from './utils/setupQps'
 
 export const exposeGlobals = () => {
 	Object.entries({

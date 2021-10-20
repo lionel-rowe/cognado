@@ -1,4 +1,4 @@
-import { FormValues } from '../App'
+import { FormValues } from '../utils/setupQps'
 import { CognateRaw } from '../core/cognates'
 
 const pseudoTarget = {
