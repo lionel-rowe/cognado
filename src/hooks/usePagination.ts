@@ -1,26 +1,27 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 type Options = {
 	pageSize: number
+	startPage: number
 }
 
 const defaultOptions: Options = {
 	pageSize: 50,
+	startPage: 1,
 }
 
-export const usePagination = (items: { length: number }, options?: Options) => {
-	const { pageSize } = {
+export const usePagination = (
+	items: { length: number },
+	options?: Partial<Options>,
+) => {
+	const { pageSize, startPage } = {
 		...defaultOptions,
 		...options,
 	}
 
-	const [page, setPage] = useState(1)
+	const [page, setPage] = useState(startPage)
 
 	const { length } = items
-
-	useEffect(() => {
-		setPage(1)
-	}, [items])
 
 	const pageStart = (page - 1) * pageSize
 	const pageEnd = pageStart + pageSize

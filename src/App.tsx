@@ -17,15 +17,22 @@ import { Pagination } from './components/Pagination'
 import { CognatesList } from './components/CognatesList'
 import { GitHubCorner } from './components/GitHubCorner'
 import { RootErrorBoundary } from './components/RootErrorBoundary'
+import { createQps, qpType } from './utils/qps'
 
-const defaultValues = {
-	word: 'dedo',
-	srcLang: 'spa' as LangCode,
-	trgLang: 'eng' as LangCode,
-	allowPrefixesAndSuffixes: false,
-} as const
+const qpInit = {
+	word: qpType.string(''),
+	srcLang: qpType.string<LangCode>('spa'),
+	trgLang: qpType.string<LangCode>('eng'),
+	allowPrefixesAndSuffixes: qpType.boolean(false, { omitIfDefault: true }),
 
-export type FormValues = typeof defaultValues
+	page: qpType.number(1, { omitIfDefault: true }),
+}
+
+export const qps = createQps(qpInit)
+
+const { page: pageNum, ...formValues } = qps.getAll()
+
+export type FormValues = typeof formValues
 
 const suppressPopovers = (e: KeyboardEvent) => {
 	if (e.key === 'Escape') {
@@ -38,8 +45,14 @@ const unsuppressPopovers = () => {
 }
 
 export const App: FC = () => {
-	const { register, handleSubmit, watch, setValue } = useForm<FormValues>({
-		defaultValues: ls.values ?? defaultValues,
+	const {
+		register,
+		handleSubmit,
+		watch,
+		setValue,
+		reset,
+	} = useForm<FormValues>({
+		defaultValues: formValues,
 	})
 
 	const allowPrefixesAndSuffixes = watch('allowPrefixesAndSuffixes')
@@ -51,9 +64,10 @@ export const App: FC = () => {
 	const [query, setQuery] = useState(
 		() =>
 			ls.query ??
-			buildSparqlQuery({ ...defaultValues, allowPrefixesAndSuffixes })
+			buildSparqlQuery({ ...formValues, allowPrefixesAndSuffixes })
 				.sparql,
 	)
+
 	const [error, setError] = useState<Error | null>(null)
 	const [loading, setLoading] = useState<boolean>(false)
 
@@ -68,15 +82,29 @@ export const App: FC = () => {
 		pageStart,
 		pageEnd,
 		maxPageNo,
-	} = usePagination(cognates, { pageSize: 50 })
+	} = usePagination(cognates, { pageSize: 50, startPage: pageNum })
 
-	const onSubmit = useCallback(async (values: FormValues) => {
+	const updatePage = useCallback(
+		(n: number, pushState?: boolean) => {
+			setPage(n)
+
+			qps.set('page', n, pushState)
+		},
+		[setPage],
+	)
+
+	const updateValues = useCallback(async (values: FormValues) => {
 		const { word, srcLang, trgLang, allowPrefixesAndSuffixes } = values
+
+		if (!word) {
+			setCognates([])
+			setLastSubmitted(null)
+		}
 
 		setLoading(true)
 
 		const result = await fetchCognates(
-			word,
+			word.trim(),
 			srcLang,
 			trgLang,
 			allowPrefixesAndSuffixes,
@@ -92,12 +120,52 @@ export const App: FC = () => {
 			setError(null)
 			setLastSubmitted(values)
 			setCognates(cognates)
+
 			setQuery(query)
 
 			ls.values = values
 			ls.cognates = cognates
 			ls.query = query
+
+			qps.setMany(values, true)
 		}
+	}, [])
+
+	const onSubmit = useCallback(
+		async (values: FormValues) => {
+			updateValues(values)
+			updatePage(1, false)
+		},
+		[updateValues, updatePage],
+	)
+
+	useEffect(() => {
+		const { values } = ls
+
+		const hasQueryParams = window.location.search.length > 1
+
+		if (!values && !hasQueryParams) {
+			const initialSearchValues = {
+				...formValues,
+				word: 'dedo',
+			}
+
+			reset(initialSearchValues)
+
+			onSubmit(initialSearchValues)
+
+			return
+		} else if (values) {
+			const isLatest = Object.entries(formValues).every(([k, v]) => {
+				return values[k as keyof typeof values] === v
+			})
+
+			if (!isLatest) {
+				onSubmit(formValues)
+			}
+		}
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	useEffect(() => {
@@ -143,7 +211,7 @@ export const App: FC = () => {
 							<input
 								id='word'
 								autoCapitalize='none'
-								defaultValue='test'
+								value={word}
 								{...register('word')}
 							/>
 						</label>
@@ -190,16 +258,7 @@ export const App: FC = () => {
 							</a>
 						</small>
 					</form>
-					{query ? (
-						<>
-							<br />
-							<details>
-								<summary>Show raw query</summary>
 
-								<pre>{query}</pre>
-							</details>
-						</>
-					) : null}
 					{loading ? (
 						<Spinner />
 					) : (
@@ -214,7 +273,7 @@ export const App: FC = () => {
 												{...{
 													page,
 													maxPageNo,
-													setPage,
+													setPage: updatePage,
 												}}
 											/>
 										}
@@ -230,30 +289,51 @@ export const App: FC = () => {
 										<strong>Error:</strong> {error.message}
 									</div>
 								) : cognates.length ? (
-									<CognatesList
-										{...{
-											cognates: hydrated,
-											pageStart,
-											pageEnd,
-										}}
-									/>
+									<>
+										<CognatesList
+											{...{
+												cognates: hydrated,
+												pageStart,
+												pageEnd,
+											}}
+										/>
+										<br />
+										Page{' '}
+										{
+											<Pagination
+												{...{
+													page,
+													maxPageNo,
+													setPage: updatePage,
+												}}
+											/>
+										}
+									</>
 								) : word === lastSubmitted?.word ? (
-									`No ${getLangName(
-										lastSubmitted.trgLang,
-									)} cognates found for ${getLangName(
-										lastSubmitted.srcLang,
-									)} "${word}"`
+									word ? (
+										`No ${getLangName(
+											lastSubmitted.trgLang,
+										)} cognates found for ${getLangName(
+											lastSubmitted.srcLang,
+										)} "${word}"`
+									) : (
+										'Enter a word to search for'
+									)
 								) : (
 									'Click "Search" to find cognates'
 								)}
+
 								<br />
-								Page{' '}
-								{
-									<Pagination
-										{...{ page, maxPageNo, setPage }}
-									/>
-								}
-								<br />
+								{cognates.length && word && query ? (
+									<>
+										<br />
+										<details>
+											<summary>Show raw query</summary>
+
+											<pre>{query}</pre>
+										</details>
+									</>
+								) : null}
 								<br />
 								<br />
 							</div>

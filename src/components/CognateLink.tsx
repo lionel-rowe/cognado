@@ -4,7 +4,7 @@ import { WordData } from '../core/cognates'
 import { fetchWiktionaryDefinitionHtml } from '../core/getWikiContent'
 import { Spinner } from './Spinner'
 
-export const Link = ({
+export const CognateLink = ({
 	url,
 	word,
 	langName,
@@ -33,7 +33,6 @@ export const Link = ({
 					rootBoundary: 'viewport',
 
 					mainAxis: true,
-					altAxis: true,
 					flipVariations: true,
 					padding: 8,
 				},

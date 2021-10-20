@@ -2,10 +2,10 @@ import { urls } from '../config'
 
 export const createSparqlClient = (endpoint: string) => {
 	return {
-		fetch: async (sparql: string) => {
+		fetch: async (query: string) => {
 			const url = new URL(endpoint)
 
-			url.searchParams.set('query', sparql)
+			url.searchParams.set('query', query)
 
 			const headers = [['Accept', 'application/sparql-results+json']]
 

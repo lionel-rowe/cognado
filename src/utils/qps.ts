@@ -1,93 +1,238 @@
-export type JsonPrimitive = null | string | number | boolean
+const updateUrl = <T>(
+	url: URL,
+	k: string,
+	v: T,
+	serialize: (str: T) => string | null,
+) => {
+	const val = serialize(v)
 
-export type JsonSerializable =
-	| JsonPrimitive
-	| JsonSerializable[]
-	| Partial<{
-			[key: string]: JsonSerializable
-	  }>
-
-type JsonSerializableTypeof = 'object' | 'string' | 'number' | 'boolean'
-
-const isNumeric = (str: string) => str !== '' && !Number.isNaN(Number(str))
-
-const isQuoteWrapped = (str: string) => /^"+[\s\S]*"+$/.test(str)
-
-const stripQuotes = (str: string) => str.replace(/^"+|"+$/g, '')
-
-const isNonStringLike = (str: string) =>
-	str && (/^(?:true|false|null)$|^[{[]/.test(str) || isNumeric(str))
-
-const serializers = {
-	string: (str: string) =>
-		isNonStringLike(stripQuotes(str)) ? `"${str}"` : str,
-	number: JSON.stringify,
-	boolean: JSON.stringify,
-	object: JSON.stringify,
-}
-
-const serialize = (val: JsonSerializable) => {
-	return serializers[typeof val as JsonSerializableTypeof](val as any)
-}
-
-const parse = (str: string | null) => {
-	if (str == null) return undefined
-
-	if (isQuoteWrapped(str)) {
-		const inner = stripQuotes(str)
-
-		return isNonStringLike(inner) ? str.slice(1, -1) : str
-	}
-
-	return isNonStringLike(str) ? JSON.parse(str) : str
-}
-
-const updateUrl = (url: URL, k: string, v: JsonSerializable | undefined) => {
-	if (typeof v === 'undefined') {
+	if (val == null) {
 		url.searchParams.delete(k)
 	} else {
-		url.searchParams.set(k, serialize(v))
+		url.searchParams.set(k, val)
 	}
 }
 
-export const qps = {
-	get(k: string) {
-		const url = new URL(window.location.href)
+type QueryOpts<
+	T extends unknown = any,
+	D extends unknown = any,
+	S extends string | null = string
+> = {
+	parse: (val: string) => T
+	serialize: (val: T) => S
+	defaultValue: D
+}
 
-		const v = url.searchParams.get(k)
+type QpsInit<T extends Record<keyof T, QueryOpts>> = {
+	[K in keyof T]: T[K]
+}
 
-		return parse(v)
-	},
-	set(k: string, v: JsonSerializable | undefined, pushState?: boolean) {
-		const method = pushState ? 'pushState' : 'replaceState'
+export type RawQpTypes<T extends Record<string, QueryOpts>> = {
+	[k in keyof T]: ReturnType<T[k]['parse']> | T[k]['defaultValue']
+}
 
-		const url = new URL(window.location.href)
+export const createQps = <T extends Record<keyof T, QueryOpts<any, any, any>>>(
+	init: QpsInit<T>,
+) => {
+	return {
+		get<K extends keyof T & string>(
+			k: K,
+		): ReturnType<T[K]['parse']> | T[K]['defaultValue'] {
+			const url = new URL(window.location.href)
 
-		updateUrl(url, k, v)
+			const v = url.searchParams.get(k)
 
-		window.history[method]({}, document.title, url.href)
-	},
-	setMany(
-		updates: {
-			[k: string]: JsonSerializable | undefined
+			return v == null ? init[k].defaultValue : init[k].parse(v)
 		},
-		pushState?: boolean,
-	) {
-		const method = pushState ? 'pushState' : 'replaceState'
+		set<K extends keyof T & string, V extends ReturnType<T[K]['parse']>>(
+			k: K,
+			v: V,
+			pushState?: boolean,
+		) {
+			const url = new URL(window.location.href)
 
-		const url = new URL(window.location.href)
+			updateUrl(url, k, v, init[k].serialize)
 
-		for (const [k, v] of Object.entries(updates)) {
-			updateUrl(url, k, v)
-		}
+			window.history[pushState ? 'pushState' : 'replaceState'](
+				{},
+				document.title,
+				url.href,
+			)
+		},
+		delete<K extends keyof T & string>(k: K, pushState?: boolean): void {
+			const url = new URL(window.location.href)
 
-		window.history[method]({}, document.title, url.href)
-	},
-	getMany(ks: string[]) {
-		const url = new URL(window.location.href)
+			url.searchParams.delete(k)
 
-		return Object.fromEntries(
-			ks.map((k) => [k, parse(url.searchParams.get(k))]),
+			window.history[pushState ? 'pushState' : 'replaceState'](
+				{},
+				document.title,
+				url.href,
+			)
+		},
+		setMany(
+			updates: Partial<
+				{
+					[k in keyof T]: ReturnType<T[k]['parse']>
+				}
+			>,
+			pushState?: boolean,
+		) {
+			const method = pushState ? 'pushState' : 'replaceState'
+
+			const url = new URL(window.location.href)
+
+			for (const [k, v] of Object.entries(updates)) {
+				updateUrl(url, k, v, init[k as keyof T].serialize)
+			}
+
+			window.history[method]({}, document.title, url.href)
+		},
+		getMany<K extends keyof T & string>(
+			ks: K[],
+		): {
+			[k in K]: ReturnType<T[k]['parse']> | T[k]['defaultValue']
+		} {
+			const url = new URL(window.location.href)
+
+			return Object.fromEntries(
+				ks.map((k) => {
+					const val = url.searchParams.get(k)
+
+					return [
+						k,
+						val == null ? init[k].defaultValue : init[k].parse(val),
+					]
+				}),
+			) as {
+				[k in K]: ReturnType<T[k]['parse']> | T[k]['defaultValue']
+			}
+		},
+		getAll(): RawQpTypes<T> {
+			const url = new URL(window.location.href)
+
+			return Object.fromEntries(
+				Object.keys(init).map((k) => {
+					const val = url.searchParams.get(k)
+					const key = k as keyof typeof init
+
+					return [
+						k,
+						val == null
+							? init[key].defaultValue
+							: init[key].parse(val),
+					]
+				}),
+			) as RawQpTypes<T>
+		},
+	}
+}
+
+type QpTypeOptions = {
+	omitIfDefault: boolean
+}
+
+const defaultQpTypeOptions: QpTypeOptions = {
+	omitIfDefault: false,
+}
+
+type SerializeVal<T extends QpTypeOptions> = T extends {
+	omitIfDefault: true
+}
+	? string | null
+	: string
+
+const applyOptions = <A extends any, B extends any, O extends QpTypeOptions>(
+	queryOpts: QueryOpts<A, B, string>,
+	opts?: O,
+) => {
+	const { parse, serialize, defaultValue } = queryOpts
+
+	const { omitIfDefault } = {
+		...defaultQpTypeOptions,
+		...opts,
+	}
+
+	const serialize_ = omitIfDefault
+		? (val: A) => (val === defaultValue ? null : serialize(val))
+		: serialize
+
+	return {
+		parse,
+		serialize: serialize_,
+		defaultValue,
+	} as QueryOpts<A, B, SerializeVal<O>>
+}
+
+export const qpType = {
+	number: <D extends number | null, O extends QpTypeOptions>(
+		defaultValue: D,
+		opts?: O,
+	) => {
+		return applyOptions(
+			{
+				parse: Number,
+				serialize: String,
+				defaultValue,
+			},
+			opts,
 		)
 	},
+
+	boolean: <D extends boolean | null, O extends QpTypeOptions>(
+		defaultValue: D,
+		opts?: O,
+	) => {
+		return applyOptions(
+			{
+				parse: (x: string) => x === 'true',
+				serialize: (x: boolean) => (x ? 'true' : 'false'),
+				defaultValue,
+			},
+			opts,
+		)
+	},
+
+	string: <
+		T extends string = string,
+		D extends T | null = T,
+		O extends QpTypeOptions = QpTypeOptions
+	>(
+		defaultValue: D,
+		opts?: O,
+	) => {
+		return applyOptions(
+			{
+				parse: (x: string) => x as T,
+				serialize: (x: T) => x,
+				defaultValue,
+			},
+			opts,
+		)
+	},
+
+	json: <
+		T extends any = any,
+		D extends any = T,
+		O extends QpTypeOptions = QpTypeOptions
+	>(
+		defaultValue: D,
+		opts?: O,
+	) => {
+		return applyOptions(
+			{
+				parse: JSON.parse,
+				serialize: JSON.stringify,
+				defaultValue,
+			},
+			opts,
+		)
+	},
+}
+export const getQpDefaults = <T extends Record<string, QueryOpts>>(
+	x: T,
+): RawQpTypes<T> => {
+	return Object.fromEntries(
+		Object.entries(x).map(([k, v]) => [k, v.defaultValue]),
+	) as RawQpTypes<T>
 }

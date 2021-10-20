@@ -36,6 +36,7 @@ export function LangSelect({
 				type='text'
 				list={listId}
 				value={enteredText}
+				placeholder={getLangName(langCode)}
 				onChange={(e) => {
 					const value = e.currentTarget.value
 

@@ -7,7 +7,7 @@ export const Pagination = ({
 }: {
 	maxPageNo: number
 	page: number
-	setPage: React.Dispatch<React.SetStateAction<number>>
+	setPage: (n: number, pushState?: boolean) => void
 }) => {
 	return (
 		<>
@@ -22,7 +22,7 @@ export const Pagination = ({
 								onClick={(e) => {
 									e.preventDefault()
 
-									setPage(i + 1)
+									setPage(i + 1, true)
 								}}
 							>
 								{i + 1}

@@ -8,4 +8,4 @@ export const urls = {
 	wiktionaryWeb: 'https://en.wiktionary.org',
 
 	github: 'https://github.com/lionel-rowe/cognate-finder',
-}
+} as const

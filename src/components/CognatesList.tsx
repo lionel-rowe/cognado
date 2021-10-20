@@ -1,5 +1,5 @@
 import { CognateHydrated } from '../core/cognates'
-import { Link } from './Link'
+import { CognateLink } from './CognateLink'
 
 export const CognatesList = ({
 	cognates,
@@ -20,25 +20,25 @@ export const CognatesList = ({
 							className='top-level-li'
 							key={`${i}-${trg[trg.length - 1]?.url}`}
 						>
-							<Link {...ancestor} />
+							<CognateLink {...ancestor} />
 							<ul>
 								<li>
 									{src.flatMap((x, i) => [
 										' → ',
-										<Link key={i} {...x} />,
+										<CognateLink key={i} {...x} />,
 									])}
 								</li>
 								<li>
 									{trg.flatMap((x, i, a) => [
 										' → ',
 										i === a.length - 1 ? (
-											<Link
+											<CognateLink
 												key={i}
 												className='bold'
 												{...x}
 											/>
 										) : (
-											<Link key={i} {...x} />
+											<CognateLink key={i} {...x} />
 										),
 									])}
 								</li>
