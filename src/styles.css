@@ -55,17 +55,6 @@ body.suppress-popovers .popover {
 	pointer-events: none !important;
 }
 
-.popover {
-	visibility: hidden;
-	pointer-events: none;
-}
-
-.popover-parent:hover .popover,
-.popover:hover {
-	visibility: visible;
-	pointer-events: all;
-}
-
 .popover-reference {
 	position: relative;
 }

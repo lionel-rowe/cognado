@@ -1,8 +1,19 @@
-import { HTMLProps, useState } from 'react'
+import {
+	HTMLProps,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from 'react'
 import { usePopper } from 'react-popper'
 import { WordData } from '../core/cognates'
 import { fetchWiktionaryDefinitionHtml } from '../core/getWikiContent'
+import { isTouchDevice } from '../utils/device'
 import { Spinner } from './Spinner'
+
+type ReactEventName = `on${Capitalize<string>}` &
+	keyof React.DOMAttributes<HTMLAnchorElement>
 
 export const CognateLink = ({
 	url,
@@ -17,9 +28,11 @@ export const CognateLink = ({
 	] = useState<HTMLElement | null>(null)
 	const [popperElement, setPopperElement] = useState<HTMLElement | null>(null)
 
+	const ref = useRef<HTMLSpanElement>(null)
+
 	const { styles, attributes } = usePopper(referenceElement, popperElement, {
 		placement: 'auto',
-		strategy: 'fixed',
+		strategy: 'absolute',
 		modifiers: [
 			{
 				name: 'preventOverflow',
@@ -47,35 +60,86 @@ export const CognateLink = ({
 
 	const title = `${word} (${langName})`
 
+	const showPopover = useCallback(async () => {
+		if (!popoverHtml) {
+			setOpen(true)
+			setLoading(true)
+
+			const html = await fetchWiktionaryDefinitionHtml(word, langCode)
+
+			setLoading(false)
+
+			setPopoverHtml(html ?? '')
+		}
+	}, [langCode, popoverHtml, word])
+
+	const hidePopover = useCallback(() => {
+		setOpen(false)
+		setPopoverHtml('')
+	}, [])
+
+	const reactHoverEventNames: ReactEventName[] = useMemo(
+		() =>
+			isTouchDevice()
+				? ['onMouseOver', 'onTouchStart', 'onClick']
+				: ['onMouseOver'],
+		[],
+	)
+
+	const htmlHoverEventNames = useMemo(
+		() =>
+			reactHoverEventNames.map((name) =>
+				name.slice(2).toLowerCase(),
+			) as (keyof HTMLElementEventMap)[],
+		[reactHoverEventNames],
+	)
+
+	const onEvents = useMemo(() => {
+		return Object.fromEntries(
+			reactHoverEventNames.map((k) => [k, showPopover]),
+		) as Record<ReactEventName, typeof showPopover>
+	}, [showPopover, reactHoverEventNames])
+
+	const hidePopoverIfNotCurrentTarget = useCallback(
+		(e: Event) => {
+			if (!ref.current?.contains(e.target as HTMLElement)) {
+				hidePopover()
+			}
+		},
+		[hidePopover],
+	)
+
+	const offEvents = useMemo(() => {
+		return Object.fromEntries(
+			htmlHoverEventNames.map((k) => [k, hidePopoverIfNotCurrentTarget]),
+		) as Record<ReactEventName, typeof hidePopoverIfNotCurrentTarget>
+	}, [hidePopoverIfNotCurrentTarget, htmlHoverEventNames])
+
+	useEffect(() => {
+		if (!open) return
+
+		Object.entries(offEvents).forEach(([k, v]) => {
+			document.body.addEventListener(k, v)
+		})
+
+		const cleanup = () => {
+			Object.entries(offEvents).forEach(([k, v]) => {
+				document.body.removeEventListener(k, v)
+			})
+		}
+
+		return cleanup
+	}, [offEvents, open])
+
 	return (
-		<span
-			className='popover-parent'
-			onMouseLeave={() => {
-				setOpen(false)
-				setPopoverHtml('')
-			}}
-		>
+		<span ref={ref} className='popover-parent'>
 			<span ref={setReferenceElement}>
 				<a
 					{...htmlProps}
 					target='_blank'
 					rel='noreferrer noopener'
 					href={url}
-					onMouseEnter={async () => {
-						if (!popoverHtml) {
-							setOpen(true)
-							setLoading(true)
-
-							const html = await fetchWiktionaryDefinitionHtml(
-								word,
-								langCode,
-							)
-
-							setLoading(false)
-
-							setPopoverHtml(html ?? '')
-						}
-					}}
+					{...onEvents}
 				>
 					{title}
 				</a>
