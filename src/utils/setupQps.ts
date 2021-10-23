@@ -1,4 +1,5 @@
 import { LangCode } from './langNames'
+import { pick } from './pick'
 import { qpType, createQps } from './qps'
 
 const qpInit = {
@@ -8,10 +9,19 @@ const qpInit = {
 	allowPrefixesAndSuffixes: qpType.boolean(false, { omitIfDefault: true }),
 
 	page: qpType.number(1, { omitIfDefault: true }),
+
+	shareText: qpType.string(null, { omitIfDefault: true }),
 }
 
 export const qps = createQps(qpInit)
 
-export const { page: pageNum, ...formValues } = qps.getAll()
+export type Qps = typeof qps
 
-export type FormValues = typeof formValues
+export const getFormValues = (qps: Qps) => {
+	return pick(
+		['word', 'srcLang', 'trgLang', 'allowPrefixesAndSuffixes'],
+		qps.getAll(),
+	)
+}
+
+export type FormValues = ReturnType<typeof getFormValues>
