@@ -24,13 +24,19 @@ export const CognatesList = ({
 							<ul>
 								<li>
 									{src.flatMap((x, i) => [
-										' → ',
+										<span key={i - 0.5} className='arrow'>
+											{' '}
+											→{' '}
+										</span>,
 										<CognateLink key={i} {...x} />,
 									])}
 								</li>
 								<li>
 									{trg.flatMap((x, i, a) => [
-										' → ',
+										<span key={i - 0.5} className='arrow'>
+											{' '}
+											→{' '}
+										</span>,
 										i === a.length - 1 ? (
 											<CognateLink
 												key={i}

@@ -61,8 +61,9 @@ export const CognateLink = ({
 	const title = `${word} (${langName})`
 
 	const showPopover = useCallback(async () => {
+		setOpen(true)
+
 		if (!popoverHtml) {
-			setOpen(true)
 			setLoading(true)
 
 			const html = await fetchWiktionaryDefinitionHtml(word, langCode)
@@ -75,7 +76,6 @@ export const CognateLink = ({
 
 	const hidePopover = useCallback(() => {
 		setOpen(false)
-		setPopoverHtml('')
 	}, [])
 
 	const reactHoverEventNames: ReactEventName[] = useMemo(

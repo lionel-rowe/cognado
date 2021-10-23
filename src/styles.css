@@ -71,3 +71,7 @@ label[for='srcLang'],
 label[for='trgLang'] {
 	display: inline-block;
 }
+
+.arrow {
+	color: #ccc;
+}

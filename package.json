@@ -13,7 +13,8 @@
 		"react-dom": "17.0.2",
 		"react-github-corner": "^2.5.0",
 		"react-hook-form": "7.17.4",
-		"react-popper": "2.2.5"
+		"react-popper": "2.2.5",
+		"web-vitals": "^2.1.2"
 	},
 	"devDependencies": {
 		"@types/react": "17.0.0",
@@ -27,7 +28,7 @@
 	},
 	"scripts": {
 		"start": "react-app-rewired start",
-		"build": "react-scripts build",
+		"build": "react-app-rewired build",
 		"test": "react-app-rewired test --env=jsdom",
 		"eject": "react-scripts eject",
 		"predeploy": "npm run build",
