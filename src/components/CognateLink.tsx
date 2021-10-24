@@ -140,6 +140,15 @@ export const CognateLink = ({
 		) as Record<ReactEventName, typeof hidePopoverIfNotCurrentTarget>
 	}, [hidePopoverIfNotCurrentTarget, htmlHoverEventNames])
 
+	const suppressOnEsc = useCallback(
+		(e: KeyboardEvent) => {
+			if (e.key === 'Escape') {
+				hidePopover()
+			}
+		},
+		[hidePopover],
+	)
+
 	useEffect(() => {
 		if (!open) return
 
@@ -147,14 +156,16 @@ export const CognateLink = ({
 			document.body.addEventListener(k, v)
 		})
 
-		const cleanup = () => {
+		window.addEventListener('keydown', suppressOnEsc)
+
+		return function cleanup() {
 			Object.entries(offEvents).forEach(([k, v]) => {
 				document.body.removeEventListener(k, v)
 			})
-		}
 
-		return cleanup
-	}, [offEvents, open])
+			window.removeEventListener('keydown', suppressOnEsc)
+		}
+	}, [offEvents, open, suppressOnEsc])
 
 	return (
 		<span ref={ref} className='popover-parent'>

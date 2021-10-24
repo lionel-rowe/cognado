@@ -50,11 +50,6 @@ li a:hover {
 	z-index: 1;
 }
 
-body.suppress-popovers .popover {
-	visibility: hidden !important;
-	pointer-events: none !important;
-}
-
 .popover-reference {
 	position: relative;
 }

@@ -8,7 +8,7 @@ import {
 	isCognateError,
 } from '../core/cognates'
 import { usePagination } from '../hooks/usePagination'
-import { getLangName, LangCode } from '../utils/langNames'
+import { getLangName } from '../utils/langNames'
 import { ls } from '../utils/ls'
 import { urls } from '../config'
 import { Spinner } from '../components/Spinner'
@@ -17,33 +17,21 @@ import { CognatesList } from '../components/CognatesList'
 import { GitHubCorner } from '../components/GitHubCorner'
 import { RootErrorBoundary } from '../components/RootErrorBoundary'
 import { FormValues, qps, getFormValues } from '../utils/setupQps'
-import { suppressPopovers, unsuppressPopovers } from '../utils/dom'
 import { CognateSearchForm } from '../components/CognateSearchForm'
 
 export const Search: FC = () => {
-	const defaultValues: FormValues = useMemo(() => {
+	// effect - run before first render
+	useMemo(() => {
 		const lsVals = ls.values
 
-		if (lsVals) {
-			const { searchParams } = new URL(window.location.href)
+		const hasSearch = window.location.search.length > 1
 
-			// effect
-			qps.setMany({
-				word: qps.get('word') ?? lsVals.word,
-				srcLang:
-					(searchParams.get('srcLang') as LangCode) || lsVals.srcLang,
-				trgLang:
-					(searchParams.get('trgLang') as LangCode) || lsVals.trgLang,
-				allowPrefixesAndSuffixes:
-					qps.get('allowPrefixesAndSuffixes') ??
-					lsVals.allowPrefixesAndSuffixes,
-			})
+		if (!hasSearch && lsVals) {
+			qps.setMany(lsVals)
 		}
-
-		const vals = getFormValues(qps)
-
-		return vals
 	}, [])
+
+	const defaultValues: FormValues = useMemo(() => getFormValues(qps), [])
 
 	const form = useForm<FormValues>({
 		defaultValues,
@@ -162,17 +150,8 @@ export const Search: FC = () => {
 			}
 		}
 
+		// only run once on mount
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
-
-	useEffect(() => {
-		document.addEventListener('keydown', suppressPopovers)
-		document.addEventListener('mouseover', unsuppressPopovers)
-
-		return function cleanup() {
-			document.removeEventListener('keydown', suppressPopovers)
-			document.removeEventListener('mouseover', unsuppressPopovers)
-		}
 	}, [])
 
 	const hydrated = useMemo(() => hydrate(cognates), [cognates])
