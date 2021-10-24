@@ -31,8 +31,26 @@ export type RawQpTypes<T extends Record<string, QueryOpts>> = {
 	[k in keyof T]: ReturnType<T[k]['parse']> | T[k]['defaultValue']
 }
 
+const historyFn = (method: 'pushState' | 'replaceState') =>
+	(({ search }: URL) => {
+		const url = new URL(window.location.href)
+
+		url.search = search
+
+		window.history[method]({}, document.title, url.href)
+	}) as ({ search }: Pick<URL, 'search'>) => void
+
+export type History = {
+	push: ({ search }: Pick<URL, 'search'>) => void
+	replace: ({ search }: Pick<URL, 'search'>) => void
+}
+
 export const createQps = <T extends Record<keyof T, QueryOpts<any, any, any>>>(
 	init: QpsInit<T>,
+	history: History = {
+		push: historyFn('pushState'),
+		replace: historyFn('replaceState'),
+	},
 ) => {
 	return {
 		get<K extends keyof T & string>(
@@ -53,22 +71,18 @@ export const createQps = <T extends Record<keyof T, QueryOpts<any, any, any>>>(
 
 			updateUrl(url, k, v, init[k].serialize)
 
-			window.history[pushState ? 'pushState' : 'replaceState'](
-				{},
-				document.title,
-				url.href,
-			)
+			const { search } = url
+
+			history[pushState ? 'push' : 'replace']({ search })
 		},
 		delete<K extends keyof T & string>(k: K, pushState?: boolean): void {
 			const url = new URL(window.location.href)
 
 			url.searchParams.delete(k)
 
-			window.history[pushState ? 'pushState' : 'replaceState'](
-				{},
-				document.title,
-				url.href,
-			)
+			const { search } = url
+
+			history[pushState ? 'push' : 'replace']({ search })
 		},
 		setMany(
 			updates: Partial<
@@ -78,8 +92,6 @@ export const createQps = <T extends Record<keyof T, QueryOpts<any, any, any>>>(
 			>,
 			pushState?: boolean,
 		) {
-			const method = pushState ? 'pushState' : 'replaceState'
-
 			const url = new URL(window.location.href)
 
 			for (const [k, v] of Object.entries(updates)) {
@@ -89,7 +101,9 @@ export const createQps = <T extends Record<keyof T, QueryOpts<any, any, any>>>(
 				updateUrl(url, k, v, serialize)
 			}
 
-			window.history[method]({}, document.title, url.href)
+			const { search } = url
+
+			history[pushState ? 'push' : 'replace']({ search })
 		},
 		getMany<K extends keyof T & string>(
 			ks: K[],

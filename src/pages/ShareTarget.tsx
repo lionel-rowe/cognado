@@ -1,9 +1,11 @@
-import { useEffect } from 'react'
+import { useContext, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
-import { qps } from '../utils/setupQps'
+import { QpsContext } from '../Routes'
 
 export const ShareTarget = () => {
 	const history = useHistory()
+
+	const qps = useContext(QpsContext)
 
 	useEffect(() => {
 		const shareText = qps.get('shareText')
@@ -17,7 +19,7 @@ export const ShareTarget = () => {
 			pathname: '/',
 			search: window.location.search,
 		})
-	}, [history])
+	}, [history, qps])
 
 	return null
 }

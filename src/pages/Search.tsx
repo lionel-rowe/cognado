@@ -1,4 +1,11 @@
-import { FC, useEffect, useState, useMemo, useCallback } from 'react'
+import {
+	FC,
+	useEffect,
+	useState,
+	useMemo,
+	useCallback,
+	useContext,
+} from 'react'
 import { useForm } from 'react-hook-form'
 import {
 	buildSparqlQuery,
@@ -16,10 +23,30 @@ import { Pagination } from '../components/Pagination'
 import { CognatesList } from '../components/CognatesList'
 import { GitHubCorner } from '../components/GitHubCorner'
 import { RootErrorBoundary } from '../components/RootErrorBoundary'
-import { FormValues, qps, getFormValues } from '../utils/setupQps'
+import { FormValues, getFormValues } from '../utils/setupQps'
 import { CognateSearchForm } from '../components/CognateSearchForm'
+import { QpsContext } from '../Routes'
+import { useLocation } from 'react-router'
+
+const matches = (x: FormValues | null, y: FormValues | null) => {
+	const truthies = [x, y].filter(Boolean)
+
+	switch (truthies.length) {
+		case 0:
+			return true
+		case 1:
+			return false
+		default:
+			return Object.entries(x!).every(
+				([k, v]) => y![k as keyof FormValues] === v,
+			)
+	}
+}
 
 export const Search: FC = () => {
+	const location = useLocation()
+	const qps = useContext(QpsContext)
+
 	// effect - run before first render
 	useMemo(() => {
 		const lsVals = ls.values
@@ -29,9 +56,9 @@ export const Search: FC = () => {
 		if (!hasSearch && lsVals) {
 			qps.setMany(lsVals)
 		}
-	}, [])
+	}, [qps])
 
-	const defaultValues: FormValues = useMemo(() => getFormValues(qps), [])
+	const defaultValues: FormValues = useMemo(() => getFormValues(qps), [qps])
 
 	const form = useForm<FormValues>({
 		defaultValues,
@@ -59,6 +86,48 @@ export const Search: FC = () => {
 		ls.values ?? null,
 	)
 
+	useEffect(() => {
+		if (!matches(lastSubmitted, getFormValues(qps))) {
+			const values = getFormValues(qps)
+
+			const { word, srcLang, trgLang, allowPrefixesAndSuffixes } = values
+
+			if (!word) {
+				setCognates([])
+				setLastSubmitted(null)
+			}
+
+			setLoading(true)
+
+			fetchCognates(
+				word.trim(),
+				srcLang,
+				trgLang,
+				allowPrefixesAndSuffixes,
+			).then((result) => {
+				setLoading(false)
+
+				if (isCognateError(result)) {
+					setError(new Error(result.error))
+				} else {
+					const { cognates, query } = result
+
+					setError(null)
+					setLastSubmitted(values)
+					setCognates(cognates)
+
+					setQuery(query)
+
+					ls.values = values
+					ls.cognates = cognates
+					ls.query = query
+
+					reset(values)
+				}
+			})
+		}
+	}, [location, lastSubmitted, qps, reset])
+
 	const {
 		page,
 		setPage,
@@ -73,46 +142,15 @@ export const Search: FC = () => {
 
 			qps.set('page', n, pushState)
 		},
-		[setPage],
+		[setPage, qps],
 	)
 
-	const updateValues = useCallback(async (values: FormValues) => {
-		const { word, srcLang, trgLang, allowPrefixesAndSuffixes } = values
-
-		if (!word) {
-			setCognates([])
-			setLastSubmitted(null)
-		}
-
-		setLoading(true)
-
-		const result = await fetchCognates(
-			word.trim(),
-			srcLang,
-			trgLang,
-			allowPrefixesAndSuffixes,
-		)
-
-		setLoading(false)
-
-		if (isCognateError(result)) {
-			setError(new Error(result.error))
-		} else {
-			const { cognates, query } = result
-
-			setError(null)
-			setLastSubmitted(values)
-			setCognates(cognates)
-
-			setQuery(query)
-
-			ls.values = values
-			ls.cognates = cognates
-			ls.query = query
-
+	const updateValues = useCallback(
+		async (values: FormValues) => {
 			qps.setMany(values, true)
-		}
-	}, [])
+		},
+		[qps],
+	)
 
 	const onSubmit = useCallback(
 		async (values: FormValues) => {

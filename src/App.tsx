@@ -1,18 +1,10 @@
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
-import { Search } from './pages/Search'
-import { ShareTarget } from './pages/ShareTarget'
+import { BrowserRouter as Router } from 'react-router-dom'
+import { Routes } from './Routes'
 
 export const App = () => {
 	return (
 		<Router basename={process.env.PUBLIC_URL}>
-			<Switch>
-				<Route exact path='/'>
-					<Search />
-				</Route>
-				<Route exact path='/share-target'>
-					<ShareTarget />
-				</Route>
-			</Switch>
+			<Routes />
 		</Router>
 	)
 }

@@ -1,6 +1,6 @@
 import { LangCode } from './langNames'
 import { pick } from './pick'
-import { qpType, createQps } from './qps'
+import { qpType, createQps, History } from './qps'
 
 const qpInit = {
 	word: qpType.string(''),
@@ -13,9 +13,12 @@ const qpInit = {
 	shareText: qpType.string(null, { omitIfDefault: true }),
 }
 
-export const qps = createQps(qpInit)
+// https://stackoverflow.com/a/62620115/
+export const initQps = (history?: History) => {
+	return createQps(qpInit, history)
+}
 
-export type Qps = typeof qps
+export type Qps = ReturnType<typeof initQps>
 
 export const getFormValues = (qps: Qps) => {
 	return pick(
