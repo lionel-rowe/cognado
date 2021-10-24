@@ -27,6 +27,7 @@ export const Search: FC = () => {
 		if (lsVals) {
 			const { searchParams } = new URL(window.location.href)
 
+			// effect
 			qps.setMany({
 				word: qps.get('word') ?? lsVals.word,
 				srcLang:

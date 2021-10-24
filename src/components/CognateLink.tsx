@@ -30,28 +30,49 @@ export const CognateLink = ({
 
 	const ref = useRef<HTMLSpanElement>(null)
 
-	const { styles, attributes } = usePopper(referenceElement, popperElement, {
-		placement: 'auto',
-		strategy: 'absolute',
-		modifiers: [
-			{
-				name: 'preventOverflow',
-				options: {
-					rootBoundary: 'viewport',
+	const { styles, attributes, forceUpdate } = usePopper(
+		referenceElement,
+		popperElement,
+		{
+			placement: 'auto',
+			strategy: 'absolute',
+			modifiers: [
+				{
+					name: 'preventOverflow',
+					options: {
+						rootBoundary: 'viewport',
+					},
 				},
-			},
-			{
-				name: 'flip',
-				options: {
-					rootBoundary: 'viewport',
+				{
+					name: 'flip',
+					options: {
+						rootBoundary: 'viewport',
 
-					mainAxis: true,
-					flipVariations: true,
-					padding: 8,
+						mainAxis: true,
+						flipVariations: true,
+						padding: 8,
+						allowedAutoPlacements: [
+							'auto',
+							'auto-start',
+							'auto-end',
+							'top-start',
+							'top-end',
+							'bottom-start',
+							'bottom-end',
+							'right-start',
+							'right-end',
+							'left-start',
+							'left-end',
+							'top',
+							'bottom',
+							// 'right', // causes vertical scroll on small screens
+							// 'left', // causes vertical scroll on small screens
+						],
+					},
 				},
-			},
-		],
-	})
+			],
+		},
+	)
 
 	const [popoverHtml, setPopoverHtml] = useState<string | null>(null)
 
@@ -73,6 +94,10 @@ export const CognateLink = ({
 			setPopoverHtml(html ?? '')
 		}
 	}, [langCode, popoverHtml, word])
+
+	useEffect(() => {
+		forceUpdate?.()
+	}, [popoverHtml, forceUpdate])
 
 	const hidePopover = useCallback(() => {
 		setOpen(false)
