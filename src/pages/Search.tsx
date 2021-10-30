@@ -27,6 +27,7 @@ import { FormValues, getFormValues } from '../utils/setupQps'
 import { CognateSearchForm } from '../components/CognateSearchForm'
 import { QpsContext } from '../Routes'
 import { useLocation } from 'react-router'
+import { SearchedWordLink } from '../components/SearchedWordLink'
 
 const matches = (x: FormValues | null, y: FormValues | null) => {
 	const truthies = [x, y].filter(Boolean)
@@ -78,6 +79,10 @@ export const Search: FC = () => {
 			}).sparql,
 	)
 
+	const [wiktionaryUrl, setWiktionaryUrl] = useState<string | null>(
+		ls.wiktionaryUrl ?? null,
+	)
+
 	const [error, setError] = useState<Error | null>(null)
 	const [loading, setLoading] = useState<boolean>(false)
 
@@ -110,17 +115,19 @@ export const Search: FC = () => {
 				if (isCognateError(result)) {
 					setError(new Error(result.error))
 				} else {
-					const { cognates, query } = result
+					const { cognates, query, wiktionaryUrl } = result
 
 					setError(null)
 					setLastSubmitted(values)
 					setCognates(cognates)
+					setWiktionaryUrl(wiktionaryUrl)
 
 					setQuery(query)
 
 					ls.values = values
 					ls.cognates = cognates
 					ls.query = query
+					ls.wiktionaryUrl = wiktionaryUrl
 
 					reset(values)
 				}
@@ -209,13 +216,17 @@ export const Search: FC = () => {
 
 					<CognateSearchForm {...{ form, onSubmit }} />
 
-					{loading ? (
+					{loading || !lastSubmitted ? (
 						<Spinner />
 					) : (
 						<>
+							<SearchedWordLink
+								word={lastSubmitted.word}
+								href={wiktionaryUrl}
+								lang={lastSubmitted.srcLang}
+							/>
 							{cognates.length ? (
 								<>
-									<br />
 									<div>
 										Total {cognates.length} results | Page{' '}
 										{

@@ -6,6 +6,7 @@ import { uniq } from '../utils/uniq'
 import { escapeForSparqlUrl } from './escapeSparqlUrlSegment'
 import { urls } from '../config'
 import { sparqlClient } from './sparql'
+import { fetchWiktionaryDefinitionHtml } from './getWikiContent'
 
 const toLangPathSegments = (lang: LangCode) =>
 	lang === baseLang ? baseLang : [baseLang, lang].join('/')
@@ -76,6 +77,7 @@ export type CognateHydrated = {
 type CognateResult = {
 	query: string
 	cognates: CognateRaw[]
+	wiktionaryUrl: string | null
 }
 
 type CognateError = {
@@ -153,7 +155,16 @@ export const fetchCognates = async (
 		allowPrefixesAndSuffixes,
 	})
 
-	const res = await sparqlClient.fetch(sparql)
+	const _wiktionaryUrl = makeWiktionaryUrl({ word, langCode: srcLang })
+	// ? _wiktionaryUrl
+	// : null
+
+	const [wiktionaryContent, res] = await Promise.all([
+		fetchWiktionaryDefinitionHtml(word, srcLang),
+		sparqlClient.fetch(sparql),
+	])
+
+	const wiktionaryUrl = wiktionaryContent ? _wiktionaryUrl : null
 
 	if (res.error) {
 		console.error(res.error)
@@ -219,7 +230,7 @@ export const fetchCognates = async (
 			uniq(({ trg }) => trg[trg.length - 1]),
 		)
 
-		return { query: sparql, cognates }
+		return { query: sparql, cognates, wiktionaryUrl }
 	}
 }
 

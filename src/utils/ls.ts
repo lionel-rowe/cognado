@@ -15,6 +15,7 @@ const pseudoTarget = {
 	values: FormValues
 	cognates: CognateRaw[]
 	query: string
+	wiktionaryUrl: string | null
 }>
 
 export const ls = new Proxy(pseudoTarget, {
