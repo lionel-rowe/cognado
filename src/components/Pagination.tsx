@@ -1,14 +1,10 @@
-import { Fragment } from 'react'
+import { FC, Fragment } from 'react'
 
-export const Pagination = ({
-	maxPageNo,
-	page,
-	setPage,
-}: {
+export const Pagination: FC<{
 	maxPageNo: number
 	page: number
 	setPage: (n: number, pushState?: boolean) => void
-}) => {
+}> = ({ maxPageNo, page, setPage }) => {
 	return (
 		<>
 			{Array.from({ length: maxPageNo }, (_, i) => {

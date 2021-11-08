@@ -16,7 +16,7 @@ const updateUrl = <T>(
 type QueryOpts<
 	T extends unknown = any,
 	D extends unknown = any,
-	S extends string | null = string
+	S extends string | null = string,
 > = {
 	parse: (val: string) => T
 	serialize: (val: T) => S
@@ -85,11 +85,9 @@ export const createQps = <T extends Record<keyof T, QueryOpts<any, any, any>>>(
 			history[pushState ? 'push' : 'replace']({ search })
 		},
 		setMany(
-			updates: Partial<
-				{
-					[k in keyof T]: ReturnType<T[k]['parse']>
-				}
-			>,
+			updates: Partial<{
+				[k in keyof T]: ReturnType<T[k]['parse']>
+			}>,
 			pushState?: boolean,
 		) {
 			const url = new URL(window.location.href)
@@ -213,7 +211,7 @@ export const qpType = {
 	string: <
 		T extends string = string,
 		D extends T | null = T,
-		O extends QpTypeOptions = QpTypeOptions
+		O extends QpTypeOptions = QpTypeOptions,
 	>(
 		defaultValue: D,
 		opts?: O,
@@ -231,7 +229,7 @@ export const qpType = {
 	json: <
 		T extends any = any,
 		D extends any = T,
-		O extends QpTypeOptions = QpTypeOptions
+		O extends QpTypeOptions = QpTypeOptions,
 	>(
 		defaultValue: D,
 		opts?: O,

@@ -1,22 +1,24 @@
-import { HTMLProps, SVGProps } from 'react'
+import { FC, HTMLProps, SVGProps } from 'react'
 import './GitHubCorner.css'
 
 // modified from https://github.com/skratchdot/react-github-corner
 
-export const GitHubCorner = ({
+export const GitHubCorner: FC<
+	HTMLProps<HTMLAnchorElement> & {
+		href: string
+		rtl?: boolean
+		svgProps?: SVGProps<SVGElement>
+		octoBannerProps?: SVGProps<SVGPathElement>
+		octoArmProps?: SVGProps<SVGPathElement>
+		octoBodyProps?: SVGProps<SVGPathElement>
+	}
+> = ({
 	octoBannerProps,
 	octoArmProps,
 	octoBodyProps,
 	title,
 	rtl,
 	...linkProps
-}: HTMLProps<HTMLAnchorElement> & {
-	href: string
-	rtl?: boolean
-	svgProps?: SVGProps<SVGElement>
-	octoBannerProps?: SVGProps<SVGPathElement>
-	octoArmProps?: SVGProps<SVGPathElement>
-	octoBodyProps?: SVGProps<SVGPathElement>
 }) => {
 	const rtlStyles = rtl
 		? {

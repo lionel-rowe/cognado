@@ -50,9 +50,9 @@ const getDefinitionDomForLanguage = (sections: Section[], language: string) => {
 
 	parsed.querySelector('head')?.appendChild(base)
 
-	for (const link of (parsed
+	for (const link of parsed
 		.querySelector('body')!
-		.querySelectorAll('a') as any) as HTMLLinkElement[]) {
+		.querySelectorAll('a') as any as HTMLLinkElement[]) {
 		link.href = link.href! // forces absolute with `base` element in head
 
 		link.target = '_blank'

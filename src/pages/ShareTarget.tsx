@@ -1,8 +1,8 @@
-import { useContext, useEffect } from 'react'
+import { FC, useContext, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import { QpsContext } from '../Routes'
 
-export const ShareTarget = () => {
+export const ShareTarget: FC = () => {
 	const history = useHistory()
 
 	const qps = useContext(QpsContext)

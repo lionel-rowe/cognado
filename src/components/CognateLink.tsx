@@ -1,4 +1,5 @@
 import {
+	FC,
 	HTMLProps,
 	useCallback,
 	useEffect,
@@ -10,22 +11,22 @@ import { usePopper } from 'react-popper'
 import { WordData } from '../core/cognates'
 import { fetchWiktionaryDefinitionHtml } from '../core/getWikiContent'
 import { isTouchDevice } from '../utils/device'
+import { getLangName } from '../utils/langNames'
 import { Spinner } from './Spinner'
+
+const defaultFormatter = (word: string, langName: string) =>
+	`${word} (${langName})`
 
 type ReactEventName = `on${Capitalize<string>}` &
 	keyof React.DOMAttributes<HTMLAnchorElement>
 
-export const CognateLink = ({
-	url,
-	word,
-	langName,
-	langCode,
-	...htmlProps
-}: WordData & HTMLProps<HTMLAnchorElement>) => {
-	const [
-		referenceElement,
-		setReferenceElement,
-	] = useState<HTMLElement | null>(null)
+export const CognateLink: FC<
+	Pick<WordData, 'url' | 'word' | 'langCode'> & {
+		formatter?: (word: string, langName: string) => string
+	} & HTMLProps<HTMLAnchorElement>
+> = ({ url, word, langCode, formatter, ...htmlProps }) => {
+	const [referenceElement, setReferenceElement] =
+		useState<HTMLElement | null>(null)
 	const [popperElement, setPopperElement] = useState<HTMLElement | null>(null)
 
 	const ref = useRef<HTMLSpanElement>(null)
@@ -79,7 +80,7 @@ export const CognateLink = ({
 	const [open, setOpen] = useState<boolean>(false)
 	const [loading, setLoading] = useState<boolean>(false)
 
-	const title = `${word} (${langName})`
+	const title = (formatter ?? defaultFormatter)(word, getLangName(langCode))
 
 	const showPopover = useCallback(async () => {
 		setOpen(true)

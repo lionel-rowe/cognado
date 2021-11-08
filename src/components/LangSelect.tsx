@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { UseFormSetValue } from 'react-hook-form'
 import {
 	getLangName,
@@ -10,15 +10,11 @@ import {
 } from '../utils/langNames'
 import { useHtmlId } from '../hooks/useHtmlId'
 
-export function LangSelect({
-	id,
-	langCode,
-	setLangCode,
-}: {
+export const LangSelect: FC<{
 	id: string
 	langCode: LangCode
 	setLangCode: UseFormSetValue<any> // TODO
-}) {
+}> = ({ id, langCode, setLangCode }) => {
 	const [enteredText, setEnteredText] = useState(() => getLangName(langCode))
 
 	useEffect(() => {

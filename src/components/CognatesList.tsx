@@ -1,15 +1,12 @@
+import { FC } from 'react'
 import { CognateHydrated } from '../core/cognates'
 import { CognateLink } from './CognateLink'
 
-export const CognatesList = ({
-	cognates,
-	pageStart,
-	pageEnd,
-}: {
+export const CognatesList: FC<{
 	cognates: CognateHydrated[]
 	pageStart: number
 	pageEnd: number
-}) => {
+}> = ({ cognates, pageStart, pageEnd }) => {
 	return (
 		<ul>
 			{cognates

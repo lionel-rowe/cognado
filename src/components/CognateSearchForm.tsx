@@ -1,16 +1,13 @@
-import { useCallback } from 'react'
+import { FC, useCallback } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { urls } from '../config'
 import { FormValues } from '../utils/setupQps'
 import { LangSelect } from './LangSelect'
 
-export const CognateSearchForm = ({
-	onSubmit,
-	form,
-}: {
+export const CognateSearchForm: FC<{
 	onSubmit: (values: FormValues) => Promise<void>
 	form: UseFormReturn<FormValues>
-}) => {
+}> = ({ onSubmit, form }) => {
 	const { register, handleSubmit, watch, setValue } = form
 
 	const word = watch('word')

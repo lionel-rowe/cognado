@@ -193,12 +193,9 @@ export const fetchCognates = async (
 				return {
 					ancestor: getEtyTreePathname(ancestor0.value),
 					src: pipe(
-						[
-							ancestor0,
-							ancestor1a,
-							ancestor2a,
-							{ value: uri },
-						].map((x) => getEtyTreePathname(x.value)),
+						[ancestor0, ancestor1a, ancestor2a, { value: uri }].map(
+							(x) => getEtyTreePathname(x.value),
+						),
 						uniq(),
 					)
 						.slice(1) // rm ancestor0

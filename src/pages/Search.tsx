@@ -27,7 +27,7 @@ import { FormValues, getFormValues } from '../utils/setupQps'
 import { CognateSearchForm } from '../components/CognateSearchForm'
 import { QpsContext } from '../Routes'
 import { useLocation } from 'react-router'
-import { SearchedWordLink } from '../components/SearchedWordLink'
+import { CognateLink } from '../components/CognateLink'
 
 const matches = (x: FormValues | null, y: FormValues | null) => {
 	const truthies = [x, y].filter(Boolean)
@@ -135,13 +135,10 @@ export const Search: FC = () => {
 		}
 	}, [location, lastSubmitted, qps, reset])
 
-	const {
-		page,
-		setPage,
-		pageStart,
-		pageEnd,
-		maxPageNo,
-	} = usePagination(cognates, { pageSize: 50, startPage: qps.get('page') })
+	const { page, setPage, pageStart, pageEnd, maxPageNo } = usePagination(
+		cognates,
+		{ pageSize: 50, startPage: qps.get('page') },
+	)
 
 	const updatePage = useCallback(
 		(n: number, pushState?: boolean) => {
@@ -220,11 +217,16 @@ export const Search: FC = () => {
 						<Spinner />
 					) : (
 						<>
-							<SearchedWordLink
-								word={lastSubmitted.word}
-								href={wiktionaryUrl}
-								lang={lastSubmitted.srcLang}
-							/>
+							<div className='y-margins'>
+								<CognateLink
+									url={wiktionaryUrl ?? ''}
+									word={lastSubmitted.word}
+									langCode={lastSubmitted.srcLang}
+									formatter={(word, langName) =>
+										`${word} (${langName}) — Wiktionary`
+									}
+								/>
+							</div>
 							{cognates.length ? (
 								<>
 									<div>

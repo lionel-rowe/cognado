@@ -35,6 +35,10 @@ li a:hover {
 	text-decoration: underline;
 }
 
+.y-margins {
+	margin: 1em auto;
+}
+
 .top-level-li {
 	margin: 1em 0;
 }
