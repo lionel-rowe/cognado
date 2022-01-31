@@ -15,7 +15,11 @@ export const CognatesList: FC<{
 					return (
 						<li
 							className='top-level-li'
-							key={`${i}-${trg[trg.length - 1]?.url}`}
+							key={[
+								i,
+								trg[trg.length - 1]?.langCode ?? 'null',
+								trg[trg.length - 1]?.word ?? 'null',
+							].join('-')}
 						>
 							<CognateLink {...ancestor} />
 							<ul>

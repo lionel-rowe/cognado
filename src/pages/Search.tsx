@@ -79,10 +79,6 @@ export const Search: FC = () => {
 			}).sparql,
 	)
 
-	const [wiktionaryUrl, setWiktionaryUrl] = useState<string | null>(
-		ls.wiktionaryUrl ?? null,
-	)
-
 	const [error, setError] = useState<Error | null>(null)
 	const [loading, setLoading] = useState<boolean>(false)
 
@@ -115,19 +111,17 @@ export const Search: FC = () => {
 				if (isCognateError(result)) {
 					setError(new Error(result.error))
 				} else {
-					const { cognates, query, wiktionaryUrl } = result
+					const { cognates, query } = result
 
 					setError(null)
 					setLastSubmitted(values)
 					setCognates(cognates)
-					setWiktionaryUrl(wiktionaryUrl)
 
 					setQuery(query)
 
 					ls.values = values
 					ls.cognates = cognates
 					ls.query = query
-					ls.wiktionaryUrl = wiktionaryUrl
 
 					reset(values)
 				}
@@ -219,12 +213,8 @@ export const Search: FC = () => {
 						<>
 							<div className='y-margins'>
 								<CognateLink
-									url={wiktionaryUrl ?? ''}
 									word={lastSubmitted.word}
 									langCode={lastSubmitted.srcLang}
-									formatter={(word, langName) =>
-										`${word} (${langName}) — Wiktionary`
-									}
 								/>
 							</div>
 							{cognates.length ? (

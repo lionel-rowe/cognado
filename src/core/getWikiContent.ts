@@ -1,5 +1,5 @@
-import { getLangName, LangCode } from '../utils/langNames'
-import { wikify } from '../utils/formatters'
+import { getLangName, LangCode, langNamesToCodes } from '../utils/langNames'
+import { makeCognateFinderUrl, unwikify, wikify } from '../utils/formatters'
 import { urls } from '../config'
 
 type Section = {
@@ -18,7 +18,13 @@ export const fetchWordSections = async (word: string) => {
 	return data.remaining.sections as Section[]
 }
 
-const getDefinitionDomForLanguage = (sections: Section[], language: string) => {
+const getDefinitionDomForLanguage = (
+	word: string,
+	sections: Section[],
+	language: string,
+) => {
+	const word_ = word
+
 	const start = sections.findIndex(
 		(s) => s.toclevel === 1 && s.line === language,
 	)
@@ -48,15 +54,51 @@ const getDefinitionDomForLanguage = (sections: Section[], language: string) => {
 	const base = document.createElement('base')
 	base.href = urls.wiktionaryWeb
 
-	parsed.querySelector('head')?.appendChild(base)
+	parsed.head.appendChild(base)
 
-	for (const link of parsed
-		.querySelector('body')!
-		.querySelectorAll('a') as any as HTMLLinkElement[]) {
-		link.href = link.href! // forces absolute with `base` element in head
+	for (const link of parsed.body.querySelectorAll<HTMLAnchorElement>(
+		'a[href]',
+	)) {
+		const rawHref = link.getAttribute('href')!
 
-		link.target = '_blank'
-		link.rel = 'noreferrer noopener'
+		const originalUrl = new URL(rawHref, urls.wiktionaryWeb)
+
+		if (originalUrl.origin !== new URL(urls.wiktionaryWeb).origin) {
+			// is non-Wiktionary URL
+
+			link.target = '_blank'
+			link.rel = 'noreferrer noopener'
+		} else {
+			// is Wiktionary URL
+
+			const rawWord = originalUrl.pathname.replace('/wiki/', '')
+			const parsedWord = unwikify(rawWord ?? '')
+
+			const srcLangName = originalUrl.hash.slice(1)
+
+			const srcLangCode: LangCode = srcLangName
+				? langNamesToCodes[srcLangName as keyof typeof langNamesToCodes]
+				: 'eng'
+
+			const isHashOnlyLink = rawHref.startsWith('#')
+
+			if (
+				!isHashOnlyLink &&
+				(!srcLangCode || !rawWord || /[:/]/.test(rawWord))
+			) {
+				// is special Wiktionary URL/unrecognized language
+
+				// not a no-op; forces href to use base URL from `head > base` of `parsed` when `innerHTML` is read
+				link.href = link.href!
+
+				link.target = '_blank'
+				link.rel = 'noreferrer noopener'
+			} else {
+				const word = isHashOnlyLink ? word_ : parsedWord
+
+				link.href = makeCognateFinderUrl({ word, srcLang: srcLangCode })
+			}
+		}
 	}
 
 	return parsed.querySelector('body')!
@@ -70,7 +112,7 @@ export const fetchWiktionaryDefinitionHtml = async (
 ) => {
 	const key = JSON.stringify({ word, langCode })
 
-	if (cache.has(key)) return cache.get(key)
+	if (cache.has(key)) return cache.get(key)!
 
 	let result: string
 
@@ -79,6 +121,7 @@ export const fetchWiktionaryDefinitionHtml = async (
 
 		result =
 			getDefinitionDomForLanguage(
+				word,
 				sections,
 				getLangName(langCode),
 			).querySelector('ol')?.outerHTML ?? ''

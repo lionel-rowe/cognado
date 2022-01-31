@@ -8,23 +8,28 @@ import {
 	useState,
 } from 'react'
 import { usePopper } from 'react-popper'
+import { Link } from 'react-router-dom'
 import { WordData } from '../core/cognates'
 import { fetchWiktionaryDefinitionHtml } from '../core/getWikiContent'
 import { isTouchDevice } from '../utils/device'
+import {
+	makeCognateFinderUrl,
+	makeWiktionarySearchUrl,
+	makeWiktionaryUrl,
+	toRelativeUrl,
+} from '../utils/formatters'
 import { getLangName } from '../utils/langNames'
 import { Spinner } from './Spinner'
-
-const defaultFormatter = (word: string, langName: string) =>
-	`${word} (${langName})`
+import { WiktionaryHtml } from './WiktionaryHtml'
 
 type ReactEventName = `on${Capitalize<string>}` &
 	keyof React.DOMAttributes<HTMLAnchorElement>
 
 export const CognateLink: FC<
-	Pick<WordData, 'url' | 'word' | 'langCode'> & {
-		formatter?: (word: string, langName: string) => string
-	} & HTMLProps<HTMLAnchorElement>
-> = ({ url, word, langCode, formatter, ...htmlProps }) => {
+	Partial<WordData> &
+		Pick<WordData, 'word' | 'langCode'> &
+		HTMLProps<HTMLAnchorElement>
+> = ({ word, langCode, langName: _, ...htmlProps }) => {
 	const [referenceElement, setReferenceElement] =
 		useState<HTMLElement | null>(null)
 	const [popperElement, setPopperElement] = useState<HTMLElement | null>(null)
@@ -77,10 +82,25 @@ export const CognateLink: FC<
 
 	const [popoverHtml, setPopoverHtml] = useState<string | null>(null)
 
+	const cognateFinderUrl = makeCognateFinderUrl({
+		word,
+		srcLang: langCode,
+	})
+
+	const wiktionaryUrl = useMemo(
+		() =>
+			popoverHtml === ''
+				? makeWiktionarySearchUrl({ word })
+				: makeWiktionaryUrl({ word, langCode }),
+		[word, langCode, popoverHtml],
+	)
+
 	const [open, setOpen] = useState<boolean>(false)
 	const [loading, setLoading] = useState<boolean>(false)
 
-	const title = (formatter ?? defaultFormatter)(word, getLangName(langCode))
+	const langName = getLangName(langCode)
+
+	const title = `${word} (${langName})`
 
 	const showPopover = useCallback(async () => {
 		setOpen(true)
@@ -106,9 +126,7 @@ export const CognateLink: FC<
 
 	const reactHoverEventNames: ReactEventName[] = useMemo(
 		() =>
-			isTouchDevice()
-				? ['onMouseOver', 'onTouchStart', 'onClick']
-				: ['onMouseOver'],
+			isTouchDevice() ? ['onMouseOver', 'onTouchStart'] : ['onMouseOver'],
 		[],
 	)
 
@@ -171,15 +189,14 @@ export const CognateLink: FC<
 	return (
 		<span ref={ref} className='popover-parent'>
 			<span ref={setReferenceElement}>
-				<a
-					{...htmlProps}
-					target='_blank'
-					rel='noreferrer noopener'
-					href={url}
+				<Link
+					{...(htmlProps as any)}
 					{...onEvents}
+					onClick={hidePopover}
+					to={toRelativeUrl(cognateFinderUrl)}
 				>
 					{title}
-				</a>
+				</Link>
 			</span>
 
 			{open && (
@@ -194,16 +211,24 @@ export const CognateLink: FC<
 					) : (
 						<>
 							<div>
-								<strong>{title}</strong>
+								<strong>
+									<a
+										target='blank'
+										rel='noreferrer noopener'
+										href={wiktionaryUrl}
+									>
+										{title} — Wiktionary
+									</a>
+								</strong>
 							</div>
-							<br />
-							<div
-								dangerouslySetInnerHTML={{
-									__html:
-										popoverHtml === ''
-											? '<span class="grayed-out">No definitions found</span>'
-											: popoverHtml ?? '',
-								}}
+
+							<WiktionaryHtml
+								hidePopover={hidePopover}
+								__html={
+									popoverHtml === ''
+										? '<span class="grayed-out">No definitions found</span>'
+										: popoverHtml ?? ''
+								}
 							/>
 						</>
 					)}

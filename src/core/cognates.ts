@@ -6,7 +6,6 @@ import { uniq } from '../utils/uniq'
 import { escapeForSparqlUrl } from './escapeSparqlUrlSegment'
 import { urls } from '../config'
 import { sparqlClient } from './sparql'
-import { fetchWiktionaryDefinitionHtml } from './getWikiContent'
 
 const toLangPathSegments = (lang: LangCode) =>
 	lang === baseLang ? baseLang : [baseLang, lang].join('/')
@@ -19,7 +18,6 @@ const toUri = (word: string, lang: LangCode) =>
 	].join('/')
 
 export type WordData = {
-	url: string
 	word: string
 	langName: string
 	langCode: LangCode
@@ -35,6 +33,14 @@ export const makeWiktionaryUrl = ({
 	const url = new URL(urls.wiktionaryWeb)
 	url.pathname = `/wiki/${wikify(word)}`
 	url.hash = wikify(getLangName(langCode))
+
+	return url.href
+}
+
+export const makeWiktionarySearchUrl = ({ word }: { word: string }) => {
+	const url = new URL('/w/index.php', urls.wiktionaryWeb)
+
+	url.searchParams.set('search', word)
 
 	return url.href
 }
@@ -55,7 +61,6 @@ const toWordData = (etytreePathname: string): WordData => {
 	const word = unwikify(_word.replace(/^__ee_(?:\d_+)?/, ''))
 
 	return {
-		url: makeWiktionaryUrl({ word, langCode: code as LangCode }),
 		word,
 		langName,
 		langCode: code as LangCode,
@@ -77,7 +82,6 @@ export type CognateHydrated = {
 type CognateResult = {
 	query: string
 	cognates: CognateRaw[]
-	wiktionaryUrl: string | null
 }
 
 type CognateError = {
@@ -155,16 +159,7 @@ export const fetchCognates = async (
 		allowPrefixesAndSuffixes,
 	})
 
-	const _wiktionaryUrl = makeWiktionaryUrl({ word, langCode: srcLang })
-	// ? _wiktionaryUrl
-	// : null
-
-	const [wiktionaryContent, res] = await Promise.all([
-		fetchWiktionaryDefinitionHtml(word, srcLang),
-		sparqlClient.fetch(sparql),
-	])
-
-	const wiktionaryUrl = wiktionaryContent ? _wiktionaryUrl : null
+	const res = await sparqlClient.fetch(sparql)
 
 	if (res.error) {
 		console.error(res.error)
@@ -227,7 +222,7 @@ export const fetchCognates = async (
 			uniq(({ trg }) => trg[trg.length - 1]),
 		)
 
-		return { query: sparql, cognates, wiktionaryUrl }
+		return { query: sparql, cognates }
 	}
 }
 
@@ -238,5 +233,8 @@ export const hydrate = (raw: CognateRaw[]): CognateHydrated[] =>
 			src: src.map(toWordData),
 			trg: trg.map(toWordData),
 		})),
-		uniq(({ trg }) => trg[trg.length - 1]?.url),
+		uniq(
+			({ trg }) => trg[trg.length - 1]?.langCode,
+			({ trg }) => trg[trg.length - 1]?.word,
+		),
 	)
