@@ -28,6 +28,7 @@ import { CognateSearchForm } from '../components/CognateSearchForm'
 import { QpsContext } from '../Routes'
 import { useLocation } from 'react-router'
 import { CognateLink } from '../components/CognateLink'
+import { fetchSeeAlsos } from '../core/seeAlsos'
 
 const matches = (x: FormValues | null, y: FormValues | null) => {
 	const truthies = [x, y].filter(Boolean)
@@ -47,6 +48,8 @@ const matches = (x: FormValues | null, y: FormValues | null) => {
 export const Search: FC = () => {
 	const location = useLocation()
 	const qps = useContext(QpsContext)
+
+	const [seeAlsos, setSeeAlsos] = useState(ls.seeAlsos ?? [])
 
 	// effect - run before first render
 	useMemo(() => {
@@ -96,16 +99,21 @@ export const Search: FC = () => {
 			if (!word) {
 				setCognates([])
 				setLastSubmitted(null)
+			} else {
+				setLastSubmitted(values)
 			}
 
 			setLoading(true)
 
-			fetchCognates(
-				word.trim(),
-				srcLang,
-				trgLang,
-				allowPrefixesAndSuffixes,
-			).then((result) => {
+			Promise.all([
+				fetchCognates(
+					word.trim(),
+					srcLang,
+					trgLang,
+					allowPrefixesAndSuffixes,
+				),
+				fetchSeeAlsos(word.trim()),
+			]).then(([result, seeAlsos]) => {
 				setLoading(false)
 
 				if (isCognateError(result)) {
@@ -116,12 +124,14 @@ export const Search: FC = () => {
 					setError(null)
 					setLastSubmitted(values)
 					setCognates(cognates)
+					setSeeAlsos(seeAlsos)
 
 					setQuery(query)
 
 					ls.values = values
 					ls.cognates = cognates
 					ls.query = query
+					ls.seeAlsos = seeAlsos
 
 					reset(values)
 				}
@@ -205,7 +215,7 @@ export const Search: FC = () => {
 				<main>
 					<h1>Cognate finder</h1>
 
-					<CognateSearchForm {...{ form, onSubmit }} />
+					<CognateSearchForm {...{ form, onSubmit, seeAlsos }} />
 
 					{loading || !lastSubmitted ? (
 						<Spinner />

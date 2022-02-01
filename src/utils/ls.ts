@@ -16,6 +16,7 @@ const pseudoTarget = {
 	cognates: CognateRaw[]
 	query: string
 	wiktionaryUrl: string | null
+	seeAlsos: string[]
 }>
 
 export const ls = new Proxy(pseudoTarget, {

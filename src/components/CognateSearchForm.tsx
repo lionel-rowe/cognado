@@ -1,9 +1,17 @@
-import { FC, KeyboardEventHandler, useCallback, useState } from 'react'
+import {
+	FC,
+	Fragment,
+	KeyboardEventHandler,
+	useCallback,
+	useState,
+} from 'react'
 import { UseFormReturn } from 'react-hook-form'
+import { Link } from 'react-router-dom'
 import { urls } from '../config'
 import { isMobile } from '../utils/device'
+import { makeCognateFinderUrl, toRelativeUrl } from '../utils/formatters'
 import { FormValues } from '../utils/setupQps'
-import { nextAnimationFrame, sleep } from '../utils/timing'
+import { nextAnimationFrame } from '../utils/timing'
 import { LangSelect } from './LangSelect'
 
 type WiktionaryOpenSearchSuggestions = [
@@ -16,7 +24,8 @@ type WiktionaryOpenSearchSuggestions = [
 export const CognateSearchForm: FC<{
 	onSubmit: (values: FormValues) => Promise<void>
 	form: UseFormReturn<FormValues>
-}> = ({ onSubmit, form }) => {
+	seeAlsos: string[]
+}> = ({ onSubmit, form, seeAlsos }) => {
 	const { register, handleSubmit, watch, setValue } = form
 
 	const [autocompleteOptions, setAutocompleteOptions] = useState<string[]>([])
@@ -108,7 +117,24 @@ export const CognateSearchForm: FC<{
 						</option>
 					))}
 				</datalist>
-			</label>
+			</label>{' '}
+			{seeAlsos.length ? (
+				<>
+					See also:{' '}
+					{seeAlsos.map((word, idx, arr) => (
+						<Fragment key={idx}>
+							<Link
+								to={toRelativeUrl(
+									makeCognateFinderUrl({ word, srcLang }),
+								)}
+							>
+								{word}
+							</Link>
+							{idx !== arr.length - 1 ? ', ' : ''}
+						</Fragment>
+					))}
+				</>
+			) : null}
 			<br />
 			<label htmlFor='srcLang'>
 				Source{' '}
