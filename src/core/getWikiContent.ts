@@ -10,12 +10,14 @@ type Section = {
 
 export const fetchWordSections = async (word: string) => {
 	const res = await fetch(
-		`${urls.wiktionaryApi}/rest_v1/page/mobile-sections/${wikify(word)}`,
+		`${urls.wiktionaryRestApi}/rest_v1/page/mobile-sections/${wikify(
+			word,
+		)}`,
 	)
 
 	const data = await res.json()
 
-	return data.remaining.sections as Section[]
+	return data.remaining?.sections ?? ([] as Section[])
 }
 
 const getDefinitionDomForLanguage = (

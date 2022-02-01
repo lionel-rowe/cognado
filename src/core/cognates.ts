@@ -1,5 +1,5 @@
 import { rank } from '../utils/rank'
-import { wikify, unwikify } from '../utils/formatters'
+import { unwikify } from '../utils/formatters'
 import { baseLang, getLangName, LangCode } from '../utils/langNames'
 import { pipe } from 'fp-ts/function'
 import { uniq } from '../utils/uniq'
@@ -21,28 +21,6 @@ export type WordData = {
 	word: string
 	langName: string
 	langCode: LangCode
-}
-
-export const makeWiktionaryUrl = ({
-	word,
-	langCode,
-}: {
-	word: string
-	langCode: LangCode
-}) => {
-	const url = new URL(urls.wiktionaryWeb)
-	url.pathname = `/wiki/${wikify(word)}`
-	url.hash = wikify(getLangName(langCode))
-
-	return url.href
-}
-
-export const makeWiktionarySearchUrl = ({ word }: { word: string }) => {
-	const url = new URL('/w/index.php', urls.wiktionaryWeb)
-
-	url.searchParams.set('search', word)
-
-	return url.href
 }
 
 const getEtyTreePathname = (etytreeUrl: string) => {
