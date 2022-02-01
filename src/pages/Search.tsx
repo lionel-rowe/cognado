@@ -28,7 +28,10 @@ import { CognateSearchForm } from '../components/CognateSearchForm'
 import { QpsContext } from '../Routes'
 import { useLocation } from 'react-router'
 import { CognateLink } from '../components/CognateLink'
-import { fetchSeeAlsos } from '../core/seeAlsos'
+import { parseSeeAlsos } from '../core/seeAlsos'
+import { parseTranslations } from '../core/translations'
+import { fetchWiktionaryPage } from '../core/fetchWiktionaryPage'
+import { Translations } from '../components/Translations'
 
 const matches = (x: FormValues | null, y: FormValues | null) => {
 	const truthies = [x, y].filter(Boolean)
@@ -50,6 +53,7 @@ export const Search: FC = () => {
 	const qps = useContext(QpsContext)
 
 	const [seeAlsos, setSeeAlsos] = useState(ls.seeAlsos ?? [])
+	const [translations, setTranslations] = useState(ls.translations ?? [])
 
 	// effect - run before first render
 	useMemo(() => {
@@ -112,8 +116,11 @@ export const Search: FC = () => {
 					trgLang,
 					allowPrefixesAndSuffixes,
 				),
-				fetchSeeAlsos(word.trim()),
-			]).then(([result, seeAlsos]) => {
+				fetchWiktionaryPage(word.trim()),
+			]).then(([result, wiktionaryPage]) => {
+				const translations = parseTranslations(wiktionaryPage)
+				const seeAlsos = parseSeeAlsos(wiktionaryPage)
+
 				setLoading(false)
 
 				if (isCognateError(result)) {
@@ -125,6 +132,7 @@ export const Search: FC = () => {
 					setLastSubmitted(values)
 					setCognates(cognates)
 					setSeeAlsos(seeAlsos)
+					setTranslations(translations)
 
 					setQuery(query)
 
@@ -132,6 +140,7 @@ export const Search: FC = () => {
 					ls.cognates = cognates
 					ls.query = query
 					ls.seeAlsos = seeAlsos
+					ls.translations = translations
 
 					reset(values)
 				}
@@ -202,6 +211,24 @@ export const Search: FC = () => {
 
 	const hydrated = useMemo(() => hydrate(cognates), [cognates])
 
+	const relevantTranslations = useMemo(
+		() =>
+		lastSubmitted?.trgLang ?
+			translations
+				.map(({ meaning, translations }) => ({
+					meaning,
+					translations:
+						translations[
+							getLangName(lastSubmitted.trgLang ?? '') ?? ''
+						],
+					trgLang: lastSubmitted.trgLang,
+				}))
+				.filter((x) => x.translations) : [],
+		[translations, lastSubmitted?.trgLang],
+	)
+
+				console.log({translations,relevantTranslations})
+
 	return (
 		<>
 			<RootErrorBoundary>
@@ -212,7 +239,7 @@ export const Search: FC = () => {
 					href={urls.github}
 				/>
 
-				<main>
+				<main className='container'>
 					<h1>Cognate finder</h1>
 
 					<CognateSearchForm {...{ form, onSubmit, seeAlsos }} />
@@ -227,6 +254,13 @@ export const Search: FC = () => {
 									langCode={lastSubmitted.srcLang}
 								/>
 							</div>
+
+							<div className='y-margins'>
+								<Translations
+									translations={relevantTranslations}
+								/>
+							</div>
+
 							{cognates.length ? (
 								<>
 									<div>

@@ -148,24 +148,23 @@ export const CognateSearchForm: FC<{
 				<span aria-hidden='true'>⇄</span>
 			</button>{' '}
 			<label htmlFor='trgLang'>
-				target{' '}
+				Target{' '}
 				<LangSelect
 					id='trgLang'
 					langCode={trgLang}
 					setLangCode={setValue}
 				/>
 			</label>
-			<br />
-			<label htmlFor='allowPrefixesAndSuffixes'>
-				Allow prefixes and suffixes{' '}
-				<input
-					type='checkbox'
-					id='allowPrefixesAndSuffixes'
-					{...register('allowPrefixesAndSuffixes')}
-				/>
-			</label>
-			<br />
-			<br />
+			<div className='y-margins'>
+				<label htmlFor='allowPrefixesAndSuffixes'>
+					Allow prefixes and suffixes{' '}
+					<input
+						type='checkbox'
+						id='allowPrefixesAndSuffixes'
+						{...register('allowPrefixesAndSuffixes')}
+					/>
+				</label>
+			</div>
 			<button type='submit'>Search</button>{' '}
 			<small>
 				Etymology search powered by{' '}

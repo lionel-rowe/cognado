@@ -73,6 +73,9 @@ export const createQps = <T extends Record<keyof T, QueryOpts<any, any, any>>>(
 
 			const { search } = url
 
+			// no-op if same location
+			if (search === window.location.search) return
+
 			history[pushState ? 'push' : 'replace']({ search })
 		},
 		delete<K extends keyof T & string>(k: K, pushState?: boolean): void {

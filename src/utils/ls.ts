@@ -1,5 +1,6 @@
 import { FormValues } from '../utils/setupQps'
 import { CognateRaw } from '../core/cognates'
+import type { Translations } from '../core/translations'
 
 const pseudoTarget = {
 	get values() {
@@ -17,6 +18,7 @@ const pseudoTarget = {
 	query: string
 	wiktionaryUrl: string | null
 	seeAlsos: string[]
+	translations: Translations
 }>
 
 export const ls = new Proxy(pseudoTarget, {
