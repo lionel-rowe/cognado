@@ -5,6 +5,11 @@ import { getLangName, LangCode } from './langNames'
 
 export const underscorify = (x: string) => x.replace(/ /g, '_')
 
+export const capitalize = (x: string) => x.charAt(0).toUpperCase() + x.slice(1)
+
+export const forceCapitalize = (x: string) =>
+	x.charAt(0).toUpperCase() + x.slice(1).toLowerCase()
+
 export const wikify = flow(underscorify, encodeURIComponent)
 export const unwikify = flow(decodeURIComponent, (x) => x.replace(/_/g, ' '))
 

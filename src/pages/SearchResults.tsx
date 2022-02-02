@@ -26,7 +26,7 @@ import { Path, QpsContext } from '../Routes'
 import { useHistory, useLocation } from 'react-router'
 import { parseSeeAlsos } from '../core/seeAlsos'
 import { parseTranslations } from '../core/translations'
-import { fetchWiktionaryPage } from '../core/fetchWiktionaryPage'
+import { fetchWiktionaryPageResult } from '../core/fetchWiktionaryPage'
 import { createQps, pseudoHistory } from '../utils/qps'
 import { Tabs } from '../components/Tabs'
 import { containsSectionForLanguage } from '../core/containsSectionForLanguage'
@@ -117,13 +117,29 @@ export const SearchResults: FC = () => {
 					trgLang,
 					allowPrefixesAndSuffixes,
 				),
-				fetchWiktionaryPage(word.trim()),
-			]).then(([result, wiktionaryPage]) => {
-				const translations = parseTranslations(wiktionaryPage)
-				const seeAlsos = parseSeeAlsos(wiktionaryPage)
+				fetchWiktionaryPageResult(word.trim()),
+			]).then(([result, wiktionaryResult]) => {
+				const { wiktionaryText, seeAlsos } =
+					wiktionaryResult.kind === 'error'
+						? {
+								wiktionaryText: '',
+								seeAlsos:
+									wiktionaryResult.prefetchedVariants.flatMap(
+										(x) => [
+											x.word,
+											...parseSeeAlsos(x.data),
+										],
+									),
+						  }
+						: {
+								wiktionaryText: wiktionaryResult.data,
+								seeAlsos: parseSeeAlsos(wiktionaryResult.data),
+						  }
+
+				const translations = parseTranslations(wiktionaryText)
 				const suggestTryFlipped = containsSectionForLanguage(
 					trgLang,
-					wiktionaryPage,
+					wiktionaryText,
 				)
 
 				setLoading(false)
