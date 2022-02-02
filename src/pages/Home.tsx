@@ -1,8 +1,8 @@
 import { Redirect } from 'react-router-dom'
-import { Paths } from '../Routes'
+import { Path } from '../Routes'
 
 export const Home = () => {
 	// just redirect for now
 
-	return <Redirect to={Paths.Cognates} />
+	return <Redirect to={Path.Cognates} />
 }

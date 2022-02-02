@@ -41,3 +41,5 @@ export const usePagination = (
 		decrementPage,
 	}
 }
+
+export type UsePaginationReturn = ReturnType<typeof usePagination>

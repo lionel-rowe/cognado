@@ -117,68 +117,71 @@ export const CognateSearchForm: FC<{
 
 	return (
 		<form onSubmit={submit}>
-			<label htmlFor='word'>
-				Word{' '}
-				<input
-					onKeyDown={onKeyDown}
-					onInput={(e) => setInput(e.currentTarget.value)}
-					id='word'
-					type='search'
-					autoCapitalize='none'
-					value={word}
-					{...register('word')}
-					list='main-search'
-				/>
-				<datalist id='main-search'>
-					{autocompleteOptions.map((option) => (
-						<option key={option} value={option}>
-							{option}
-						</option>
-					))}
-				</datalist>
-			</label>{' '}
-			{seeAlsos.length ? (
-				<>
-					See also:{' '}
-					{seeAlsos.map((word, idx, arr) => (
-						<Fragment key={idx}>
-							<Link
-								to={toRelativeUrl(
-									makeCognateFinderUrl({ word, srcLang }),
-								)}
-							>
-								{word}
-							</Link>
-							{idx !== arr.length - 1 ? ', ' : ''}
-						</Fragment>
-					))}
-				</>
-			) : null}
-			<br />
-			<label htmlFor='srcLang'>
-				Source{' '}
-				<LangSelect
-					id='srcLang'
-					langCode={srcLang}
-					setLangCode={setValue}
-				/>
-			</label>{' '}
-			<button
-				className='swap'
-				type='button'
-				onClick={swap}
-				aria-label='Swap'
-			>
-				<span aria-hidden='true'>⇄</span>
-			</button>{' '}
-			<label htmlFor='trgLang'>
-				Target{' '}
-				<LangSelect
-					id='trgLang'
-					langCode={trgLang}
-					setLangCode={setValue}
-				/>
-			</label>
+			<div>
+				<label htmlFor='word'>
+					Word{' '}
+					<input
+						onKeyDown={onKeyDown}
+						onInput={(e) => setInput(e.currentTarget.value)}
+						id='word'
+						type='search'
+						autoCapitalize='none'
+						value={word}
+						{...register('word')}
+						list='main-search'
+					/>
+					<datalist id='main-search'>
+						{autocompleteOptions.map((option) => (
+							<option key={option} value={option}>
+								{option}
+							</option>
+						))}
+					</datalist>
+				</label>{' '}
+				{seeAlsos.length ? (
+					<>
+						See also:{' '}
+						{seeAlsos.map((word, idx, arr) => (
+							<Fragment key={idx}>
+								<Link
+									to={toRelativeUrl(
+										makeCognateFinderUrl({ word, srcLang }),
+									)}
+								>
+									{word}
+								</Link>
+								{idx !== arr.length - 1 ? ', ' : ''}
+							</Fragment>
+						))}
+					</>
+				) : null}
+			</div>
+			<div>
+				<label htmlFor='srcLang'>
+					Source{' '}
+					<LangSelect
+						id='srcLang'
+						langCode={srcLang}
+						setLangCode={setValue}
+					/>
+				</label>{' '}
+				<button
+					className='swap'
+					type='button'
+					onClick={swap}
+					aria-label='Swap'
+				>
+					<span aria-hidden='true'>⇄</span>
+				</button>{' '}
+				<label htmlFor='trgLang'>
+					Target{' '}
+					<LangSelect
+						id='trgLang'
+						langCode={trgLang}
+						setLangCode={setValue}
+					/>
+				</label>
+			</div>
 			<div className='y-margins'>
 				<label htmlFor='allowPrefixesAndSuffixes'>
 					Allow prefixes and suffixes{' '}
@@ -189,17 +192,19 @@ export const CognateSearchForm: FC<{
 					/>
 				</label>
 			</div>
-			<button type='submit'>Search</button>{' '}
-			<small>
-				Etymology search powered by{' '}
-				<a
-					target='_blank'
-					rel='noreferrer noopener'
-					href={urls.etytreeWeb}
-				>
-					etytree
-				</a>
-			</small>
+			<div className='y-margins'>
+				<button type='submit'>Search</button>{' '}
+				<small className='powered-by'>
+					Etymology search powered by{' '}
+					<a
+						target='_blank'
+						rel='noreferrer noopener'
+						href={urls.etytreeWeb}
+					>
+						etytree
+					</a>
+				</small>
+			</div>
 		</form>
 	)
 }

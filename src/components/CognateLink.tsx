@@ -1,6 +1,7 @@
 import {
 	FC,
 	HTMLProps,
+	MouseEventHandler,
 	useCallback,
 	useEffect,
 	useMemo,
@@ -8,9 +9,10 @@ import {
 	useState,
 } from 'react'
 import { usePopper } from 'react-popper'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import { WordData } from '../core/cognates'
 import { fetchWiktionaryDefinitionHtml } from '../core/getWikiContent'
+import { isLink, isSameOrigin } from '../utils/browser'
 import { isTouchDevice } from '../utils/device'
 import {
 	makeCognateFinderUrl,
@@ -76,6 +78,8 @@ export const CognateLink: FC<
 	)
 
 	const [popoverHtml, setPopoverHtml] = useState<string | null>(null)
+
+	const history = useHistory()
 
 	const cognateFinderUrl = makeCognateFinderUrl({
 		word,
@@ -181,6 +185,19 @@ export const CognateLink: FC<
 		}
 	}, [offEvents, open, suppressOnEsc])
 
+	const onClick: MouseEventHandler<HTMLDivElement> = useCallback(
+		(e) => {
+			if (isLink(e.target) && isSameOrigin(e.target.href)) {
+				e.preventDefault()
+
+				hidePopover()
+
+				history?.push(toRelativeUrl(e.target.href))
+			}
+		},
+		[history, hidePopover],
+	)
+
 	return (
 		<span ref={ref} className='popover-parent'>
 			<span ref={setReferenceElement}>
@@ -204,28 +221,12 @@ export const CognateLink: FC<
 					{loading ? (
 						<Spinner />
 					) : (
-						<>
-							<div>
-								<strong>
-									<a
-										target='blank'
-										rel='noreferrer noopener'
-										href={wiktionaryUrl}
-									>
-										{title} — Wiktionary
-									</a>
-								</strong>
-							</div>
-
+						<div onClick={onClick}>
 							<WiktionaryHtml
-								hidePopover={hidePopover}
-								__html={
-									popoverHtml === ''
-										? '<span class="grayed-out">No definitions found</span>'
-										: popoverHtml ?? ''
-								}
+								dangerousHtml={popoverHtml}
+								{...{ wiktionaryUrl, title }}
 							/>
-						</>
+						</div>
 					)}
 				</div>
 			)}

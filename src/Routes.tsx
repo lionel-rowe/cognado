@@ -8,11 +8,12 @@ import { Qps, initQps } from './utils/setupQps'
 
 export const QpsContext = createContext<Qps>(initQps())
 
-export enum Paths {
+export enum Path {
 	Home = '/',
 	ShareTarget = '/share-target',
 	Cognates = '/cognates',
 	Definition = '/definition',
+	Translations = '/translations',
 }
 
 export const Routes = () => {
@@ -23,13 +24,15 @@ export const Routes = () => {
 	return (
 		<QpsContext.Provider value={qps}>
 			<Switch>
-				<Route exact path={Paths.Home}>
+				<Route exact path={Path.Home}>
 					<Home />
 				</Route>
-				<Route exact path={Paths.ShareTarget}>
+				<Route exact path={Path.ShareTarget}>
 					<ShareTarget />
 				</Route>
-				<Route path={[Paths.Cognates, Paths.Definition]}>
+				<Route
+					path={[Path.Cognates, Path.Definition, Path.Translations]}
+				>
 					<SearchResults />
 				</Route>
 				<Route path='*'>

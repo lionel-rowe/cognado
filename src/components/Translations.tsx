@@ -1,5 +1,5 @@
 import { pipe } from 'fp-ts/lib/function'
-import { FC, Fragment } from 'react'
+import { FC } from 'react'
 import { Link } from 'react-router-dom'
 import { makeCognateFinderUrl, toRelativeUrl } from '../utils/formatters'
 import { LangCode } from '../utils/langNames'
@@ -30,31 +30,26 @@ const TranslationLink: FC<{ word: string; trgLang: LangCode }> = ({
 export const Translations: FC<Props> = ({ translations }) => {
 	return (
 		<div>
-			<ul>
+			<ol>
 				{translations.map(({ meaning, translations, trgLang }) => {
 					return (
-						<li>
-							{meaning}:{' '}
-							{translations.map((word, idx, arr) =>
-								idx === arr.length - 1 ? (
-									<Fragment key={word}>
-										<TranslationLink
-											{...{ word, trgLang }}
-										/>
-									</Fragment>
-								) : (
-									<Fragment key={word}>
-										<TranslationLink
-											{...{ word, trgLang }}
-										/>
-										{', '}
-									</Fragment>
-								),
-							)}
+						<li key={meaning}>
+							<div className='y-margins'>
+								{meaning}
+								<ul>
+									{translations.map((word) => (
+										<li key={word}>
+											<TranslationLink
+												{...{ word, trgLang }}
+											/>
+										</li>
+									))}
+								</ul>
+							</div>
 						</li>
 					)
 				})}
-			</ul>
+			</ol>
 		</div>
 	)
 }

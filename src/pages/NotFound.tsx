@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Paths } from '../Routes'
+import { Path } from '../Routes'
 
 export const NotFound = () => {
 	return (
@@ -7,7 +7,7 @@ export const NotFound = () => {
 			<h1>Page not found</h1>
 
 			<p>
-				<Link to={Paths.Home}>Home</Link>
+				<Link to={Path.Home}>Home</Link>
 			</p>
 		</>
 	)

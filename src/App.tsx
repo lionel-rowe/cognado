@@ -4,7 +4,7 @@ import { Routes } from './Routes'
 export const App = () => {
 	return (
 		<Router basename={process.env.PUBLIC_URL}>
-			<main className='container'>
+			<main className='container' translate='no'>
 				<Routes />
 			</main>
 		</Router>

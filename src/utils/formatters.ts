@@ -1,5 +1,6 @@
 import { flow } from 'fp-ts/lib/function'
 import { urls } from '../config'
+import { Path } from '../Routes'
 import { getLangName, LangCode } from './langNames'
 
 export const underscorify = (x: string) => x.replace(/ /g, '_')
@@ -22,11 +23,16 @@ export const getDefaultTrgLang = (srcLang: LangCode): LangCode => {
 export const makeCognateFinderUrl = ({
 	word,
 	srcLang,
+	path = Path.Cognates,
 }: {
 	word: string
 	srcLang: LangCode
+	path?: Path
 }) => {
-	const url = new URL(process.env.PUBLIC_URL, window.location.href)
+	const url = new URL(
+		[process.env.PUBLIC_URL, path].join(''),
+		window.location.origin,
+	)
 
 	const trgLang = getDefaultTrgLang(srcLang)
 

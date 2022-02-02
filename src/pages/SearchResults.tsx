@@ -14,25 +14,21 @@ import {
 	hydrate,
 	isCognateError,
 } from '../core/cognates'
-import { usePagination } from '../hooks/usePagination'
 import { getLangName } from '../utils/langNames'
 import { ls } from '../utils/ls'
 import { urls } from '../config'
 import { Spinner } from '../components/Spinner'
-import { Pagination } from '../components/Pagination'
-import { CognatesList } from '../components/CognatesList'
 import { GitHubCorner } from '../components/GitHubCorner'
 import { RootErrorBoundary } from '../components/RootErrorBoundary'
 import { FormValues, getFormValues, qpInit } from '../utils/setupQps'
 import { CognateSearchForm } from '../components/CognateSearchForm'
-import { Paths, QpsContext } from '../Routes'
+import { Path, QpsContext } from '../Routes'
 import { useHistory, useLocation } from 'react-router'
-import { CognateLink } from '../components/CognateLink'
 import { parseSeeAlsos } from '../core/seeAlsos'
 import { parseTranslations } from '../core/translations'
 import { fetchWiktionaryPage } from '../core/fetchWiktionaryPage'
-import { Translations } from '../components/Translations'
 import { createQps, pseudoHistory } from '../utils/qps'
+import { Tabs } from '../components/Tabs'
 
 const matches = (x: FormValues | null, y: FormValues | null) => {
 	const truthies = [x, y].filter(Boolean)
@@ -150,30 +146,15 @@ export const SearchResults: FC = () => {
 		}
 	}, [location, lastSubmitted, qps, reset])
 
-	const { page, setPage, pageStart, pageEnd, maxPageNo } = usePagination(
-		cognates,
-		{ pageSize: 50, startPage: qps.get('page') },
-	)
-
-	const updatePage = useCallback(
-		(n: number, pushState?: boolean) => {
-			setPage(n)
-
-			qps.set('page', n, pushState)
-		},
-		[setPage, qps],
-	)
-
 	const onSubmit = useCallback(
 		async (values: FormValues) => {
 			const u = new URL(window.location.href)
+
 			const pseudoQps = createQps(qpInit, pseudoHistory(u))
 
 			pseudoQps.setMany({ ...values, page: 1 })
 
-			console.log(u.search, pseudoQps.getAll())
-
-			history.push({ pathname: Paths.Cognates, search: u.search })
+			history.push({ pathname: Path.Cognates, search: u.search })
 
 			setLastSubmitted(values.word ? values : null)
 		},
@@ -255,92 +236,16 @@ export const SearchResults: FC = () => {
 						</div>
 					) : (
 						<>
-							<div className='y-margins'>
-								<CognateLink
-									word={lastSubmitted.word}
-									langCode={lastSubmitted.srcLang}
-								/>
-							</div>
-
-							<div className='y-margins'>
-								<Translations
-									translations={relevantTranslations}
-								/>
-							</div>
-
-							{cognates.length ? (
-								<>
-									<div>
-										Total {cognates.length} results | Page{' '}
-										{
-											<Pagination
-												{...{
-													page,
-													maxPageNo,
-													setPage: updatePage,
-												}}
-											/>
-										}
-									</div>
-								</>
-							) : null}
-
-							<br />
-
-							<div>
-								{error ? (
-									<div>
-										<strong>Error:</strong> {error.message}
-									</div>
-								) : cognates.length ? (
-									<>
-										<CognatesList
-											{...{
-												cognates: hydrated,
-												pageStart,
-												pageEnd,
-											}}
-										/>
-										<br />
-										Page{' '}
-										{
-											<Pagination
-												{...{
-													page,
-													maxPageNo,
-													setPage: updatePage,
-												}}
-											/>
-										}
-									</>
-								) : word === lastSubmitted?.word ? (
-									word ? (
-										`No ${getLangName(
-											lastSubmitted.trgLang,
-										)} cognates found for ${getLangName(
-											lastSubmitted.srcLang,
-										)} "${word}"`
-									) : (
-										'Enter a word to search for'
-									)
-								) : (
-									'Click "Search" to find cognates'
-								)}
-
-								<br />
-								{cognates.length && word && query ? (
-									<>
-										<br />
-										<details>
-											<summary>Show raw query</summary>
-
-											<pre>{query}</pre>
-										</details>
-									</>
-								) : null}
-								<br />
-								<br />
-							</div>
+							<Tabs
+								{...{
+									word,
+									lastSubmitted,
+									translations: relevantTranslations,
+									cognates: hydrated,
+									query,
+									error,
+								}}
+							/>
 						</>
 					)}
 				</div>

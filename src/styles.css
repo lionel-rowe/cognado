@@ -4,14 +4,16 @@
 
 body {
 	font-family: sans-serif;
+	overflow-y: scroll;
 }
 
 :root {
 	--color-primary: #1d9222;
+	--grid-maxWidth: 100rem;
 	/* --color-secondary: #9e3f00; */
 }
 
-a:hover:is([class], :not([class])) {
+a[href]:hover {
 	opacity: initial;
 }
 
@@ -19,9 +21,8 @@ button.swap {
 	padding-block: 0.8rem;
 }
 
-main {
-	max-width: 800px;
-	margin: auto;
+main.container {
+	margin-block: 3rem;
 }
 
 details summary {
@@ -42,6 +43,10 @@ a {
 
 a:hover {
 	text-decoration: underline;
+}
+
+nav a:hover {
+	text-decoration: initial;
 }
 
 .y-margins {
@@ -87,4 +92,8 @@ label[for='trgLang'] {
 .popover ol {
 	margin-block-start: 1em;
 	margin-block-end: 1em;
+}
+
+.powered-by {
+	margin-left: 0.5rem;
 }

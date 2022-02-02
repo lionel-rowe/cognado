@@ -1,24 +1,80 @@
-import { BrowserRouter as Router } from 'react-router-dom'
-import { Paths } from '../Routes'
-// import { Routes } from './Routes'
+import { FC } from 'react'
+import { NavLink, Route, Switch, useLocation } from 'react-router-dom'
+import { CognateHydrated } from '../core/cognates'
+import { Path } from '../Routes'
+import { LangCode } from '../utils/langNames'
+import { FormValues } from '../utils/setupQps'
+import { CognatesTab } from './CognatesTab'
+import { DefinitionTab } from './DefinitionTab'
+import { TranslationsTab } from './TranslationsTab'
 
-export const Tabs = () => {
-	// return (
-	// 	<Router basename={process.env.PUBLIC_URL}>
-	// 		<nav className='tabs'>
-	// 			<NavLink exact activeClassName='active' to={Paths.Cognates}>
-	// 				Cognates
-	// 			</NavLink>
-	// 			<NavLink exact activeClassName='active' to={Paths.Definition}>
-	// 				Definition
-	// 			</NavLink>
-	// 			<NavLink exact activeClassName='active' to={Paths.Translations}>
-	// 				Translation
-	// 			</NavLink>
-	// 		</nav>
-	// 		<main className='container'>
-	// 			<Routes />
-	// 		</main>
-	// 	</Router>
-	// )
+type Props = {
+	lastSubmitted: FormValues
+	translations: {
+		meaning: string
+		trgLang: LangCode
+		translations: string[]
+	}[]
+	cognates: CognateHydrated[]
+	word: string
+	query: string
+	error: Error | null
+}
+
+export const Tabs: FC<Props> = ({
+	lastSubmitted,
+	translations,
+	cognates,
+	word,
+	query,
+	error,
+}) => {
+	const { search } = useLocation()
+
+	return (
+		<div className='y-margins'>
+			<nav className='tabs'>
+				<NavLink
+					exact
+					activeClassName='active'
+					to={[Path.Cognates, search].join('')}
+				>
+					Cognates
+				</NavLink>
+				<NavLink
+					exact
+					activeClassName='active'
+					to={[Path.Definition, search].join('')}
+				>
+					Definition
+				</NavLink>
+				{translations.length ? (
+					<NavLink
+						exact
+						activeClassName='active'
+						to={[Path.Translations, search].join('')}
+					>
+						Translations
+					</NavLink>
+				) : null}
+			</nav>
+			<article>
+				<Switch>
+					<Route exact path={Path.Cognates}>
+						<CognatesTab
+							{...{ cognates, lastSubmitted, word, query, error }}
+						/>
+					</Route>
+					<Route exact path={Path.Definition}>
+						<DefinitionTab {...{ lastSubmitted }} />
+					</Route>
+					<Route exact path={Path.Translations}>
+						{translations.length ? (
+							<TranslationsTab {...{ translations }} />
+						) : null}
+					</Route>
+				</Switch>
+			</article>
+		</div>
+	)
 }
