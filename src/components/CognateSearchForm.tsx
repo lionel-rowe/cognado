@@ -1,9 +1,12 @@
 import {
+	EventHandler,
 	FC,
 	Fragment,
 	KeyboardEventHandler,
 	useCallback,
+	useRef,
 	useState,
+	SyntheticEvent,
 } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { Link } from 'react-router-dom'
@@ -49,6 +52,22 @@ export const CognateSearchForm: FC<{
 		[setValue, watch],
 	)
 
+	const lastSubmittedAt = useRef(-1)
+
+	const submit = useCallback<EventHandler<SyntheticEvent>>(
+		(e) => {
+			// rate limited to once per second
+			// - avoid double-submit on `Enter` keydown
+			const now = Date.now()
+
+			if (now - lastSubmittedAt.current > 1e3) {
+				handleSubmit(onSubmit)(e)
+				lastSubmittedAt.current = now
+			}
+		},
+		[handleSubmit, onSubmit],
+	)
+
 	const onKeyDown = useCallback<KeyboardEventHandler<HTMLInputElement>>(
 		(e) => {
 			if (!input) return
@@ -62,7 +81,7 @@ export const CognateSearchForm: FC<{
 
 			if (onAutocompleteSelectKeys.includes(e.key)) {
 				// wait for `e.currentTarget.value` to update first
-				nextAnimationFrame().then(() => handleSubmit(onSubmit)(e))
+				nextAnimationFrame().then(() => submit(e))
 
 				return
 			}
@@ -93,11 +112,11 @@ export const CognateSearchForm: FC<{
 				controller.abort()
 			}
 		},
-		[input, handleSubmit, onSubmit],
+		[input, submit],
 	)
 
 	return (
-		<form onSubmit={handleSubmit(onSubmit)}>
+		<form onSubmit={submit}>
 			<label htmlFor='word'>
 				Word{' '}
 				<input
@@ -144,7 +163,12 @@ export const CognateSearchForm: FC<{
 					setLangCode={setValue}
 				/>
 			</label>{' '}
-			<button type='button' onClick={swap} aria-label='Swap'>
+			<button
+				className='swap'
+				type='button'
+				onClick={swap}
+				aria-label='Swap'
+			>
 				<span aria-hidden='true'>⇄</span>
 			</button>{' '}
 			<label htmlFor='trgLang'>

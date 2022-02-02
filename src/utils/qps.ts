@@ -31,7 +31,7 @@ export type RawQpTypes<T extends Record<string, QueryOpts>> = {
 	[k in keyof T]: ReturnType<T[k]['parse']> | T[k]['defaultValue']
 }
 
-const historyFn = (method: 'pushState' | 'replaceState') =>
+export const windowHistoryFn = (method: 'pushState' | 'replaceState') =>
 	(({ search }: URL) => {
 		const url = new URL(window.location.href)
 
@@ -39,6 +39,15 @@ const historyFn = (method: 'pushState' | 'replaceState') =>
 
 		window.history[method]({}, document.title, url.href)
 	}) as ({ search }: Pick<URL, 'search'>) => void
+
+export const pseudoHistory = (url: URL): History => ({
+	push: ({ search }) => {
+		url.search = search
+	},
+	replace: ({ search }) => {
+		url.search = search
+	},
+})
 
 export type History = {
 	push: ({ search }: Pick<URL, 'search'>) => void
@@ -48,8 +57,8 @@ export type History = {
 export const createQps = <T extends Record<keyof T, QueryOpts<any, any, any>>>(
 	init: QpsInit<T>,
 	history: History = {
-		push: historyFn('pushState'),
-		replace: historyFn('replaceState'),
+		push: windowHistoryFn('pushState'),
+		replace: windowHistoryFn('replaceState'),
 	},
 ) => {
 	return {

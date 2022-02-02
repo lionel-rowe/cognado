@@ -23,15 +23,16 @@ import { Pagination } from '../components/Pagination'
 import { CognatesList } from '../components/CognatesList'
 import { GitHubCorner } from '../components/GitHubCorner'
 import { RootErrorBoundary } from '../components/RootErrorBoundary'
-import { FormValues, getFormValues } from '../utils/setupQps'
+import { FormValues, getFormValues, qpInit } from '../utils/setupQps'
 import { CognateSearchForm } from '../components/CognateSearchForm'
-import { QpsContext } from '../Routes'
-import { useLocation } from 'react-router'
+import { Paths, QpsContext } from '../Routes'
+import { useHistory, useLocation } from 'react-router'
 import { CognateLink } from '../components/CognateLink'
 import { parseSeeAlsos } from '../core/seeAlsos'
 import { parseTranslations } from '../core/translations'
 import { fetchWiktionaryPage } from '../core/fetchWiktionaryPage'
 import { Translations } from '../components/Translations'
+import { createQps, pseudoHistory } from '../utils/qps'
 
 const matches = (x: FormValues | null, y: FormValues | null) => {
 	const truthies = [x, y].filter(Boolean)
@@ -48,8 +49,10 @@ const matches = (x: FormValues | null, y: FormValues | null) => {
 	}
 }
 
-export const Search: FC = () => {
+export const SearchResults: FC = () => {
 	const location = useLocation()
+	const history = useHistory()
+
 	const qps = useContext(QpsContext)
 
 	const [seeAlsos, setSeeAlsos] = useState(ls.seeAlsos ?? [])
@@ -102,9 +105,8 @@ export const Search: FC = () => {
 
 			if (!word) {
 				setCognates([])
-				setLastSubmitted(null)
-			} else {
-				setLastSubmitted(values)
+
+				return
 			}
 
 			setLoading(true)
@@ -162,19 +164,20 @@ export const Search: FC = () => {
 		[setPage, qps],
 	)
 
-	const updateValues = useCallback(
-		async (values: FormValues) => {
-			qps.setMany(values, true)
-		},
-		[qps],
-	)
-
 	const onSubmit = useCallback(
 		async (values: FormValues) => {
-			updateValues(values)
-			updatePage(1, false)
+			const u = new URL(window.location.href)
+			const pseudoQps = createQps(qpInit, pseudoHistory(u))
+
+			pseudoQps.setMany({ ...values, page: 1 })
+
+			console.log(u.search, pseudoQps.getAll())
+
+			history.push({ pathname: Paths.Cognates, search: u.search })
+
+			setLastSubmitted(values.word ? values : null)
 		},
-		[updateValues, updatePage],
+		[history],
 	)
 
 	useEffect(() => {
@@ -213,21 +216,21 @@ export const Search: FC = () => {
 
 	const relevantTranslations = useMemo(
 		() =>
-		lastSubmitted?.trgLang ?
-			translations
-				.map(({ meaning, translations }) => ({
-					meaning,
-					translations:
-						translations[
-							getLangName(lastSubmitted.trgLang ?? '') ?? ''
-						],
-					trgLang: lastSubmitted.trgLang,
-				}))
-				.filter((x) => x.translations) : [],
+			lastSubmitted?.trgLang
+				? translations
+						.map(({ meaning, translations }) => ({
+							meaning,
+							translations:
+								translations[
+									getLangName(lastSubmitted.trgLang ?? '') ??
+										''
+								],
+							trgLang: lastSubmitted.trgLang,
+						}))
+						.filter((x) => x.translations)
+				: [],
 		[translations, lastSubmitted?.trgLang],
 	)
-
-				console.log({translations,relevantTranslations})
 
 	return (
 		<>
@@ -239,13 +242,17 @@ export const Search: FC = () => {
 					href={urls.github}
 				/>
 
-				<main className='container'>
+				<div>
 					<h1>Cognate finder</h1>
 
 					<CognateSearchForm {...{ form, onSubmit, seeAlsos }} />
 
-					{loading || !lastSubmitted ? (
+					{loading ? (
 						<Spinner />
+					) : !lastSubmitted ? (
+						<div className='y-margins'>
+							Enter a word to search for
+						</div>
 					) : (
 						<>
 							<div className='y-margins'>
@@ -336,7 +343,7 @@ export const Search: FC = () => {
 							</div>
 						</>
 					)}
-				</main>
+				</div>
 			</RootErrorBoundary>
 		</>
 	)

@@ -51,14 +51,18 @@ const getDefinitionDomForLanguage = (
 			].includes(x.line.trim().toLowerCase()),
 		) ?? { text: '' }
 
-	const parsed = new DOMParser().parseFromString(text, 'text/html')
+	const doc = new DOMParser().parseFromString(text, 'text/html')
 
-	const base = document.createElement('base')
+	const base = doc.createElement('base')
 	base.href = urls.wiktionaryWeb
 
-	parsed.head.appendChild(base)
+	doc.head.appendChild(base)
 
-	for (const link of parsed.body.querySelectorAll<HTMLAnchorElement>(
+	for (const el of doc.body.querySelectorAll('.maintenance-line')) {
+		el.remove()
+	}
+
+	for (const link of doc.body.querySelectorAll<HTMLAnchorElement>(
 		'a[href]',
 	)) {
 		const rawHref = link.getAttribute('href')!
@@ -103,7 +107,7 @@ const getDefinitionDomForLanguage = (
 		}
 	}
 
-	return parsed.querySelector('body')!
+	return doc.querySelector('body')!
 }
 
 const cache = new Map<string, string>()

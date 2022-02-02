@@ -5,7 +5,8 @@ type HasGroups<T extends string> = RegExpMatchArray & {
 }
 
 // {{xyz}} syntax, used for templates in MediaWiki
-const wrap = (...args: [x: TemplateStringsArray, ...rest: any[]]) => regex`\{\{${regex(...args)}\}\}`
+const wrap = (...args: [x: TemplateStringsArray, ...rest: any[]]) =>
+	regex`\{\{${regex(...args)}\}\}`
 
 // for example:
 // {{trans-top|meaning description here}}

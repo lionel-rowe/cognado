@@ -2,7 +2,7 @@ import { LangCode } from './langNames'
 import { pick } from './pick'
 import { qpType, createQps, History } from './qps'
 
-const qpInit = {
+export const qpInit = {
 	word: qpType.string(''),
 	srcLang: qpType.string<LangCode>('spa'),
 	trgLang: qpType.string<LangCode>('eng'),

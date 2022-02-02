@@ -61,18 +61,13 @@ export const CognateLink: FC<
 							'auto',
 							'auto-start',
 							'auto-end',
-							'top-start',
-							'top-end',
 							'bottom-start',
 							'bottom-end',
 							'right-start',
 							'right-end',
 							'left-start',
 							'left-end',
-							'top',
 							'bottom',
-							// 'right', // causes vertical scroll on small screens
-							// 'left', // causes vertical scroll on small screens
 						],
 					},
 				},

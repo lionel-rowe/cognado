@@ -6,6 +6,19 @@ body {
 	font-family: sans-serif;
 }
 
+:root {
+	--color-primary: #1d9222;
+	/* --color-secondary: #9e3f00; */
+}
+
+a:hover:is([class], :not([class])) {
+	opacity: initial;
+}
+
+button.swap {
+	padding-block: 0.8rem;
+}
+
 main {
 	max-width: 800px;
 	margin: auto;
@@ -24,14 +37,10 @@ pre {
 }
 
 a {
-	color: rgb(0, 110, 101);
-}
-
-li a {
 	text-decoration: none;
 }
 
-li a:hover {
+a:hover {
 	text-decoration: underline;
 }
 

@@ -1,3 +1,4 @@
+import 'chota/dist/chota.css' // can't use .min.css due to CRA transpiling bug
 import './styles.css'
 import { render } from 'react-dom'
 import { App } from './App'

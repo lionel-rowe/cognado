@@ -38,11 +38,15 @@ export const Translations: FC<Props> = ({ translations }) => {
 							{translations.map((word, idx, arr) =>
 								idx === arr.length - 1 ? (
 									<Fragment key={word}>
-										<TranslationLink {...{word, trgLang}} />
+										<TranslationLink
+											{...{ word, trgLang }}
+										/>
 									</Fragment>
 								) : (
 									<Fragment key={word}>
-										<TranslationLink {...{word, trgLang}} />
+										<TranslationLink
+											{...{ word, trgLang }}
+										/>
 										{', '}
 									</Fragment>
 								),
