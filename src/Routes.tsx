@@ -4,9 +4,12 @@ import { Home } from './pages/Home'
 import { NotFound } from './pages/NotFound'
 import { SearchResults } from './pages/SearchResults'
 import { ShareTarget } from './pages/ShareTarget'
+import { pseudoHistory } from './utils/qps'
 import { Qps, initQps } from './utils/setupQps'
 
-export const QpsContext = createContext<Qps>(initQps())
+export const QpsContext = createContext<Qps>(
+	initQps(pseudoHistory(new URL(window.location.href))),
+)
 
 export enum Path {
 	Home = '/',

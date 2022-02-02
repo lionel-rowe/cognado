@@ -1,7 +1,9 @@
 import { FC, useCallback, useContext } from 'react'
+import { Link } from 'react-router-dom'
 import { CognateHydrated } from '../core/cognates'
 import { usePagination } from '../hooks/usePagination'
 import { QpsContext } from '../Routes'
+import { makeCognateFinderUrl, toRelativeUrl } from '../utils/formatters'
 import { getLangName } from '../utils/langNames'
 import { FormValues } from '../utils/setupQps'
 import { CognatesList } from './CognatesList'
@@ -13,6 +15,7 @@ type Props = {
 	word: string
 	query: string
 	error: Error | null
+	suggestTryFlipped: boolean
 }
 
 export const CognatesTab: FC<Props> = ({
@@ -21,6 +24,7 @@ export const CognatesTab: FC<Props> = ({
 	lastSubmitted,
 	query,
 	error,
+	suggestTryFlipped,
 }) => {
 	const qps = useContext(QpsContext)
 
@@ -41,6 +45,8 @@ export const CognatesTab: FC<Props> = ({
 		},
 		[setPage, qps],
 	)
+
+	const { srcLang, trgLang } = lastSubmitted
 
 	return (
 		<div className='y-margins'>
@@ -89,11 +95,31 @@ export const CognatesTab: FC<Props> = ({
 					</>
 				) : word === lastSubmitted?.word ? (
 					word ? (
-						`No ${getLangName(
-							lastSubmitted.trgLang,
-						)} cognates found for ${getLangName(
-							lastSubmitted.srcLang,
-						)} "${word}"`
+						<>
+							<p>
+								No {getLangName(trgLang)} cognates found for{' '}
+								{getLangName(srcLang)} "{word}".{' '}
+							</p>
+							{suggestTryFlipped ? (
+								<p>
+									Did you mean to search{' '}
+									<strong>
+										<Link
+											to={toRelativeUrl(
+												makeCognateFinderUrl({
+													word,
+													srcLang: trgLang,
+												}),
+											)}
+										>
+											{getLangName(trgLang)} →{' '}
+											{getLangName(srcLang)}
+										</Link>
+									</strong>
+									?
+								</p>
+							) : null}
+						</>
 					) : (
 						'Enter a word to search for'
 					)

@@ -19,6 +19,7 @@ const pseudoTarget = {
 	wiktionaryUrl: string | null
 	seeAlsos: string[]
 	translations: Translations
+	suggestTryFlipped: boolean
 }>
 
 export const ls = new Proxy(pseudoTarget, {

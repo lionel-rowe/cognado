@@ -19,6 +19,7 @@ type Props = {
 	word: string
 	query: string
 	error: Error | null
+	suggestTryFlipped: boolean
 }
 
 export const Tabs: FC<Props> = ({
@@ -28,6 +29,7 @@ export const Tabs: FC<Props> = ({
 	word,
 	query,
 	error,
+	suggestTryFlipped,
 }) => {
 	const { search } = useLocation()
 
@@ -62,7 +64,14 @@ export const Tabs: FC<Props> = ({
 				<Switch>
 					<Route exact path={Path.Cognates}>
 						<CognatesTab
-							{...{ cognates, lastSubmitted, word, query, error }}
+							{...{
+								cognates,
+								lastSubmitted,
+								word,
+								query,
+								error,
+								suggestTryFlipped,
+							}}
 						/>
 					</Route>
 					<Route exact path={Path.Definition}>

@@ -29,6 +29,7 @@ import { parseTranslations } from '../core/translations'
 import { fetchWiktionaryPage } from '../core/fetchWiktionaryPage'
 import { createQps, pseudoHistory } from '../utils/qps'
 import { Tabs } from '../components/Tabs'
+import { containsSectionForLanguage } from '../core/containsSectionForLanguage'
 
 const matches = (x: FormValues | null, y: FormValues | null) => {
 	const truthies = [x, y].filter(Boolean)
@@ -93,6 +94,8 @@ export const SearchResults: FC = () => {
 		ls.values ?? null,
 	)
 
+	const [suggestTryFlipped, setSuggestTryFlipped] = useState(false)
+
 	useEffect(() => {
 		if (!matches(lastSubmitted, getFormValues(qps))) {
 			const values = getFormValues(qps)
@@ -118,6 +121,10 @@ export const SearchResults: FC = () => {
 			]).then(([result, wiktionaryPage]) => {
 				const translations = parseTranslations(wiktionaryPage)
 				const seeAlsos = parseSeeAlsos(wiktionaryPage)
+				const suggestTryFlipped = containsSectionForLanguage(
+					trgLang,
+					wiktionaryPage,
+				)
 
 				setLoading(false)
 
@@ -131,6 +138,7 @@ export const SearchResults: FC = () => {
 					setCognates(cognates)
 					setSeeAlsos(seeAlsos)
 					setTranslations(translations)
+					setSuggestTryFlipped(suggestTryFlipped)
 
 					setQuery(query)
 
@@ -139,6 +147,7 @@ export const SearchResults: FC = () => {
 					ls.query = query
 					ls.seeAlsos = seeAlsos
 					ls.translations = translations
+					ls.suggestTryFlipped = suggestTryFlipped
 
 					reset(values)
 				}
@@ -244,6 +253,7 @@ export const SearchResults: FC = () => {
 									cognates: hydrated,
 									query,
 									error,
+									suggestTryFlipped,
 								}}
 							/>
 						</>
