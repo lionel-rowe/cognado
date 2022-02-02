@@ -1,6 +1,6 @@
 import { FC, useContext, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
-import { QpsContext } from '../Routes'
+import { Path, QpsContext } from '../Routes'
 
 export const ShareTarget: FC = () => {
 	const history = useHistory()
@@ -16,7 +16,7 @@ export const ShareTarget: FC = () => {
 		qps.set('word', content ?? shareText ?? '', false)
 
 		history.replace({
-			pathname: '/',
+			pathname: Path.Cognates,
 			search: window.location.search,
 		})
 	}, [history, qps])

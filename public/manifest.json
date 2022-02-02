@@ -3,9 +3,29 @@
 	"name": "Cognate Finder",
 	"icons": [
 		{
-			"src": "favicon.svg",
-			"sizes": "150x150",
-			"type": "image/svg+xml"
+			"src": "favicon-16.png",
+			"sizes": "16x16",
+			"type": "image/png"
+		},
+		{
+			"src": "favicon-32.png",
+			"sizes": "32x32",
+			"type": "image/png"
+		},
+		{
+			"src": "favicon-96.png",
+			"sizes": "96x96",
+			"type": "image/png"
+		},
+		{
+			"src": "favicon-144.png",
+			"sizes": "144x144",
+			"type": "image/png"
+		},
+		{
+			"src": "favicon-560.png",
+			"sizes": "560x560",
+			"type": "image/png"
 		}
 	],
 	"start_url": ".",
