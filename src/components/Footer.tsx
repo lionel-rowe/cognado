@@ -44,7 +44,10 @@ export const Footer: FC<HtmlHTMLAttributes<HTMLElement>> = ({
 					>
 						MIT
 					</a>
-					) · Version <abbr title={buildInfo.ts}>{buildInfo.hash}</abbr>
+					) · Version{' '}
+					<code className='build-info' title={buildInfo.ts}>
+						{buildInfo.hash}
+					</code>
 				</small>
 			</div>
 		</footer>

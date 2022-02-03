@@ -7,9 +7,11 @@ import buildInfo from './buildInfo.json'
 
 import { injectCssConstants } from './utils/cssConstants'
 import * as serviceWorkerRegistration from './serviceWorkerRegistration'
+import { initViewportHeightAdjuster } from './utils/viewportHeightAdjuster'
 
 exposeGlobals()
 injectCssConstants()
+initViewportHeightAdjuster()
 
 render(<App />, document.getElementById('root'))
 

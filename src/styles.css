@@ -8,7 +8,9 @@ body {
 }
 
 :root {
+	--vh: 1vh; /* modified in JS to give accurate results on mobile */
 	--color-primary: #1d9222;
+	--color-primary-dark: #107916;
 	--grid-maxWidth: 100rem;
 	/* --color-secondary: #9e3f00; */
 	--page-padding: 3rem;
@@ -21,7 +23,27 @@ a[href]:hover {
 }
 
 button.swap {
+	background-color: var(--bg-color);
+	font-size: 2rem;
 	padding-block: 0.8rem;
+	padding-inline: 0.5rem;
+	width: 4rem;
+	color: var(--color-primary);
+}
+
+button.swap:hover {
+	color: var(--color-primary-dark);
+	font-weight: bold;
+	background-color: none;
+}
+
+:is(.button, button[type='submit']):hover {
+	opacity: revert;
+}
+
+:is(.button.primary, button[type='submit']):hover {
+	opacity: revert;
+	background-color: var(--color-primary-dark);
 }
 
 main.container {
@@ -131,7 +153,7 @@ a[href^='http']:not([href^='%ROOT_URL%'])::after {
 .full-page {
 	display: flex;
 	flex-direction: column;
-	min-height: 100vh;
+	min-height: calc(var(--vh) * 100);
 }
 
 main.container {
@@ -144,8 +166,6 @@ footer.container {
 
 /* /sticky footer */
 
-abbr[title] {
-	border-block-end: 1px dashed tomato;
-    text-decoration: none;
+.build-info[title] {
 	cursor: help;
 }
