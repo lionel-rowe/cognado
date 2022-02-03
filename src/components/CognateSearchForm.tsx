@@ -194,16 +194,6 @@ export const CognateSearchForm: FC<{
 			</div>
 			<div className='y-margins'>
 				<button type='submit'>Search</button>{' '}
-				<small className='powered-by'>
-					Etymology search powered by{' '}
-					<a
-						target='_blank'
-						rel='noreferrer noopener'
-						href={urls.etytreeWeb}
-					>
-						etytree
-					</a>
-				</small>
 			</div>
 		</form>
 	)

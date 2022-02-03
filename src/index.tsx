@@ -3,11 +3,13 @@ import './styles.css'
 import { render } from 'react-dom'
 import { App } from './App'
 import { exposeGlobals } from './debug'
+import { injectCssConstants } from './utils/cssConstants'
 import * as serviceWorkerRegistration from './serviceWorkerRegistration'
 
-render(<App />, document.getElementById('root'))
-
 exposeGlobals()
+injectCssConstants()
+
+render(<App />, document.getElementById('root'))
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

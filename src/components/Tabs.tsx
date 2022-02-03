@@ -39,14 +39,14 @@ export const Tabs: FC<Props> = ({
 				<NavLink
 					exact
 					activeClassName='active'
-					to={[Path.Cognates, search].join('')}
+					to={Path.Cognates + search}
 				>
 					Cognates
 				</NavLink>
 				<NavLink
 					exact
 					activeClassName='active'
-					to={[Path.Definition, search].join('')}
+					to={Path.Definition + search}
 				>
 					Definition
 				</NavLink>
@@ -54,7 +54,7 @@ export const Tabs: FC<Props> = ({
 					<NavLink
 						exact
 						activeClassName='active'
-						to={[Path.Translations, search].join('')}
+						to={Path.Translations + search}
 					>
 						Translations
 					</NavLink>

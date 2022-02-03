@@ -34,10 +34,7 @@ export const makeCognateFinderUrl = ({
 	srcLang: LangCode
 	path?: Path
 }) => {
-	const url = new URL(
-		[process.env.PUBLIC_URL, path].join(''),
-		window.location.origin,
-	)
+	const url = new URL(process.env.PUBLIC_URL + path, window.location.origin)
 
 	const trgLang = getDefaultTrgLang(srcLang)
 

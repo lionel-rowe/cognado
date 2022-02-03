@@ -13,7 +13,7 @@ export const WiktionaryHtml: FC<Props> = ({
 }) => {
 	const __html =
 		dangerousHtml === ''
-			? '<span class="grayed-out">No definitions found</span>'
+			? '<p><span class="grayed-out">No definitions found</span></p>'
 			: dangerousHtml ?? ''
 
 	return (
