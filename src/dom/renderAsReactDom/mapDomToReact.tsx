@@ -1,5 +1,6 @@
 import { Fragment } from 'react'
 import { DomNodeToReactParser } from '.'
+import { kebabToCamel } from '../../utils/formatters'
 
 const isTextNode = (node: Node): node is Text =>
 	node.nodeType === Node.TEXT_NODE
@@ -19,12 +20,17 @@ const allowedAttrs = [
 	'id',
 	'typeof',
 	'data-mw',
+	'data-mw-deduplicate',
 ]
 
+const reactProps: Record<string, string> = {
+	class: 'className',
+}
+
 export const mapDomToReact = (parseCustomNode: DomNodeToReactParser) => {
-	const mapDomToReact_ = (node: Node, idx: number) => {
+	const mapDomToReact_ = (node: Node) => {
 		if (isTextNode(node)) {
-			return <Fragment key={idx}>{node.data}</Fragment>
+			return <Fragment>{node.data}</Fragment>
 		} else if (isHtmlElementNode(node)) {
 			const customNode = parseCustomNode(node)
 
@@ -37,33 +43,50 @@ export const mapDomToReact = (parseCustomNode: DomNodeToReactParser) => {
 
 				for (const { name, value } of node.attributes) {
 					if (allowedAttrs.includes(name)) {
-						props[name] = value
+						props[reactProps[name] ?? name] = value
+					} else if (name === 'style') {
+						const style = Object.fromEntries(
+							value
+								.split(';')
+								.map((x) =>
+									x
+										.trim()
+										.split(':')
+										.map((y, i) =>
+											i
+												? y.trim()
+												: kebabToCamel(y.trim()),
+										),
+								)
+								.filter(Boolean),
+						)
+
+						props.style = style as string
 					} else {
 						console.info('Attribute blocked: ', name, value)
 					}
 				}
 
 				return node.textContent ? (
-					<El key={idx} {...(props as any)}>
-						{[...node.childNodes].map((n, i) =>
-							mapDomToReact_(n, i),
-						)}
+					<El {...(props as any)}>
+						{[...node.childNodes].map((n, i) => (
+							<Fragment key={i}>{mapDomToReact_(n)}</Fragment>
+						))}
 					</El>
 				) : (
-					<El key={idx} {...props} />
+					<El {...props} />
 				)
 			} catch (e) {
 				console.error(e)
 
 				return node.innerHTML ? (
 					<El
-						key={idx}
-						{...{
+						{...({
 							dangerouslySetInnerHTML: { __html: node.innerHTML },
-						}}
+						} as any)}
 					/>
 				) : (
-					<El key={idx} />
+					<El />
 				)
 			}
 		} else {

@@ -3,4 +3,6 @@
 HASH=$(git rev-parse --short HEAD)
 TIMESTAMP=$(git log -1 --format=%cI)
 
-echo \{\"hash\":\"$HASH\",\"ts\":\"$TIMESTAMP\"\} > ./src/buildInfo.json
+JSON="{\"hash\":\"$HASH\",\"ts\":\"$TIMESTAMP\"}"
+
+echo $JSON > ./src/buildInfo.json

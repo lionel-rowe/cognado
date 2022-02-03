@@ -10,6 +10,9 @@ export const capitalize = (x: string) => x.charAt(0).toUpperCase() + x.slice(1)
 export const forceCapitalize = (x: string) =>
 	x.charAt(0).toUpperCase() + x.slice(1).toLowerCase()
 
+export const kebabToCamel = (kebab: string) =>
+	kebab.replace(/([a-z])-([a-z])/g, (_, p1, p2) => p1 + p2.toUpperCase())
+
 export const wikify = flow(underscorify, encodeURIComponent)
 export const unwikify = flow(decodeURIComponent, (x) => x.replace(/_/g, ' '))
 
