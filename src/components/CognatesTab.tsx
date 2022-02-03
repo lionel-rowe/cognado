@@ -1,9 +1,7 @@
 import { FC, useCallback, useContext } from 'react'
-import { Link } from 'react-router-dom'
 import { CognateHydrated } from '../core/cognates'
 import { usePagination } from '../hooks/usePagination'
 import { QpsContext } from '../Routes'
-import { makeCognateFinderUrl, toRelativeUrl } from '../utils/formatters'
 import { getLangName } from '../utils/langNames'
 import { FormValues } from '../utils/setupQps'
 import { CognatesList } from './CognatesList'
@@ -15,7 +13,6 @@ type Props = {
 	word: string
 	query: string
 	error: Error | null
-	suggestTryFlipped: boolean
 }
 
 export const CognatesTab: FC<Props> = ({
@@ -24,7 +21,6 @@ export const CognatesTab: FC<Props> = ({
 	lastSubmitted,
 	query,
 	error,
-	suggestTryFlipped,
 }) => {
 	const qps = useContext(QpsContext)
 
@@ -98,33 +94,14 @@ export const CognatesTab: FC<Props> = ({
 						<>
 							<p>
 								No {getLangName(trgLang)} cognates found for{' '}
-								{getLangName(srcLang)} "{word}".{' '}
+								{getLangName(srcLang)} <em>{word}</em>{' '}
 							</p>
-							{suggestTryFlipped ? (
-								<p>
-									Did you mean to search{' '}
-									<strong>
-										<Link
-											to={toRelativeUrl(
-												makeCognateFinderUrl({
-													word,
-													srcLang: trgLang,
-												}),
-											)}
-										>
-											{getLangName(trgLang)} →{' '}
-											{getLangName(srcLang)}
-										</Link>
-									</strong>
-									?
-								</p>
-							) : null}
 						</>
 					) : (
 						'Enter a word to search for'
 					)
 				) : (
-					'Click "Search" to find cognates'
+					'Click “Search” to find cognates'
 				)}
 
 				{cognates.length && word && query ? (

@@ -169,3 +169,18 @@ footer.container {
 .build-info[title] {
 	cursor: help;
 }
+
+nav .active {
+	cursor: default;
+}
+
+nav .disabled-tab,
+nav .disabled-tab:hover {
+	cursor: default;
+	color: var(--color-lightGrey);
+	border-color: var(--color-lightGrey);
+}
+
+.popover dl {
+	margin-block: 0;
+}

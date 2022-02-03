@@ -28,7 +28,7 @@ export const getDefaultTrgLang = (srcLang: LangCode): LangCode => {
 export const makeCognateFinderUrl = ({
 	word,
 	srcLang,
-	path = Path.Cognates,
+	path = Path.Definition,
 }: {
 	word: string
 	srcLang: LangCode

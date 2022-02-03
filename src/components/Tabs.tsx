@@ -1,11 +1,12 @@
 import { FC } from 'react'
-import { NavLink, Route, Switch, useLocation } from 'react-router-dom'
+import { Route, Switch, useLocation } from 'react-router-dom'
 import { CognateHydrated } from '../core/cognates'
 import { Path } from '../Routes'
 import { LangCode } from '../utils/langNames'
 import { FormValues } from '../utils/setupQps'
 import { CognatesTab } from './CognatesTab'
 import { DefinitionTab } from './DefinitionTab'
+import { TabLink } from './TabLink'
 import { TranslationsTab } from './TranslationsTab'
 
 type Props = {
@@ -36,46 +37,45 @@ export const Tabs: FC<Props> = ({
 	return (
 		<div className='y-margins'>
 			<nav className='tabs'>
-				<NavLink
+				<TabLink exact to={Path.Definition + search}>
+					Definition
+				</TabLink>
+				<TabLink
 					exact
-					activeClassName='active'
 					to={Path.Cognates + search}
+					disabled={!cognates.length}
+					disabledMessage='No cognates found'
 				>
 					Cognates
-				</NavLink>
-				<NavLink
+				</TabLink>
+				<TabLink
 					exact
-					activeClassName='active'
-					to={Path.Definition + search}
+					to={Path.Translations + search}
+					disabled={!translations.length}
+					disabledMessage='No translations found'
 				>
-					Definition
-				</NavLink>
-				{translations.length ? (
-					<NavLink
-						exact
-						activeClassName='active'
-						to={Path.Translations + search}
-					>
-						Translations
-					</NavLink>
-				) : null}
+					Translations
+				</TabLink>
 			</nav>
 			<article>
 				<Switch>
-					<Route exact path={Path.Cognates}>
-						<CognatesTab
-							{...{
-								cognates,
-								lastSubmitted,
-								word,
-								query,
-								error,
-								suggestTryFlipped,
-							}}
+					<Route exact path={Path.Definition}>
+						<DefinitionTab
+							{...{ lastSubmitted, suggestTryFlipped }}
 						/>
 					</Route>
-					<Route exact path={Path.Definition}>
-						<DefinitionTab {...{ lastSubmitted }} />
+					<Route exact path={Path.Cognates}>
+						{cognates.length ? (
+							<CognatesTab
+								{...{
+									cognates,
+									lastSubmitted,
+									word,
+									query,
+									error,
+								}}
+							/>
+						) : null}
 					</Route>
 					<Route exact path={Path.Translations}>
 						{translations.length ? (

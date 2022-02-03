@@ -23,6 +23,7 @@ import {
 import { getLangName } from '../utils/langNames'
 import { Spinner } from './Spinner'
 import { WiktionaryHtml } from './WiktionaryHtml'
+import { WiktionaryTitleLink } from './WiktionaryTitleLink'
 
 type ReactEventName = `on${Capitalize<string>}` &
 	keyof React.DOMAttributes<HTMLAnchorElement>
@@ -31,7 +32,7 @@ export const CognateLink: FC<
 	Partial<WordData> &
 		Pick<WordData, 'word' | 'langCode'> &
 		HTMLProps<HTMLAnchorElement>
-> = ({ word, langCode, langName: _, ...htmlProps }) => {
+> = ({ word, langCode, children, langName: _, ...htmlProps }) => {
 	const [referenceElement, setReferenceElement] =
 		useState<HTMLElement | null>(null)
 	const [popperElement, setPopperElement] = useState<HTMLElement | null>(null)
@@ -207,7 +208,7 @@ export const CognateLink: FC<
 					onClick={hidePopover}
 					to={toRelativeUrl(cognateFinderUrl)}
 				>
-					{title}
+					{children ?? title}
 				</Link>
 			</span>
 
@@ -222,9 +223,16 @@ export const CognateLink: FC<
 						<Spinner />
 					) : (
 						<div onClick={onClick}>
+							<WiktionaryTitleLink
+								{...{
+									title: popoverHtml ? title : word,
+									wiktionaryUrl,
+								}}
+							/>
+
 							<WiktionaryHtml
+								{...{ word, langCode }}
 								dangerousHtml={popoverHtml}
-								{...{ wiktionaryUrl, title }}
 							/>
 						</div>
 					)}

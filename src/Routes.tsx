@@ -34,7 +34,7 @@ export const Routes = () => {
 					<ShareTarget />
 				</Route>
 				<Route
-					path={[Path.Cognates, Path.Definition, Path.Translations]}
+					path={[Path.Definition, Path.Cognates, Path.Translations]}
 				>
 					<SearchResults />
 				</Route>

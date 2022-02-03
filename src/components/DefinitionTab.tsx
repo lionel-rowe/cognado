@@ -1,16 +1,26 @@
 import { FC, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { fetchWiktionaryDefinitionHtml } from '../core/getWikiContent'
-import { makeWiktionaryUrl } from '../utils/formatters'
+import {
+	makeCognateFinderUrl,
+	makeWiktionaryUrl,
+	toRelativeUrl,
+} from '../utils/formatters'
 import { getLangName } from '../utils/langNames'
 import { FormValues } from '../utils/setupQps'
-import { WiktionaryHtml } from './WiktionaryHtml'
+import { WiktionaryHtmlRootLevel } from './WiktionaryHtml'
+import { WiktionaryTitleLink } from './WiktionaryTitleLink'
 
 type Props = {
 	lastSubmitted: FormValues
+	suggestTryFlipped: boolean
 }
 
-export const DefinitionTab: FC<Props> = ({ lastSubmitted }) => {
-	const { word, srcLang } = lastSubmitted
+export const DefinitionTab: FC<Props> = ({
+	lastSubmitted,
+	suggestTryFlipped,
+}) => {
+	const { word, srcLang, trgLang } = lastSubmitted
 
 	const [html, setHtml] = useState<string | null>(null)
 
@@ -27,10 +37,36 @@ export const DefinitionTab: FC<Props> = ({ lastSubmitted }) => {
 		<div className='y-margins'>
 			<div className='y-margins'>
 				<h2>Definition</h2>
-				<WiktionaryHtml
+
+				{suggestTryFlipped ? null : (
+					<WiktionaryTitleLink
+						{...{ title: html ? title : word, wiktionaryUrl }}
+					/>
+				)}
+
+				<WiktionaryHtmlRootLevel
+					{...{ word, langCode: srcLang }}
 					dangerousHtml={html}
-					{...{ title, wiktionaryUrl }}
 				/>
+
+				{suggestTryFlipped ? (
+					<p>
+						Did you mean to search{' '}
+						<strong>
+							<Link
+								to={toRelativeUrl(
+									makeCognateFinderUrl({
+										word,
+										srcLang: trgLang,
+									}),
+								)}
+							>
+								{getLangName(trgLang)} → {getLangName(srcLang)}
+							</Link>
+						</strong>
+						?
+					</p>
+				) : null}
 			</div>
 		</div>
 	)

@@ -4,5 +4,5 @@ import { Path } from '../Routes'
 export const Home = () => {
 	// just redirect for now
 
-	return <Redirect to={Path.Cognates} />
+	return <Redirect to={Path.Definition} />
 }

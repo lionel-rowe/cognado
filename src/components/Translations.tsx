@@ -1,8 +1,6 @@
-import { pipe } from 'fp-ts/lib/function'
 import { FC } from 'react'
-import { Link } from 'react-router-dom'
-import { makeCognateFinderUrl, toRelativeUrl } from '../utils/formatters'
 import { LangCode } from '../utils/langNames'
+import { CognateLink } from './CognateLink'
 
 type Props = {
 	translations: {
@@ -10,21 +8,6 @@ type Props = {
 		trgLang: LangCode
 		translations: string[]
 	}[]
-}
-
-const TranslationLink: FC<{ word: string; trgLang: LangCode }> = ({
-	word,
-	trgLang,
-}) => {
-	const to = pipe(
-		makeCognateFinderUrl({
-			word,
-			srcLang: trgLang,
-		}),
-		toRelativeUrl,
-	)
-
-	return <Link to={to}>{word}</Link>
 }
 
 export const Translations: FC<Props> = ({ translations }) => {
@@ -39,9 +22,11 @@ export const Translations: FC<Props> = ({ translations }) => {
 								<ul>
 									{translations.map((word) => (
 										<li key={word}>
-											<TranslationLink
-												{...{ word, trgLang }}
-											/>
+											<CognateLink
+												{...{ word, langCode: trgLang }}
+											>
+												{word}
+											</CognateLink>
 										</li>
 									))}
 								</ul>

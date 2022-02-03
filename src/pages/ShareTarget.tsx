@@ -16,7 +16,7 @@ export const ShareTarget: FC = () => {
 		qps.set('word', content ?? shareText ?? '', false)
 
 		history.replace({
-			pathname: Path.Cognates,
+			pathname: Path.Definition,
 			search: window.location.search,
 		})
 	}, [history, qps])

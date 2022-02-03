@@ -179,7 +179,7 @@ export const SearchResults: FC = () => {
 
 			pseudoQps.setMany({ ...values, page: 1 })
 
-			history.push({ pathname: Path.Cognates, search: u.search })
+			history.push({ pathname: Path.Definition, search: u.search })
 
 			setLastSubmitted(values.word ? values : null)
 		},
