@@ -3,6 +3,8 @@ import './styles.css'
 import { render } from 'react-dom'
 import { App } from './App'
 import { exposeGlobals } from './debug'
+import buildInfo from './buildInfo.json'
+
 import { injectCssConstants } from './utils/cssConstants'
 import * as serviceWorkerRegistration from './serviceWorkerRegistration'
 
@@ -15,3 +17,5 @@ render(<App />, document.getElementById('root'))
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://cra.link/PWA
 serviceWorkerRegistration.register()
+
+console.info(`Build ${buildInfo.hash}\n${buildInfo.ts}`)

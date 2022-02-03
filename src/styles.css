@@ -129,17 +129,23 @@ a[href^='http']:not([href^='%ROOT_URL%'])::after {
 /* sticky footer */
 
 .full-page {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
 }
 
 main.container {
-  flex: 1 0 auto;
+	flex: 1 0 auto;
 }
 
 footer.container {
-  flex-shrink: 0;
+	flex-shrink: 0;
 }
 
 /* /sticky footer */
+
+abbr[title] {
+	border-block-end: 1px dashed tomato;
+    text-decoration: none;
+	cursor: help;
+}

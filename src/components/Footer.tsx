@@ -1,5 +1,6 @@
 import { FC, HtmlHTMLAttributes } from 'react'
 import { urls } from '../config'
+import buildInfo from '../buildInfo.json'
 
 export const Footer: FC<HtmlHTMLAttributes<HTMLElement>> = ({
 	...htmlProps
@@ -43,7 +44,7 @@ export const Footer: FC<HtmlHTMLAttributes<HTMLElement>> = ({
 					>
 						MIT
 					</a>
-					){/*  · Build 17892778 */}
+					) · Version <abbr title={buildInfo.ts}>{buildInfo.hash}</abbr>
 				</small>
 			</div>
 		</footer>
