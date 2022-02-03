@@ -137,10 +137,10 @@ export const SearchResults: FC = () => {
 						  }
 
 				const translations = parseTranslations(wiktionaryText)
-				const suggestTryFlipped = containsSectionForLanguage(
-					trgLang,
-					wiktionaryText,
-				)
+
+				const suggestTryFlipped =
+					!containsSectionForLanguage(srcLang, wiktionaryText) &&
+					containsSectionForLanguage(trgLang, wiktionaryText)
 
 				setLoading(false)
 
