@@ -1,6 +1,10 @@
-import { FormValues } from '../utils/setupQps'
-import { CognateRaw } from '../core/cognates'
+import type { FormValues } from '../utils/setupQps'
+import type { CognateRaw } from '../core/cognates'
 import type { Translations } from '../core/translations'
+import type { Variant } from '../components/ColorSchemeSwitcher'
+
+const namespace = process.env.PUBLIC_URL.slice(1)
+const ns = (s: string) => `${namespace}::${s}`
 
 const pseudoTarget = {
 	get values() {
@@ -20,11 +24,12 @@ const pseudoTarget = {
 	seeAlsos: string[]
 	translations: Translations
 	suggestTryFlipped: boolean
+	colorSchemeOverride: Variant
 }>
 
 export const ls = new Proxy(pseudoTarget, {
 	get(_t, p: string) {
-		const raw = localStorage.getItem(p)
+		const raw = localStorage.getItem(ns(p))
 
 		try {
 			return raw ? JSON.parse(raw) : undefined
@@ -34,7 +39,7 @@ export const ls = new Proxy(pseudoTarget, {
 	},
 	set(_t, p: string, v) {
 		try {
-			localStorage.setItem(p, JSON.stringify(v))
+			localStorage.setItem(ns(p), JSON.stringify(v))
 
 			return true
 		} catch {
@@ -42,7 +47,7 @@ export const ls = new Proxy(pseudoTarget, {
 		}
 	},
 	deleteProperty(_t, p: string) {
-		localStorage.removeItem(p)
+		localStorage.removeItem(ns(p))
 
 		return true
 	},

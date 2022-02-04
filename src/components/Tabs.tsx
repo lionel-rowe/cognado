@@ -57,7 +57,7 @@ export const Tabs: FC<Props> = ({
 					Translations
 				</TabLink>
 			</nav>
-			<article>
+			<article translate='no'>
 				<Switch>
 					<Route exact path={Path.Definition}>
 						<DefinitionTab

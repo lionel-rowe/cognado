@@ -1,6 +1,7 @@
 import { FC, HtmlHTMLAttributes } from 'react'
 import { urls } from '../config'
 import buildInfo from '../buildInfo.json'
+import { ColorSchemeSwitcher } from './ColorSchemeSwitcher'
 
 export const Footer: FC<HtmlHTMLAttributes<HTMLElement>> = ({
 	...htmlProps
@@ -48,6 +49,7 @@ export const Footer: FC<HtmlHTMLAttributes<HTMLElement>> = ({
 					<code className='build-info' title={buildInfo.ts}>
 						{buildInfo.hash}
 					</code>
+					<ColorSchemeSwitcher />
 				</small>
 			</div>
 		</footer>

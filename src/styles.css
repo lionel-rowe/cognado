@@ -10,12 +10,39 @@ body {
 :root {
 	--vh: 1vh; /* modified in JS to give accurate results on mobile */
 	--color-primary: #1d9222;
-	--color-primary-dark: #107916;
+	--color-primary-emphasized: #107916;
 	--grid-maxWidth: 100rem;
-	/* --color-secondary: #9e3f00; */
 	--page-padding: 3rem;
-	/* --footer-padding: var(--page-padding); */
 	--footer-padding: 2rem;
+}
+
+:root.dark {
+	color-scheme: dark;
+
+	--bg-color: #0f1012;
+	--bg-secondary-color: #1e2024;
+	--font-color: #f5f5f5;
+	--color-grey: #bbb;
+	--color-darkGrey: #888;
+	/* `lightGrey` is functionally de-emphasized grey (name defined by Chota) */
+	--color-lightGrey: #444;
+	--color-primary-emphasized: #30dd39;
+	--color-primary: #17bd1e;
+	--color-error: #ea4f4f;
+}
+
+input {
+	background-color: var(--bg-color);
+	color: var(--font-color);
+}
+
+:root.dark input {
+	background-color: var(--bg-secondary-color);
+}
+
+:root.dark
+	:is(.button.primary, .button.secondary, .button.dark, .button.error, .button.success, [type='submit']) {
+	color: var(--bg-color);
 }
 
 a[href]:hover {
@@ -32,7 +59,7 @@ button.swap {
 }
 
 button.swap:hover {
-	color: var(--color-primary-dark);
+	color: var(--color-primary-emphasized);
 	font-weight: bold;
 	background-color: none;
 }
@@ -43,7 +70,7 @@ button.swap:hover {
 
 :is(.button.primary, button[type='submit']):hover {
 	opacity: revert;
-	background-color: var(--color-primary-dark);
+	background-color: var(--color-primary-emphasized);
 }
 
 main.container {
@@ -153,7 +180,7 @@ a[href^='http']:not([href^='%ROOT_URL%'])::after {
 .full-page {
 	display: flex;
 	flex-direction: column;
-	min-height: calc(var(--vh) * 100);
+	min-height: calc(var(--vh) * 100 - 1px);
 }
 
 main.container {
@@ -183,4 +210,25 @@ nav .disabled-tab:hover {
 
 .popover dl {
 	margin-block: 0;
+}
+
+.color-scheme-switcher-container {
+	margin-inline-start: 0.5rem;
+	display: inline-block;
+}
+
+.color-scheme-switcher-container .color-scheme-switcher:not(:hover) {
+	background: none;
+}
+.color-scheme-switcher-container .color-scheme-switcher {
+	transition: background-color 0.1s linear, border-color 0.1s linear,
+		color 0.1s linear, box-shadow 0.1s linear, transform 0.1s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 3rem;
+	height: 3rem;
+	margin: 0;
+	padding: 0;
+	border-radius: 1em;
 }
