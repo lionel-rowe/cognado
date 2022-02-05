@@ -7,5 +7,5 @@ export const urls = {
 	wiktionaryRestApi: 'https://en.wiktionary.org/api',
 	wiktionaryWeb: 'https://en.wiktionary.org',
 
-	github: 'https://github.com/lionel-rowe/cognate-finder',
+	github: 'https://github.com/lionel-rowe/cognado',
 } as const

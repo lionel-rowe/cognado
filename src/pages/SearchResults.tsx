@@ -249,7 +249,7 @@ export const SearchResults: FC = () => {
 				/>
 
 				<div>
-					<h1>Cognate finder</h1>
+					<h1>Search Cognates</h1>
 
 					<CognateSearchForm {...{ form, onSubmit, seeAlsos }} />
 

@@ -1,4 +1,4 @@
-# Cognate finder
+# Cognado
 
 Search a word in one language to find its [cognates](https://en.wikipedia.org/wiki/Cognate) in another (or the same) language, along with their common ancestry.
 

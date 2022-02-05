@@ -4,7 +4,7 @@ import type { Translations } from '../core/translations'
 import type { Variant } from '../components/ColorSchemeSwitcher'
 
 const namespace = process.env.PUBLIC_URL.slice(1)
-const ns = (s: string) => `${namespace}::${s}`
+const ns = (s: string) => namespace ? `${namespace}::${s}` : s
 
 const pseudoTarget = {
 	get values() {
