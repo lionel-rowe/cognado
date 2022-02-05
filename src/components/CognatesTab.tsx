@@ -98,7 +98,7 @@ export const CognatesTab: FC<Props> = ({
 							</p>
 						</>
 					) : (
-						'Enter a word to search for'
+						'Enter a word to search for cognates'
 					)
 				) : (
 					'Click “Search” to find cognates'

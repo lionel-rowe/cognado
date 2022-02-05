@@ -9,7 +9,7 @@ import { App } from './App'
 import { exposeGlobals } from './debug'
 import buildInfo from './buildInfo.json'
 
-import { injectCssConstants } from './utils/cssConstants'
+import { injectCssConstants } from './utils/dynamicStyles'
 import * as serviceWorkerRegistration from './serviceWorkerRegistration'
 import { initViewportHeightAdjuster } from './utils/viewportHeightAdjuster'
 import { addGlobalListeners } from './utils/addGlobalListeners'

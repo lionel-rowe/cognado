@@ -19,13 +19,41 @@ const allowedAttrs = [
 	'about',
 	'id',
 	'typeof',
-	'data-mw',
-	'data-mw-deduplicate',
 ]
+
+const isAllowedAttr = (attr: string, value: string) => {
+	return allowedAttrs.includes(attr)
+		|| attr.startsWith('data-')
+}
 
 const reactProps: Record<string, string> = {
 	class: 'className',
 }
+
+const styleStrToObj = (style: string) =>
+	Object.fromEntries(
+		style
+			.split(';')
+			.map(
+				(x) =>
+					x
+						.trim()
+						.split(':')
+						.map((y, i) =>
+							i
+								? y.trim()
+								: kebabToCamel(
+										y.trim(),
+									),
+						) as [
+						string,
+						string | undefined,
+					],
+			)
+			.filter(Boolean),
+	)
+
+type StyleObj = ReturnType<typeof styleStrToObj>
 
 export const mapDomToReact = (parseCustomNode: DomNodeToReactParser) => {
 	const mapDomToReact_ = (node: Node) => {
@@ -39,31 +67,15 @@ export const mapDomToReact = (parseCustomNode: DomNodeToReactParser) => {
 			const El = node.nodeName.toLowerCase()
 
 			try {
-				const props: Record<string, string> = {}
+				const props: Record<string, string | StyleObj> = {}
 
 				for (const { name, value } of node.attributes) {
-					if (allowedAttrs.includes(name)) {
+					if (isAllowedAttr(name, value)) {
 						props[reactProps[name] ?? name] = value
 					} else if (name === 'style') {
-						const style = Object.fromEntries(
-							value
-								.split(';')
-								.map((x) =>
-									x
-										.trim()
-										.split(':')
-										.map((y, i) =>
-											i
-												? y.trim()
-												: kebabToCamel(y.trim()),
-										),
-								)
-								.filter(Boolean),
-						)
-
-						props.style = style as string
+						props.style = styleStrToObj(value)
 					} else {
-						console.info('Attribute blocked: ', name, value)
+						console.warn('Attribute blocked: ', name, value)
 					}
 				}
 

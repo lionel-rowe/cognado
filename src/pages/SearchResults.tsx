@@ -90,6 +90,7 @@ export const SearchResults: FC = () => {
 	const [loading, setLoading] = useState<boolean>(false)
 
 	const [cognates, setCognates] = useState<CognateRaw[]>(ls.cognates ?? [])
+
 	const [lastSubmitted, setLastSubmitted] = useState<FormValues | null>(
 		ls.values ?? null,
 	)
@@ -194,10 +195,7 @@ export const SearchResults: FC = () => {
 		const formValues = getFormValues(qps)
 
 		if (!values && !hasQueryParams) {
-			const initialSearchValues = {
-				...formValues,
-				word: 'dedo',
-			}
+			const initialSearchValues = { ...formValues }
 
 			reset(initialSearchValues)
 
@@ -256,7 +254,7 @@ export const SearchResults: FC = () => {
 					{loading ? (
 						<Spinner />
 					) : !lastSubmitted ? (
-						<div className='y-margins'>
+						<div className='y-margins grayed-out'>
 							Enter a word to search for
 						</div>
 					) : (

@@ -29,6 +29,8 @@ export const CognateSearchForm: FC<{
 	form: UseFormReturn<FormValues>
 	seeAlsos: string[]
 }> = ({ onSubmit, form, seeAlsos }) => {
+	const formRef = useRef<HTMLFormElement>(null)
+
 	const { register, handleSubmit, watch, setValue } = form
 
 	const [autocompleteOptions, setAutocompleteOptions] = useState<string[]>([])
@@ -56,6 +58,8 @@ export const CognateSearchForm: FC<{
 
 	const submit = useCallback<EventHandler<SyntheticEvent>>(
 		(e) => {
+			e.preventDefault()
+
 			// rate limited to once per second
 			// - avoid double-submit on `Enter` keydown
 			const now = Date.now()
@@ -116,11 +120,12 @@ export const CognateSearchForm: FC<{
 	)
 
 	return (
-		<form onSubmit={submit}>
+		<form ref={formRef} onSubmit={submit}>
 			<div>
 				<label htmlFor='word'>
 					Word{' '}
 					<input
+						required
 						onKeyDown={onKeyDown}
 						onInput={(e) => setInput(e.currentTarget.value)}
 						id='word'
@@ -129,6 +134,8 @@ export const CognateSearchForm: FC<{
 						value={word}
 						{...register('word')}
 						list='main-search'
+						placeholder='Search for definitions, cognates, and translations'
+						autoFocus
 					/>
 					<datalist id='main-search'>
 						{autocompleteOptions.map((option) => (

@@ -14,6 +14,7 @@ body {
 	--grid-maxWidth: 62rem;
 	--page-padding: 1.8rem;
 	--footer-padding: 1.2rem;
+	--color-placeholder: #aaa;
 }
 
 :root.dark {
@@ -29,6 +30,11 @@ body {
 	--color-primary-emphasized: #30dd39;
 	--color-primary: #17bd1e;
 	--color-error: #ea4f4f;
+	--color-placeholder: #888;
+}
+
+::placeholder {
+	color: var(--color-placeholder);
 }
 
 input {
@@ -64,12 +70,11 @@ button.swap:hover {
 	background-color: none;
 }
 
-:is(.button, button[type='submit']):hover {
+:is(button, .button.primary, .button, button[type='submit']):not([disabled]):hover {
 	opacity: revert;
 }
 
-:is(.button.primary, button[type='submit']):hover {
-	opacity: revert;
+:is(.button.primary, button[type='submit']):not([disabled]):hover {
 	background-color: var(--color-primary-emphasized);
 }
 
