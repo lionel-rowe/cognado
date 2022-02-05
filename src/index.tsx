@@ -1,5 +1,5 @@
 /* can't use `chota.min.css` due to CRA transpiling bug */
-import 'chota/dist/chota.css'
+import './vendor/chota.100.css'
 /* import `styles.css` after `chota.css`to override definedvars */
 import './styles.css'
 /* import `overrides.css` last to give precedence over component styles */

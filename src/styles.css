@@ -11,9 +11,9 @@ body {
 	--vh: 1vh; /* modified in JS to give accurate results on mobile */
 	--color-primary: #1d9222;
 	--color-primary-emphasized: #107916;
-	--grid-maxWidth: 100rem;
-	--page-padding: 3rem;
-	--footer-padding: 2rem;
+	--grid-maxWidth: 62rem;
+	--page-padding: 1.8rem;
+	--footer-padding: 1.2rem;
 }
 
 :root.dark {
@@ -51,10 +51,10 @@ a[href]:hover {
 
 button.swap {
 	background-color: var(--bg-color);
-	font-size: 2rem;
-	padding-block: 0.8rem;
+	font-size: 1.2rem;
+	padding-block: 0.5rem;
 	padding-inline: 0.5rem;
-	width: 4rem;
+	width: 2.5rem;
 	color: var(--color-primary);
 }
 
@@ -116,12 +116,16 @@ nav a:hover {
 .popover {
 	position: absolute;
 	max-width: min(500px, calc(100vw - 16px));
-	background: white;
+	background: var(--bg-color);
 	border: 1px solid #aaa;
 	border-radius: 5px;
 	padding: 0.7em;
 	filter: drop-shadow(4px 4px 4px #0006);
 	z-index: 1;
+}
+
+:root.dark .popover {
+	background: var(--bg-secondary-color);
 }
 
 .popover-reference {
@@ -171,7 +175,7 @@ a[href^='http']:not([href^='%ROOT_URL%'])::after {
 
 @media screen and (max-width: 50rem) {
 	:root {
-		--footer-padding: 2rem;
+		--footer-padding: 1.2rem;
 	}
 }
 
@@ -213,7 +217,7 @@ nav .disabled-tab:hover {
 }
 
 .color-scheme-switcher-container {
-	margin-inline-start: 0.5rem;
+	margin-inline-start: 0.3rem;
 	display: inline-block;
 }
 
@@ -226,8 +230,8 @@ nav .disabled-tab:hover {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 3rem;
-	height: 3rem;
+	width: 1.8rem;
+	height: 1.8rem;
 	margin: 0;
 	padding: 0;
 	border-radius: 1em;
