@@ -16,12 +16,10 @@ import {
 } from '../core/cognates'
 import { getLangName } from '../utils/langNames'
 import { ls } from '../utils/ls'
-import { urls } from '../config'
 import { Spinner } from '../components/Spinner'
-import { GitHubCorner } from '../components/GitHubCorner'
 import { RootErrorBoundary } from '../components/RootErrorBoundary'
 import { FormValues, getFormValues, qpInit } from '../utils/setupQps'
-import { CognateSearchForm } from '../components/CognateSearchForm'
+import { CognateSearchForm } from '../components/SearchForm'
 import { Path, QpsContext } from '../Routes'
 import { useHistory, useLocation } from 'react-router'
 import { parseSeeAlsos } from '../core/seeAlsos'
@@ -30,6 +28,24 @@ import { fetchWiktionaryPageResult } from '../core/fetchWiktionaryPage'
 import { createQps, pseudoHistory } from '../utils/qps'
 import { Tabs } from '../components/Tabs'
 import { containsSectionForLanguage } from '../core/containsSectionForLanguage'
+import clsx from 'clsx'
+import { SearchHeader } from '../components/SearchHeader'
+
+type Props = {}
+
+const animationTimingSeconds = 0
+const ms = animationTimingSeconds * 1e3
+
+document.documentElement.style.setProperty(
+	'--search-results__expand-seconds',
+	`${animationTimingSeconds}s`,
+)
+
+type Location_ = Window['location']
+type Location = ReturnType<typeof useLocation>
+
+const checkIsHome = (location: Location | Location_) =>
+	location.pathname === Path.Home
 
 const matches = (x: FormValues | null, y: FormValues | null) => {
 	const truthies = [x, y].filter(Boolean)
@@ -46,7 +62,7 @@ const matches = (x: FormValues | null, y: FormValues | null) => {
 	}
 }
 
-export const SearchResults: FC = () => {
+export const SearchResults: FC<Props> = () => {
 	const location = useLocation()
 	const history = useHistory()
 
@@ -54,17 +70,6 @@ export const SearchResults: FC = () => {
 
 	const [seeAlsos, setSeeAlsos] = useState(ls.seeAlsos ?? [])
 	const [translations, setTranslations] = useState(ls.translations ?? [])
-
-	// effect - run before first render
-	useMemo(() => {
-		const lsVals = ls.values
-
-		const hasSearch = window.location.search.length > 1
-
-		if (!hasSearch && lsVals) {
-			qps.setMany(lsVals)
-		}
-	}, [qps])
 
 	const defaultValues: FormValues = useMemo(() => getFormValues(qps), [qps])
 
@@ -92,8 +97,20 @@ export const SearchResults: FC = () => {
 	const [cognates, setCognates] = useState<CognateRaw[]>(ls.cognates ?? [])
 
 	const [lastSubmitted, setLastSubmitted] = useState<FormValues | null>(
-		ls.values ?? null,
+		ls.lastSubmitted ?? null,
 	)
+
+	useEffect(() => {
+		if (!qps.get('word')) {
+			setLastSubmitted(null)
+		}
+	}, [qps])
+
+	useEffect(() => {
+		if (!lastSubmitted) {
+			setSeeAlsos([])
+		}
+	}, [lastSubmitted])
 
 	const [suggestTryFlipped, setSuggestTryFlipped] = useState(false)
 
@@ -159,7 +176,7 @@ export const SearchResults: FC = () => {
 
 					setQuery(query)
 
-					ls.values = values
+					ls.lastSubmitted = values
 					ls.cognates = cognates
 					ls.query = query
 					ls.seeAlsos = seeAlsos
@@ -187,35 +204,6 @@ export const SearchResults: FC = () => {
 		[history],
 	)
 
-	useEffect(() => {
-		const { values } = ls
-
-		const hasQueryParams = window.location.search.length > 1
-
-		const formValues = getFormValues(qps)
-
-		if (!values && !hasQueryParams) {
-			const initialSearchValues = { ...formValues }
-
-			reset(initialSearchValues)
-
-			onSubmit(initialSearchValues)
-
-			return
-		} else if (values) {
-			const isLatest = Object.entries(formValues).every(([k, v]) => {
-				return values[k as keyof typeof values] === v
-			})
-
-			if (!isLatest) {
-				onSubmit(formValues)
-			}
-		}
-
-		// only run once on mount
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
-
 	const hydrated = useMemo(() => hydrate(cognates), [cognates])
 
 	const relevantTranslations = useMemo(
@@ -236,44 +224,81 @@ export const SearchResults: FC = () => {
 		[translations, lastSubmitted?.trgLang],
 	)
 
+	const [shouldShowResults, setShouldShowResults] = useState(
+		!checkIsHome(location),
+	)
+
+	useEffect(() => {
+		setShouldShowResults((prevShouldShowResults) => {
+			const shouldShowResults = !checkIsHome(location)
+
+			if (shouldShowResults && !prevShouldShowResults) {
+				setTimeout(() => {
+					setShouldShowResults(!checkIsHome(window.location) && true)
+				}, ms)
+
+				return false
+			} else if (!shouldShowResults && prevShouldShowResults) {
+				return false
+			}
+
+			return prevShouldShowResults
+		})
+	}, [location])
+
+	const isHome = checkIsHome(location)
+
 	return (
-		<>
+		<div
+			className={clsx([
+				'search-results__ancestor',
+				isHome && 'search-results__ancestor--home-page',
+			])}
+		>
 			<RootErrorBoundary>
-				<GitHubCorner
-					target='_blank'
-					title='See project on GitHub'
-					rel='noreferrer noopener'
-					href={urls.github}
-				/>
+				<div
+					className={clsx([
+						'search-results__outer',
+						isHome && 'search-results__outer--home-page',
+					])}
+				>
+					<SearchHeader />
 
-				<div>
-					<h1>Search Cognates</h1>
+					<CognateSearchForm
+						{...{
+							form,
+							onSubmit,
+							seeAlsos: isHome ? [] : seeAlsos,
+						}}
+					/>
 
-					<CognateSearchForm {...{ form, onSubmit, seeAlsos }} />
-
-					{loading ? (
-						<Spinner />
-					) : !lastSubmitted ? (
-						<div className='y-margins grayed-out'>
-							Enter a word to search for
-						</div>
-					) : (
-						<>
-							<Tabs
-								{...{
-									word,
-									lastSubmitted,
-									translations: relevantTranslations,
-									cognates: hydrated,
-									query,
-									error,
-									suggestTryFlipped,
-								}}
-							/>
-						</>
-					)}
+					{shouldShowResults ? (
+						loading ? (
+							<Spinner />
+						) : !lastSubmitted ? (
+							<div className='y-margins grayed-out'>
+								Enter a word to search for
+							</div>
+						) : (
+							<>
+								{shouldShowResults ? (
+									<Tabs
+										{...{
+											word,
+											lastSubmitted,
+											translations: relevantTranslations,
+											cognates: hydrated,
+											query,
+											error,
+											suggestTryFlipped,
+										}}
+									/>
+								) : null}
+							</>
+						)
+					) : null}
 				</div>
 			</RootErrorBoundary>
-		</>
+		</div>
 	)
 }

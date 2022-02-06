@@ -7,7 +7,7 @@ const namespace = process.env.PUBLIC_URL.slice(1)
 const ns = (s: string) => (namespace ? `${namespace}::${s}` : s)
 
 const pseudoTarget = {
-	get values() {
+	get lastSubmitted() {
 		return undefined
 	},
 	get cognates() {
@@ -17,7 +17,7 @@ const pseudoTarget = {
 		return undefined
 	},
 } as Partial<{
-	values: FormValues
+	lastSubmitted: FormValues
 	cognates: CognateRaw[]
 	query: string
 	wiktionaryUrl: string | null

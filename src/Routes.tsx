@@ -1,6 +1,5 @@
 import { createContext, useState } from 'react'
 import { Switch, Route, useHistory } from 'react-router-dom'
-import { Home } from './pages/Home'
 import { NotFound } from './pages/NotFound'
 import { SearchResults } from './pages/SearchResults'
 import { ShareTarget } from './pages/ShareTarget'
@@ -27,14 +26,17 @@ export const Routes = () => {
 	return (
 		<QpsContext.Provider value={qps}>
 			<Switch>
-				<Route exact path={Path.Home}>
-					<Home />
-				</Route>
 				<Route exact path={Path.ShareTarget}>
 					<ShareTarget />
 				</Route>
 				<Route
-					path={[Path.Definition, Path.Cognates, Path.Translations]}
+					exact
+					path={[
+						Path.Home,
+						Path.Definition,
+						Path.Cognates,
+						Path.Translations,
+					]}
 				>
 					<SearchResults />
 				</Route>

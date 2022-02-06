@@ -35,7 +35,7 @@ export const Tabs: FC<Props> = ({
 	const { search } = useLocation()
 
 	return (
-		<div className='y-margins'>
+		<div className='y-margins tabs-outer'>
 			<nav className='tabs'>
 				<TabLink exact to={Path.Definition + search}>
 					Definition

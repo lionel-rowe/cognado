@@ -22,8 +22,7 @@ const allowedAttrs = [
 ]
 
 const isAllowedAttr = (attr: string, value: string) => {
-	return allowedAttrs.includes(attr)
-		|| attr.startsWith('data-')
+	return allowedAttrs.includes(attr) || attr.startsWith('data-')
 }
 
 const reactProps: Record<string, string> = {
@@ -40,15 +39,8 @@ const styleStrToObj = (style: string) =>
 						.trim()
 						.split(':')
 						.map((y, i) =>
-							i
-								? y.trim()
-								: kebabToCamel(
-										y.trim(),
-									),
-						) as [
-						string,
-						string | undefined,
-					],
+							i ? y.trim() : kebabToCamel(y.trim()),
+						) as [string, string | undefined],
 			)
 			.filter(Boolean),
 	)

@@ -30,7 +30,17 @@ export const DefinitionTab: FC<Props> = ({
 	const wiktionaryUrl = makeWiktionaryUrl({ word, langCode: srcLang })
 
 	useEffect(() => {
-		fetchWiktionaryDefinitionHtml(word, srcLang).then(setHtml)
+		let unmounted = false
+
+		fetchWiktionaryDefinitionHtml(word, srcLang).then((x) => {
+			if (!unmounted) {
+				setHtml(x)
+			}
+		})
+
+		return () => {
+			unmounted = true
+		}
 	}, [srcLang, word])
 
 	return (
