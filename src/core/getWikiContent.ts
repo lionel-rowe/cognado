@@ -9,16 +9,82 @@ type Section = {
 	line: string
 }
 
+const partsOfSpeech = [
+	// https://en.wiktionary.org/wiki/Wiktionary:Entry_layout#Part_of_speech
+	// General
+	'adjective',
+	'adverb',
+	'ambiposition',
+	'article',
+	'circumposition',
+	'classifier',
+	'conjunction',
+	'contraction',
+	'counter',
+	'determiner',
+	'ideophone',
+	'interjection',
+	'noun',
+	'numeral',
+	'participle',
+	'particle',
+	'postposition',
+	'preposition',
+	'pronoun',
+	'proper noun',
+	'verb',
+	// Morphemes
+	'circumfix',
+	'combining form',
+	'infix',
+	'interfix',
+	'prefix',
+	'root',
+	'suffix',
+	// Symbols and characters
+	'diacritical mark',
+	'letter',
+	'ligature',
+	'number',
+	'punctuation mark',
+	'syllable',
+	'symbol',
+	// Phrases
+	'phrase',
+	'proverb',
+	'prepositional phrase',
+	// Han characters and language-specific varieties
+	'han character',
+	'hanzi',
+	'kanji',
+	'hanja',
+	// Other
+	'romanization',
+	'logogram',
+]
+
+const wordSectionsCache = new Map<string, Section[]>()
+
 export const fetchWordSections = async (word: string) => {
+	if (wordSectionsCache.has(word)) return wordSectionsCache.get(word)!
+
 	const res = await fetch(
 		`${urls.wiktionaryRestApi}/rest_v1/page/mobile-sections/${wikify(
 			word,
 		)}`,
 	)
 
-	const data = await res.json()
+	const data = (await res.json()) as {
+		remaining?: {
+			sections: Section[]
+		}
+	}
 
-	return data.remaining?.sections ?? ([] as Section[])
+	const sections = data.remaining?.sections ?? []
+
+	wordSectionsCache.set(word, sections)
+
+	return sections
 }
 
 const getDefinitionDomForLanguage = (
@@ -36,21 +102,9 @@ const getDefinitionDomForLanguage = (
 
 	const { text } = sections
 		.slice(start, end)
-		.find((x) =>
-			[
-				'noun',
-				'verb',
-				'adjective',
-				'adverb',
-				'pronoun',
-				'preposition',
-				'conjunction',
-				'interjection',
-				'numeral',
-				'article',
-				'determiner',
-			].includes(x.line.trim().toLowerCase()),
-		) ?? { text: '' }
+		.find((x) => partsOfSpeech.includes(x.line.trim().toLowerCase())) ?? {
+		text: '',
+	}
 
 	const doc = new DOMParser().parseFromString(text, 'text/html')
 

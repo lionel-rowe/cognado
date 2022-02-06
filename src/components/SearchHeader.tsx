@@ -6,7 +6,10 @@ const LinkOrText: FC<{ isHome: boolean }> = ({ isHome, children }) => {
 	return isHome ? (
 		<span className='search-header__text'>{children}</span>
 	) : (
-		<Link className='search-header__link search-header__text' to={Path.Home}>
+		<Link
+			className='search-header__link search-header__text'
+			to={Path.Home}
+		>
 			{children}
 		</Link>
 	)

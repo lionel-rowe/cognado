@@ -308,7 +308,7 @@ nav .disabled-tab:hover {
 .search-header__link,
 .search-header__link:hover {
 	color: unset;
-    text-decoration: unset;
+	text-decoration: unset;
 	cursor: pointer;
 }
 
