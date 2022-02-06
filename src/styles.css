@@ -35,6 +35,8 @@ body {
 	--color-placeholder: #888;
 
 	--popover-shadow: drop-shadow(1px 2px 4px #000f);
+
+	--y-margin: var(--grid-gutter);
 }
 
 ::placeholder {
@@ -114,11 +116,17 @@ nav a:hover {
 }
 
 .y-margins {
-	margin-block: 1em;
+	margin-block: var(--y-margin);
+}
+
+.y-margins-between {
+	display: flex;
+	flex-direction: column;
+	row-gap: var(--y-margin);
 }
 
 .top-level-li {
-	margin: 1em 0;
+	margin: 1rem 0;
 }
 
 .cognate-link--highlighted {
@@ -332,7 +340,7 @@ nav .disabled-tab:hover {
 }
 
 .example-links {
-	margin-top: 2rem;
+	margin-top: calc(var(--y-margin) * 1.5);
 }
 
 /* tooltip */

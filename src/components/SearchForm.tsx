@@ -121,7 +121,7 @@ export const CognateSearchForm: FC<{
 	)
 
 	return (
-		<form ref={formRef} onSubmit={submit}>
+		<form className='y-margins-between' ref={formRef} onSubmit={submit}>
 			<div>
 				<label htmlFor='word'>
 					Word{' '}
@@ -191,7 +191,7 @@ export const CognateSearchForm: FC<{
 				TODO: possibly re-add? might be confusing for users,
 				probably hide behind "advanced options"
 			*/}
-			{/* <div className='y-margins'>
+			{/* <div>
 				<label htmlFor='allowPrefixesAndSuffixes'>
 					Allow prefixes and suffixes{' '}
 					<input
@@ -201,7 +201,7 @@ export const CognateSearchForm: FC<{
 					/>
 				</label>
 			</div> */}
-			<div className='y-margins'>
+			<div>
 				<button type='submit'>Search</button>{' '}
 			</div>
 		</form>

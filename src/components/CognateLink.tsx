@@ -21,7 +21,7 @@ import {
 	makeWiktionaryUrl,
 	toRelativeUrl,
 } from '../utils/formatters'
-import { getLangName } from '../utils/langNames'
+import { getExtendedLangName } from '../utils/langNames'
 import { Spinner } from './Spinner'
 import { WiktionaryHtml } from './WiktionaryHtml'
 import { WiktionaryTitleLink } from './WiktionaryTitleLink'
@@ -99,9 +99,9 @@ export const CognateLink: FC<
 	const [open, setOpen] = useState<boolean>(false)
 	const [loading, setLoading] = useState<boolean>(false)
 
-	const langName = getLangName(langCode)
+	const extendedLangName = getExtendedLangName(langCode)
 
-	const title = `${word} (${langName})`
+	const title = `${word} (${extendedLangName})`
 
 	const showPopover = useCallback(async () => {
 		setOpen(true)

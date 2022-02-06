@@ -3,7 +3,7 @@ import { renderAsReactDom } from '../dom/renderAsReactDom'
 import { CognateLink } from '../components/CognateLink'
 import { DomNodeToReactParser } from '../dom/renderAsReactDom'
 import { isSameOrigin } from '../utils/browser'
-import { getLangName, LangCode } from '../utils/langNames'
+import { getExtendedLangName, LangCode } from '../utils/langNames'
 
 type Props = {
 	word: string
@@ -41,7 +41,7 @@ export const createWiktionaryHtmlRenderer = (
 		) : (
 			<p>
 				<span className='grayed-out'>
-					No {getLangName(langCode)} definitions found for{' '}
+					No {getExtendedLangName(langCode)} definitions found for{' '}
 					<em>{word}</em>
 				</span>
 			</p>

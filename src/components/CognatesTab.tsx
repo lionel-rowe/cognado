@@ -2,7 +2,7 @@ import { FC, useCallback, useContext } from 'react'
 import { CognateHydrated } from '../core/cognates'
 import { usePagination } from '../hooks/usePagination'
 import { QpsContext } from '../Routes'
-import { getLangName } from '../utils/langNames'
+import { getExtendedLangName } from '../utils/langNames'
 import { FormValues } from '../utils/setupQps'
 import { CognatesList } from './CognatesList'
 import { Pagination } from './Pagination'
@@ -93,8 +93,9 @@ export const CognatesTab: FC<Props> = ({
 					word ? (
 						<>
 							<p>
-								No {getLangName(trgLang)} cognates found for{' '}
-								{getLangName(srcLang)} <em>{word}</em>{' '}
+								No {getExtendedLangName(trgLang)} cognates found
+								for {getExtendedLangName(srcLang)}{' '}
+								<em>{word}</em>{' '}
 							</p>
 						</>
 					) : (

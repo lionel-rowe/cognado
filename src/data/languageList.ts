@@ -1,6 +1,26 @@
 /**
 
-# Scraped from the following resources:
+# Extended language list scraped as follows:
+
+https://en.wiktionary.org/wiki/Wiktionary:List_of_languages
+
+```js
+JSON.stringify(
+	Object.fromEntries(
+		[...document.querySelectorAll('table tbody')]
+			.flatMap(tbody => [...tbody.querySelectorAll('tr')]
+				.map(x => [...x.querySelectorAll('td')].map(x => x.textContent.trim()))
+				.map(([code, canonicalName]) => ({ code, canonicalName })
+
+				).filter(({ code }) => code?.length > 2)
+			).map(({ code, canonicalName }) => [code, canonicalName])
+	)
+)
+```
+
+---
+
+# Basic language list scraped as follows:
 
 ## Step 1 - Wiktionary frequent languages
 
