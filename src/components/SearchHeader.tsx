@@ -4,9 +4,9 @@ import { Path } from '../Routes'
 
 const LinkOrText: FC<{ isHome: boolean }> = ({ isHome, children }) => {
 	return isHome ? (
-		<>{children}</>
+		<span className='search-header__text'>{children}</span>
 	) : (
-		<Link className='search-header__link' to={Path.Home}>
+		<Link className='search-header__link search-header__text' to={Path.Home}>
 			{children}
 		</Link>
 	)
@@ -18,8 +18,8 @@ export const SearchHeader: FC<{}> = () => {
 
 	return (
 		<header className='search-header'>
-			<LinkOrText {...{ isHome }}>
-				<h1 className='search-header__main-heading'>
+			<h1 className='search-header__main-heading'>
+				<LinkOrText {...{ isHome }}>
 					<img
 						src='logo.svg'
 						alt=''
@@ -28,8 +28,8 @@ export const SearchHeader: FC<{}> = () => {
 					<span className='search-header__main-heading-text'>
 						Cognado
 					</span>
-				</h1>
-			</LinkOrText>
+				</LinkOrText>
+			</h1>
 			<div className='search-header__subheading'>
 				<em>Cognate search</em>
 			</div>

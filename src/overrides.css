@@ -1,4 +1,4 @@
-body {
-	--gh-corner__bg: var(--font-color);
-	--gh-corner__fg: var(--bg-color);
+.gh-corner {
+	--bg: var(--font-color);
+	--fg: var(--bg-color);
 }

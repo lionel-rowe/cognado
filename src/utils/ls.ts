@@ -2,6 +2,12 @@ import type { FormValues } from '../utils/setupQps'
 import type { CognateRaw } from '../core/cognates'
 import type { Translations } from '../core/translations'
 import type { Variant } from '../components/ColorSchemeSwitcher'
+import { LangCode } from './langNames'
+
+export type LangPair = {
+	srcLang: LangCode
+	trgLang: LangCode
+}
 
 const namespace = process.env.PUBLIC_URL.slice(1)
 const ns = (s: string) => (namespace ? `${namespace}::${s}` : s)
@@ -13,7 +19,7 @@ const pseudoTarget = localStorage as Partial<{
 	wiktionaryUrl: string | null
 	seeAlsos: string[]
 	translations: Translations
-	suggestTryFlipped: boolean
+	suggestedLangPairs: LangPair[]
 	colorSchemeOverride: Variant
 	cognatesTooltipDismissed: boolean
 	definition: string

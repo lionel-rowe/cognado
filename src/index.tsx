@@ -2,8 +2,6 @@
 import './vendor/chota.100.css'
 /* import `styles.css` after `chota.css`to override definedvars */
 import './styles.css'
-/* import `overrides.css` last to give precedence over component styles */
-import './overrides.css'
 import { render } from 'react-dom'
 import { App } from './App'
 import { exposeGlobals } from './debug'
@@ -13,6 +11,9 @@ import { injectCssConstants } from './utils/dynamicStyles'
 import * as serviceWorkerRegistration from './serviceWorkerRegistration'
 import { initViewportHeightAdjuster } from './utils/viewportHeightAdjuster'
 import { addGlobalListeners } from './utils/addGlobalListeners'
+
+/* import `overrides.css` last to give precedence over component styles */
+import './overrides.css'
 
 exposeGlobals()
 injectCssConstants()

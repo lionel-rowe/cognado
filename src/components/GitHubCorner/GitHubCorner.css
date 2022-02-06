@@ -1,11 +1,9 @@
 /* modified from https://github.com/skratchdot/react-github-corner/blob/master/src/lib/get-github-corner-styles.js */
 
-:root {
-	--gh-corner__fg: #fff;
-	--gh-corner__bg: #151513;
-}
-
 .gh-corner {
+	--fg: #fff;
+	--bg: #151513;
+
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -21,11 +19,11 @@
 
 .gh-corner__octo-body,
 .gh-corner__octo-arm {
-	fill: var(--gh-corner__fg);
+	fill: var(--fg);
 }
 
 .gh-corner__octo-banner {
-	fill: var(--gh-corner__bg);
+	fill: var(--bg);
 }
 
 .gh-corner__octo-arm {

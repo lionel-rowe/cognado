@@ -9,7 +9,7 @@ import { DefinitionTab } from './DefinitionTab'
 import { TabLink } from './TabLink'
 import { TranslationsTab } from './TranslationsTab'
 import { Tooltip } from './Tooltip'
-import { ls } from '../utils/ls'
+import { LangPair, ls } from '../utils/ls'
 
 type Props = {
 	lastSubmitted: FormValues
@@ -22,7 +22,7 @@ type Props = {
 	word: string
 	query: string
 	error: Error | null
-	suggestTryFlipped: boolean
+	suggestedLangPairs: LangPair[]
 	definition: string | null
 }
 
@@ -33,7 +33,7 @@ export const Tabs: FC<Props> = ({
 	word,
 	query,
 	error,
-	suggestTryFlipped,
+	suggestedLangPairs,
 	definition,
 }) => {
 	const { search } = useLocation()
@@ -86,15 +86,13 @@ export const Tabs: FC<Props> = ({
 			<article translate='no'>
 				<Switch>
 					<Route exact path={Path.Definition}>
-						{definition ? (
-							<DefinitionTab
-								{...{
-									definition,
-									lastSubmitted,
-									suggestTryFlipped,
-								}}
-							/>
-						) : null}
+						<DefinitionTab
+							{...{
+								definition,
+								lastSubmitted,
+								suggestedLangPairs,
+							}}
+						/>
 					</Route>
 					<Route exact path={Path.Cognates}>
 						{cognates.length ? (

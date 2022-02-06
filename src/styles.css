@@ -307,12 +307,22 @@ nav .disabled-tab:hover {
 
 .search-header__link,
 .search-header__link:hover {
-	all: unset;
+	color: unset;
+    text-decoration: unset;
 	cursor: pointer;
 }
 
+:root.dark .search-header__link:hover {
+	color: #7bb2b4;
+}
+
 .search-header__link:hover {
-	color: var(--color-primary-emphasized);
+	color: #49898b;
+}
+
+.search-header__text {
+	display: flex;
+	align-items: center;
 }
 
 @media screen and (max-width: 36rem) {

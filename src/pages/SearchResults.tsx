@@ -15,7 +15,7 @@ import {
 	isCognateError,
 } from '../core/cognates'
 import { getLangName } from '../utils/langNames'
-import { ls } from '../utils/ls'
+import { LangPair, ls } from '../utils/ls'
 import { Spinner } from '../components/Spinner'
 import { FormValues, getFormValues, qpInit } from '../utils/setupQps'
 import { CognateSearchForm } from '../components/SearchForm'
@@ -26,7 +26,7 @@ import { parseTranslations } from '../core/translations'
 import { fetchWiktionaryPageResult } from '../core/fetchWiktionaryPage'
 import { createQps, pseudoHistory } from '../utils/qps'
 import { Tabs } from '../components/Tabs'
-import { containsSectionForLanguage } from '../core/containsSectionForLanguage'
+import { getLangCodesFromSections } from '../core/parseMobileSections'
 import clsx from 'clsx'
 import { SearchHeader } from '../components/SearchHeader'
 import { ExampleLinks } from '../components/ExampleLinks'
@@ -107,32 +107,38 @@ export const SearchResults: FC<Props> = () => {
 
 	const [definition, setDefinition] = useState(ls.definition ?? '')
 
-	const [suggestTryFlipped, setSuggestTryFlipped] = useState(false)
+	const [suggestedLangPairs, setSuggestedLangPairs] = useState<LangPair[]>([])
 
 	useEffect(() => {
-		if (!matches(lastSubmitted, getFormValues(qps))) {
-			const values = getFormValues(qps)
+		if (loading) {
+			return
+		}
 
-			const { word, srcLang, trgLang, allowPrefixesAndSuffixes } = values
+		const values = getFormValues(qps)
 
-			if (!word) {
-				setCognates([])
+		if (matches(lastSubmitted, values)) {
+			return
+		}
 
-				return
-			}
+		const { word, srcLang, trgLang, allowPrefixesAndSuffixes } = values
 
-			setLoading(true)
+		if (!word) {
+			return
+		}
 
-			Promise.all([
-				fetchCognates(
-					word.trim(),
-					srcLang,
-					trgLang,
-					allowPrefixesAndSuffixes,
-				),
-				fetchWiktionaryPageResult(word.trim()),
-				fetchWiktionaryDefinitionHtml(word, srcLang),
-			]).then(([result, wiktionaryResult, definition]) => {
+		setLoading(true)
+
+		Promise.all([
+			fetchCognates(
+				word.trim(),
+				srcLang,
+				trgLang,
+				allowPrefixesAndSuffixes,
+			),
+			fetchWiktionaryPageResult(word.trim()),
+			fetchWiktionaryDefinitionHtml(word, srcLang),
+		])
+			.then(([result, wiktionaryResult, definition]) => {
 				const { wiktionaryText, seeAlsos } =
 					wiktionaryResult.kind === 'error'
 						? {
@@ -152,9 +158,19 @@ export const SearchResults: FC<Props> = () => {
 
 				const translations = parseTranslations(wiktionaryText)
 
+				const langCodesFromSections =
+					getLangCodesFromSections(wiktionaryText)
+
 				const suggestTryFlipped =
-					!containsSectionForLanguage(srcLang, wiktionaryText) &&
-					containsSectionForLanguage(trgLang, wiktionaryText)
+					!langCodesFromSections.includes(srcLang) &&
+					langCodesFromSections.includes(trgLang)
+
+				const suggestedLangPairs: LangPair[] = suggestTryFlipped
+					? [{ srcLang: trgLang, trgLang: srcLang }]
+					: langCodesFromSections.map((srcLang) => ({
+							srcLang,
+							trgLang,
+					  }))
 
 				setLoading(false)
 
@@ -168,7 +184,7 @@ export const SearchResults: FC<Props> = () => {
 					setCognates(cognates)
 					setSeeAlsos(seeAlsos)
 					setTranslations(translations)
-					setSuggestTryFlipped(suggestTryFlipped)
+					setSuggestedLangPairs(suggestedLangPairs)
 					setDefinition(definition)
 
 					setQuery(query)
@@ -178,14 +194,14 @@ export const SearchResults: FC<Props> = () => {
 					ls.query = query
 					ls.seeAlsos = seeAlsos
 					ls.translations = translations
-					ls.suggestTryFlipped = suggestTryFlipped
+					ls.suggestedLangPairs = suggestedLangPairs
 					ls.definition = definition
 
 					reset(values)
 				}
 			})
-		}
-	}, [location, lastSubmitted, qps, reset])
+			.catch(() => setLoading(false))
+	}, [location, lastSubmitted, qps, reset, loading])
 
 	const onSubmit = useCallback(
 		async (values: FormValues) => {
@@ -265,7 +281,7 @@ export const SearchResults: FC<Props> = () => {
 							cognates: hydrated,
 							query,
 							error,
-							suggestTryFlipped,
+							suggestedLangPairs,
 						}}
 					/>
 				)}
