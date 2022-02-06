@@ -1,6 +1,7 @@
 import { getLangName, LangCode, langNamesToCodes } from '../utils/langNames'
 import { makeCognateFinderUrl, unwikify, wikify } from '../utils/formatters'
 import { urls } from '../config'
+import { ls } from '../utils/ls'
 
 type Section = {
 	toclevel: number
@@ -112,11 +113,17 @@ const getDefinitionDomForLanguage = (
 
 const cache = new Map<string, string>()
 
+if (ls.lastSubmitted && ls.definition) {
+	const { word, srcLang } = ls.lastSubmitted
+
+	cache.set(JSON.stringify([word, srcLang]), ls.definition)
+}
+
 export const fetchWiktionaryDefinitionHtml = async (
 	word: string,
 	langCode: LangCode,
 ) => {
-	const key = JSON.stringify({ word, langCode })
+	const key = JSON.stringify([word, langCode])
 
 	if (cache.has(key)) return cache.get(key)!
 

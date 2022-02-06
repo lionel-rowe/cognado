@@ -1,6 +1,5 @@
-import { FC, useEffect, useState } from 'react'
+import { FC } from 'react'
 import { Link } from 'react-router-dom'
-import { fetchWiktionaryDefinitionHtml } from '../core/getWikiContent'
 import {
 	makeCognateFinderUrl,
 	makeWiktionaryUrl,
@@ -12,36 +11,22 @@ import { WiktionaryHtmlRootLevel } from './WiktionaryHtml'
 import { WiktionaryTitleLink } from './WiktionaryTitleLink'
 
 type Props = {
+	definition: string
 	lastSubmitted: FormValues
 	suggestTryFlipped: boolean
 }
 
 export const DefinitionTab: FC<Props> = ({
+	definition,
 	lastSubmitted,
 	suggestTryFlipped,
 }) => {
 	const { word, srcLang, trgLang } = lastSubmitted
 
-	const [html, setHtml] = useState<string | null>(null)
-
 	const langName = getLangName(srcLang)
 
 	const title = `${word} (${langName})`
 	const wiktionaryUrl = makeWiktionaryUrl({ word, langCode: srcLang })
-
-	useEffect(() => {
-		let unmounted = false
-
-		fetchWiktionaryDefinitionHtml(word, srcLang).then((x) => {
-			if (!unmounted) {
-				setHtml(x)
-			}
-		})
-
-		return () => {
-			unmounted = true
-		}
-	}, [srcLang, word])
 
 	return (
 		<div className='y-margins'>
@@ -50,13 +35,13 @@ export const DefinitionTab: FC<Props> = ({
 
 				{suggestTryFlipped ? null : (
 					<WiktionaryTitleLink
-						{...{ title: html ? title : word, wiktionaryUrl }}
+						{...{ title: definition ? title : word, wiktionaryUrl }}
 					/>
 				)}
 
 				<WiktionaryHtmlRootLevel
 					{...{ word, langCode: srcLang }}
-					dangerousHtml={html}
+					dangerousHtml={definition}
 				/>
 
 				{suggestTryFlipped ? (

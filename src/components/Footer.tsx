@@ -2,6 +2,7 @@ import { FC, HtmlHTMLAttributes } from 'react'
 import { urls } from '../config'
 import buildInfo from '../buildInfo.json'
 import { ColorSchemeSwitcher } from './ColorSchemeSwitcher'
+import { Tooltip } from './Tooltip'
 
 export const Footer: FC<HtmlHTMLAttributes<HTMLElement>> = ({
 	...htmlProps
@@ -46,9 +47,9 @@ export const Footer: FC<HtmlHTMLAttributes<HTMLElement>> = ({
 						MIT
 					</a>
 					) · Version{' '}
-					<code className='build-info' title={buildInfo.ts}>
-						{buildInfo.hash}
-					</code>
+					<Tooltip title={buildInfo.ts}>
+						<code className='build-info'>{buildInfo.hash}</code>
+					</Tooltip>
 					<ColorSchemeSwitcher />
 				</small>
 			</div>

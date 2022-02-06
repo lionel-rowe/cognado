@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { Route, Switch, useLocation } from 'react-router-dom'
 import { CognateHydrated } from '../core/cognates'
 import { Path } from '../Routes'
@@ -8,6 +8,8 @@ import { CognatesTab } from './CognatesTab'
 import { DefinitionTab } from './DefinitionTab'
 import { TabLink } from './TabLink'
 import { TranslationsTab } from './TranslationsTab'
+import { Tooltip } from './Tooltip'
+import { ls } from '../utils/ls'
 
 type Props = {
 	lastSubmitted: FormValues
@@ -21,6 +23,7 @@ type Props = {
 	query: string
 	error: Error | null
 	suggestTryFlipped: boolean
+	definition: string | null
 }
 
 export const Tabs: FC<Props> = ({
@@ -31,8 +34,22 @@ export const Tabs: FC<Props> = ({
 	query,
 	error,
 	suggestTryFlipped,
+	definition,
 }) => {
 	const { search } = useLocation()
+
+	const [open, setOpen] = useState(false)
+
+	const dismissTooltip = () => {
+		ls.cognatesTooltipDismissed = true
+		setOpen(false)
+	}
+
+	useEffect(() => {
+		if (!ls.cognatesTooltipDismissed) {
+			setOpen(Boolean(cognates.length))
+		}
+	}, [cognates])
 
 	return (
 		<div className='y-margins tabs-outer'>
@@ -40,14 +57,23 @@ export const Tabs: FC<Props> = ({
 				<TabLink exact to={Path.Definition + search}>
 					Definition
 				</TabLink>
-				<TabLink
-					exact
-					to={Path.Cognates + search}
-					disabled={!cognates.length}
-					disabledMessage='No cognates found'
+
+				<Tooltip
+					open={open}
+					arrow
+					title={open ? 'Cognates found! Click here to view' : ''}
+					className='tooltip--emphasized'
+					onClick={dismissTooltip}
 				>
-					Cognates
-				</TabLink>
+					<TabLink
+						exact
+						to={Path.Cognates + search}
+						disabled={!cognates.length}
+						disabledMessage='No cognates found'
+					>
+						Cognates
+					</TabLink>
+				</Tooltip>
 				<TabLink
 					exact
 					to={Path.Translations + search}
@@ -60,9 +86,15 @@ export const Tabs: FC<Props> = ({
 			<article translate='no'>
 				<Switch>
 					<Route exact path={Path.Definition}>
-						<DefinitionTab
-							{...{ lastSubmitted, suggestTryFlipped }}
-						/>
+						{definition ? (
+							<DefinitionTab
+								{...{
+									definition,
+									lastSubmitted,
+									suggestTryFlipped,
+								}}
+							/>
+						) : null}
 					</Route>
 					<Route exact path={Path.Cognates}>
 						{cognates.length ? (

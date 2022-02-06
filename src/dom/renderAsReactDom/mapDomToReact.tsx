@@ -21,8 +21,13 @@ const allowedAttrs = [
 	'typeof',
 ]
 
+const allowedPrefixes = ['data', 'aria'].map((x) => x + '-')
+
 const isAllowedAttr = (attr: string, value: string) => {
-	return allowedAttrs.includes(attr) || attr.startsWith('data-')
+	return (
+		allowedAttrs.includes(attr) ||
+		allowedPrefixes.some(attr.startsWith.bind(attr))
+	)
 }
 
 const reactProps: Record<string, string> = {

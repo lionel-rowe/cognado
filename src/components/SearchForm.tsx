@@ -16,6 +16,7 @@ import { makeCognateFinderUrl, toRelativeUrl } from '../utils/formatters'
 import { FormValues } from '../utils/setupQps'
 import { nextAnimationFrame } from '../utils/timing'
 import { LangSelect } from './LangSelect'
+import { Tooltip } from './Tooltip'
 
 type WiktionaryOpenSearchSuggestions = [
 	input: string,
@@ -172,14 +173,11 @@ export const CognateSearchForm: FC<{
 						setLangCode={setValue}
 					/>
 				</label>{' '}
-				<button
-					className='swap'
-					type='button'
-					onClick={swap}
-					aria-label='Swap'
-				>
-					<span aria-hidden='true'>⇄</span>
-				</button>{' '}
+				<Tooltip title='Swap languages'>
+					<button className='swap' type='button' onClick={swap}>
+						<span aria-hidden='true'>⇄</span>
+					</button>
+				</Tooltip>{' '}
 				<label htmlFor='trgLang'>
 					Target{' '}
 					<LangSelect

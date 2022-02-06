@@ -15,6 +15,8 @@ body {
 	--page-padding: 1.8rem;
 	--footer-padding: 1.2rem;
 	--color-placeholder: #aaa;
+
+	--popover-shadow: drop-shadow(1px 2px 4px #0006);
 }
 
 :root.dark {
@@ -31,6 +33,8 @@ body {
 	--color-primary: #17bd1e;
 	--color-error: #ea4f4f;
 	--color-placeholder: #888;
+
+	--popover-shadow: drop-shadow(1px 2px 4px #000f);
 }
 
 ::placeholder {
@@ -135,8 +139,8 @@ nav a:hover {
 	background: var(--bg-color);
 	border: 1px solid #aaa;
 	border-radius: 5px;
-	padding: 0.7em;
-	filter: drop-shadow(4px 4px 4px #0006);
+	padding: 1rem;
+	filter: var(--popover-shadow);
 	z-index: 1;
 }
 
@@ -209,7 +213,7 @@ footer.container {
 
 /* /sticky footer */
 
-.build-info[title] {
+.build-info {
 	cursor: help;
 }
 
@@ -251,13 +255,13 @@ nav .disabled-tab:hover {
 
 .search-results__ancestor {
 	height: 100%;
-	flex: 1 0 auto;
-	display: flex;
 }
 
 .search-results__ancestor--home-page {
 	align-items: center;
 	justify-content: center;
+	flex: 1 0 auto;
+	display: flex;
 }
 
 /* search form */
@@ -319,4 +323,40 @@ nav .disabled-tab:hover {
 
 .example-links {
 	margin-top: 2rem;
+}
+
+/* tooltip */
+
+div.tooltip {
+	--fg: var(--font-color);
+	--bg: var(--bg-secondary-color);
+
+	color: var(--fg);
+	background: var(--bg);
+}
+
+div.tooltip::after {
+	/* drop shadow hack to fix blurry rendering in Chrome */
+	content: '';
+	filter: var(--popover-shadow);
+	display: block;
+	position: absolute;
+	inset: 0;
+	background: inherit;
+	border-radius: inherit;
+	z-index: -1;
+}
+
+div.tooltip:not(.tooltip--has-arrow)::after {
+	/* drop shadow hack to fix blurry rendering in Chrome */
+	margin: inherit;
+}
+
+div.tooltip--emphasized {
+	--fg: var(--bg-color);
+	--bg: var(--font-color);
+}
+
+div.tooltip .tooltip__arrow {
+	color: var(--bg);
 }

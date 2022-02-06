@@ -17,7 +17,6 @@ import {
 import { getLangName } from '../utils/langNames'
 import { ls } from '../utils/ls'
 import { Spinner } from '../components/Spinner'
-import { RootErrorBoundary } from '../components/RootErrorBoundary'
 import { FormValues, getFormValues, qpInit } from '../utils/setupQps'
 import { CognateSearchForm } from '../components/SearchForm'
 import { Path, QpsContext } from '../Routes'
@@ -31,6 +30,7 @@ import { containsSectionForLanguage } from '../core/containsSectionForLanguage'
 import clsx from 'clsx'
 import { SearchHeader } from '../components/SearchHeader'
 import { ExampleLinks } from '../components/ExampleLinks'
+import { fetchWiktionaryDefinitionHtml } from '../core/getWikiContent'
 
 type Props = {}
 
@@ -105,6 +105,8 @@ export const SearchResults: FC<Props> = () => {
 		}
 	}, [lastSubmitted])
 
+	const [definition, setDefinition] = useState(ls.definition ?? '')
+
 	const [suggestTryFlipped, setSuggestTryFlipped] = useState(false)
 
 	useEffect(() => {
@@ -129,7 +131,8 @@ export const SearchResults: FC<Props> = () => {
 					allowPrefixesAndSuffixes,
 				),
 				fetchWiktionaryPageResult(word.trim()),
-			]).then(([result, wiktionaryResult]) => {
+				fetchWiktionaryDefinitionHtml(word, srcLang),
+			]).then(([result, wiktionaryResult, definition]) => {
 				const { wiktionaryText, seeAlsos } =
 					wiktionaryResult.kind === 'error'
 						? {
@@ -166,6 +169,7 @@ export const SearchResults: FC<Props> = () => {
 					setSeeAlsos(seeAlsos)
 					setTranslations(translations)
 					setSuggestTryFlipped(suggestTryFlipped)
+					setDefinition(definition)
 
 					setQuery(query)
 
@@ -175,6 +179,7 @@ export const SearchResults: FC<Props> = () => {
 					ls.seeAlsos = seeAlsos
 					ls.translations = translations
 					ls.suggestTryFlipped = suggestTryFlipped
+					ls.definition = definition
 
 					reset(values)
 				}
@@ -226,46 +231,45 @@ export const SearchResults: FC<Props> = () => {
 				isHome && 'search-results__ancestor--home-page',
 			])}
 		>
-			<RootErrorBoundary>
-				<div
-					className={clsx([
-						'search-results__outer',
-						isHome && 'search-results__outer--home-page',
-					])}
-				>
-					<SearchHeader />
+			<div
+				className={clsx([
+					'search-results__outer',
+					isHome && 'search-results__outer--home-page',
+				])}
+			>
+				<SearchHeader />
 
-					<CognateSearchForm
+				<CognateSearchForm
+					{...{
+						form,
+						onSubmit,
+						seeAlsos: isHome ? [] : seeAlsos,
+					}}
+				/>
+
+				{isHome ? (
+					<ExampleLinks />
+				) : loading ? (
+					<Spinner />
+				) : !lastSubmitted ? (
+					<div className='y-margins grayed-out'>
+						Enter a word to search for
+					</div>
+				) : (
+					<Tabs
 						{...{
-							form,
-							onSubmit,
-							seeAlsos: isHome ? [] : seeAlsos,
+							definition,
+							word,
+							lastSubmitted,
+							translations: relevantTranslations,
+							cognates: hydrated,
+							query,
+							error,
+							suggestTryFlipped,
 						}}
 					/>
-
-					{isHome ? (
-						<ExampleLinks />
-					) : loading ? (
-						<Spinner />
-					) : !lastSubmitted ? (
-						<div className='y-margins grayed-out'>
-							Enter a word to search for
-						</div>
-					) : (
-						<Tabs
-							{...{
-								word,
-								lastSubmitted,
-								translations: relevantTranslations,
-								cognates: hydrated,
-								query,
-								error,
-								suggestTryFlipped,
-							}}
-						/>
-					)}
-				</div>
-			</RootErrorBoundary>
+				)}
+			</div>
 		</div>
 	)
 }

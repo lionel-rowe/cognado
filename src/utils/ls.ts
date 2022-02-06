@@ -6,17 +6,7 @@ import type { Variant } from '../components/ColorSchemeSwitcher'
 const namespace = process.env.PUBLIC_URL.slice(1)
 const ns = (s: string) => (namespace ? `${namespace}::${s}` : s)
 
-const pseudoTarget = {
-	get lastSubmitted() {
-		return undefined
-	},
-	get cognates() {
-		return undefined
-	},
-	get query() {
-		return undefined
-	},
-} as Partial<{
+const pseudoTarget = localStorage as Partial<{
 	lastSubmitted: FormValues
 	cognates: CognateRaw[]
 	query: string
@@ -25,6 +15,8 @@ const pseudoTarget = {
 	translations: Translations
 	suggestTryFlipped: boolean
 	colorSchemeOverride: Variant
+	cognatesTooltipDismissed: boolean
+	definition: string
 }>
 
 export const ls = new Proxy(pseudoTarget, {
