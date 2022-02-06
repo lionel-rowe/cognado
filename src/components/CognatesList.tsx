@@ -21,7 +21,10 @@ export const CognatesList: FC<{
 								trg[trg.length - 1]?.word ?? 'null',
 							].join('-')}
 						>
-							<CognateLink {...ancestor} />
+							<CognateLink
+								className='cognate-link--lowlighted'
+								{...ancestor}
+							/>
 							<ul>
 								<li>
 									{src.flatMap((x, i) => [
@@ -29,7 +32,11 @@ export const CognatesList: FC<{
 											{' '}
 											→{' '}
 										</span>,
-										<CognateLink key={i} {...x} />,
+										<CognateLink
+											className='cognate-link--lowlighted'
+											key={i}
+											{...x}
+										/>,
 									])}
 								</li>
 								<li>
@@ -41,11 +48,15 @@ export const CognatesList: FC<{
 										i === a.length - 1 ? (
 											<CognateLink
 												key={i}
-												className='bold'
+												className='cognate-link--highlighted'
 												{...x}
 											/>
 										) : (
-											<CognateLink key={i} {...x} />
+											<CognateLink
+												key={i}
+												className='cognate-link--lowlighted'
+												{...x}
+											/>
 										),
 									])}
 								</li>

@@ -30,16 +30,9 @@ import { Tabs } from '../components/Tabs'
 import { containsSectionForLanguage } from '../core/containsSectionForLanguage'
 import clsx from 'clsx'
 import { SearchHeader } from '../components/SearchHeader'
+import { ExampleLinks } from '../components/ExampleLinks'
 
 type Props = {}
-
-const animationTimingSeconds = 0
-const ms = animationTimingSeconds * 1e3
-
-document.documentElement.style.setProperty(
-	'--search-results__expand-seconds',
-	`${animationTimingSeconds}s`,
-)
 
 type Location_ = Window['location']
 type Location = ReturnType<typeof useLocation>
@@ -224,28 +217,6 @@ export const SearchResults: FC<Props> = () => {
 		[translations, lastSubmitted?.trgLang],
 	)
 
-	const [shouldShowResults, setShouldShowResults] = useState(
-		!checkIsHome(location),
-	)
-
-	useEffect(() => {
-		setShouldShowResults((prevShouldShowResults) => {
-			const shouldShowResults = !checkIsHome(location)
-
-			if (shouldShowResults && !prevShouldShowResults) {
-				setTimeout(() => {
-					setShouldShowResults(!checkIsHome(window.location) && true)
-				}, ms)
-
-				return false
-			} else if (!shouldShowResults && prevShouldShowResults) {
-				return false
-			}
-
-			return prevShouldShowResults
-		})
-	}, [location])
-
 	const isHome = checkIsHome(location)
 
 	return (
@@ -272,31 +243,27 @@ export const SearchResults: FC<Props> = () => {
 						}}
 					/>
 
-					{shouldShowResults ? (
-						loading ? (
-							<Spinner />
-						) : !lastSubmitted ? (
-							<div className='y-margins grayed-out'>
-								Enter a word to search for
-							</div>
-						) : (
-							<>
-								{shouldShowResults ? (
-									<Tabs
-										{...{
-											word,
-											lastSubmitted,
-											translations: relevantTranslations,
-											cognates: hydrated,
-											query,
-											error,
-											suggestTryFlipped,
-										}}
-									/>
-								) : null}
-							</>
-						)
-					) : null}
+					{isHome ? (
+						<ExampleLinks />
+					) : loading ? (
+						<Spinner />
+					) : !lastSubmitted ? (
+						<div className='y-margins grayed-out'>
+							Enter a word to search for
+						</div>
+					) : (
+						<Tabs
+							{...{
+								word,
+								lastSubmitted,
+								translations: relevantTranslations,
+								cognates: hydrated,
+								query,
+								error,
+								suggestTryFlipped,
+							}}
+						/>
+					)}
 				</div>
 			</RootErrorBoundary>
 		</div>

@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import {
 	FC,
 	HTMLProps,
@@ -32,7 +33,7 @@ export const CognateLink: FC<
 	Partial<WordData> &
 		Pick<WordData, 'word' | 'langCode'> &
 		HTMLProps<HTMLAnchorElement>
-> = ({ word, langCode, children, langName: _, ...htmlProps }) => {
+> = ({ word, langCode, children, langName: _, className, ...htmlProps }) => {
 	const [referenceElement, setReferenceElement] =
 		useState<HTMLElement | null>(null)
 	const [popperElement, setPopperElement] = useState<HTMLElement | null>(null)
@@ -203,6 +204,7 @@ export const CognateLink: FC<
 		<span ref={ref} className='popover-parent'>
 			<span ref={setReferenceElement}>
 				<Link
+					className={clsx([className, 'cognate-link'])}
 					{...(htmlProps as any)}
 					{...onEvents}
 					onClick={hidePopover}

@@ -31,15 +31,17 @@ export const getDefaultTrgLang = (srcLang: LangCode): LangCode => {
 export const makeCognateFinderUrl = ({
 	word,
 	srcLang,
+	trgLang: trgLang_,
 	path = Path.Definition,
 }: {
 	word: string
 	srcLang: LangCode
+	trgLang?: LangCode
 	path?: Path
 }) => {
 	const url = new URL(process.env.PUBLIC_URL + path, window.location.origin)
 
-	const trgLang = getDefaultTrgLang(srcLang)
+	const trgLang = trgLang_ ?? getDefaultTrgLang(srcLang)
 
 	for (const [k, v] of Object.entries({
 		word,

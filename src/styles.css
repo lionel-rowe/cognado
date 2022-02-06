@@ -15,7 +15,6 @@ body {
 	--page-padding: 1.8rem;
 	--footer-padding: 1.2rem;
 	--color-placeholder: #aaa;
-	--search-results__expand-seconds: 1s;
 }
 
 :root.dark {
@@ -118,6 +117,18 @@ nav a:hover {
 	margin: 1em 0;
 }
 
+.cognate-link--highlighted {
+	font-weight: bold;
+}
+
+.cognate-link--lowlighted {
+	opacity: 0.8;
+}
+
+:root.dark .cognate-link--lowlighted {
+	opacity: 0.6;
+}
+
 .popover {
 	position: absolute;
 	max-width: min(500px, calc(100vw - 16px));
@@ -139,10 +150,6 @@ nav a:hover {
 
 .grayed-out {
 	color: var(--color-grey);
-}
-
-.bold {
-	font-weight: bold;
 }
 
 label[for='srcLang'],
@@ -249,18 +256,13 @@ nav .disabled-tab:hover {
 }
 
 .search-results__ancestor--home-page {
-    align-items: center;
-    justify-content: center;
+	align-items: center;
+	justify-content: center;
 }
 
 /* search form */
-/* todo: make animations work */
 .search-results__outer {
-	transition: all var(--search-results-expand-seconds);
 	width: 100%;
-}
-
-.search-results__outer:not(.search-results__outer--home-page) {
 	max-width: 100%;
 }
 
@@ -313,4 +315,8 @@ nav .disabled-tab:hover {
 	.search-results__outer--home-page .search-header {
 		font-size: 1.5rem;
 	}
+}
+
+.example-links {
+	margin-top: 2rem;
 }

@@ -189,7 +189,11 @@ export const CognateSearchForm: FC<{
 					/>
 				</label>
 			</div>
-			<div className='y-margins'>
+			{/*
+				TODO: possibly re-add? might be confusing for users,
+				probably hide behind "advanced options"
+			*/}
+			{/* <div className='y-margins'>
 				<label htmlFor='allowPrefixesAndSuffixes'>
 					Allow prefixes and suffixes{' '}
 					<input
@@ -198,7 +202,7 @@ export const CognateSearchForm: FC<{
 						{...register('allowPrefixesAndSuffixes')}
 					/>
 				</label>
-			</div>
+			</div> */}
 			<div className='y-margins'>
 				<button type='submit'>Search</button>{' '}
 			</div>
