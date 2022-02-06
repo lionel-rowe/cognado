@@ -11,7 +11,10 @@ export const App = () => {
 		<RootErrorBoundary>
 			<Router basename={process.env.PUBLIC_URL}>
 				<div className='full-page'>
-					<Tooltip title='See project on GitHub'>
+					<Tooltip
+						title='View project on GitHub'
+						enterTouchDelay={300}
+					>
 						<GitHubCorner
 							target='_blank'
 							rel='noreferrer noopener'

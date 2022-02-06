@@ -121,8 +121,12 @@ export const CognateSearchForm: FC<{
 	)
 
 	return (
-		<form className='y-margins-between' ref={formRef} onSubmit={submit}>
-			<div>
+		<form
+			className='search-form y-gap-between'
+			ref={formRef}
+			onSubmit={submit}
+		>
+			<div className='long-field'>
 				<label htmlFor='word'>
 					Word{' '}
 					<input
@@ -147,7 +151,7 @@ export const CognateSearchForm: FC<{
 					</datalist>
 				</label>{' '}
 				{seeAlsos.length ? (
-					<>
+					<div className='see-alsos'>
 						See also:{' '}
 						{seeAlsos.map((word, idx, arr) => (
 							<Fragment key={idx}>
@@ -161,10 +165,10 @@ export const CognateSearchForm: FC<{
 								{idx !== arr.length - 1 ? ', ' : ''}
 							</Fragment>
 						))}
-					</>
+					</div>
 				) : null}
 			</div>
-			<div>
+			<div className='short-field'>
 				<label htmlFor='srcLang'>
 					Source{' '}
 					<LangSelect
@@ -173,11 +177,15 @@ export const CognateSearchForm: FC<{
 						setLangCode={setValue}
 					/>
 				</label>{' '}
-				<Tooltip title='Swap languages'>
+			</div>
+			<div className='short-field'>
+				<Tooltip title='Swap languages' enterTouchDelay={300}>
 					<button className='swap' type='button' onClick={swap}>
 						<span aria-hidden='true'>⇄</span>
 					</button>
 				</Tooltip>{' '}
+			</div>
+			<div className='short-field'>
 				<label htmlFor='trgLang'>
 					Target{' '}
 					<LangSelect
@@ -201,7 +209,7 @@ export const CognateSearchForm: FC<{
 					/>
 				</label>
 			</div> */}
-			<div>
+			<div className='long-field'>
 				<button type='submit'>Search</button>{' '}
 			</div>
 		</form>

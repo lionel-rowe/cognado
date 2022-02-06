@@ -20,7 +20,7 @@ export const SearchHeader: FC<{}> = () => {
 	const isHome = location.pathname === Path.Home
 
 	return (
-		<header className='search-header'>
+		<header className='search-header y-margins'>
 			<h1 className='search-header__main-heading'>
 				<LinkOrText {...{ isHome }}>
 					<img

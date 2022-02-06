@@ -50,7 +50,7 @@ export const ExampleLinks: FC<{}> = () => {
 							toRelativeUrl,
 						)}
 					>
-						{word} ({getLangName(srcLang)})
+						<em>{word}</em> ({getLangName(srcLang)})
 					</Link>
 					{idx === arr.length - 1 ? null : ', '}
 				</Fragment>

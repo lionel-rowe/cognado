@@ -17,6 +17,8 @@ body {
 	--color-placeholder: #aaa;
 
 	--popover-shadow: drop-shadow(1px 2px 4px #0006);
+
+	--y-margin: var(--grid-gutter);
 }
 
 :root.dark {
@@ -35,8 +37,6 @@ body {
 	--color-placeholder: #888;
 
 	--popover-shadow: drop-shadow(1px 2px 4px #000f);
-
-	--y-margin: var(--grid-gutter);
 }
 
 ::placeholder {
@@ -59,21 +59,6 @@ input {
 
 a[href]:hover {
 	opacity: initial;
-}
-
-button.swap {
-	background-color: var(--bg-color);
-	font-size: 1.2rem;
-	padding-block: 0.5rem;
-	padding-inline: 0.5rem;
-	width: 2.5rem;
-	color: var(--color-primary);
-}
-
-button.swap:hover {
-	color: var(--color-primary-emphasized);
-	font-weight: bold;
-	background-color: none;
 }
 
 :is(button, .button.primary, .button, button[type='submit']):not([disabled]):hover {
@@ -119,12 +104,6 @@ nav a:hover {
 	margin-block: var(--y-margin);
 }
 
-.y-margins-between {
-	display: flex;
-	flex-direction: column;
-	row-gap: var(--y-margin);
-}
-
 .top-level-li {
 	margin: 1rem 0;
 }
@@ -162,11 +141,6 @@ nav a:hover {
 
 .grayed-out {
 	color: var(--color-grey);
-}
-
-label[for='srcLang'],
-label[for='trgLang'] {
-	display: inline-block;
 }
 
 .arrow {
@@ -262,6 +236,12 @@ nav .disabled-tab:hover {
 }
 
 .search-results__ancestor {
+	--swap-button-width: 4rem;
+	--language-select-width: 16rem;
+	--home-page-form-width: calc(
+		var(--swap-button-width) + var(--language-select-width) * 2
+	);
+
 	height: 100%;
 }
 
@@ -279,7 +259,7 @@ nav .disabled-tab:hover {
 }
 
 .search-results__outer.search-results__outer--home-page {
-	max-width: 36rem;
+	max-width: var(--home-page-form-width);
 }
 
 /* header */
@@ -377,4 +357,46 @@ div.tooltip--emphasized {
 
 div.tooltip .tooltip__arrow {
 	color: var(--bg);
+}
+
+/* search form */
+
+.search-form {
+	display: flex;
+	flex-direction: row;
+	row-gap: var(--y-margin);
+	flex-wrap: wrap;
+	align-items: flex-end;
+}
+
+.see-alsos {
+	margin-bottom: -0.7rem;
+}
+
+.long-field {
+	width: 100%;
+}
+
+.short-field {
+	max-width: var(--language-select-width);
+}
+
+#srcLang,
+#trgLang {
+	width: var(--language-select-width);
+}
+
+button.swap {
+	background-color: var(--bg-color);
+	font-size: 1.6rem;
+	padding-block: 0.5rem;
+	padding-inline: 0.5rem;
+	width: var(--swap-button-width);
+	color: var(--color-primary);
+}
+
+button.swap:hover {
+	color: var(--color-primary-emphasized);
+	font-weight: bold;
+	background-color: none;
 }

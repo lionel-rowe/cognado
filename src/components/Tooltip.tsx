@@ -10,6 +10,7 @@ type Props = {
 	children: ReactElement<any, any>
 	open?: boolean
 	arrow?: boolean
+	enterTouchDelay?: number
 } & Pick<HTMLProps<HTMLElement>, 'title' | 'className' | 'id' | ReactEventName>
 
 export const Tooltip: FC<Props> = ({
@@ -18,6 +19,7 @@ export const Tooltip: FC<Props> = ({
 	className,
 	open,
 	arrow,
+	enterTouchDelay,
 	...htmlProps
 }) => {
 	return (
@@ -36,6 +38,7 @@ export const Tooltip: FC<Props> = ({
 			// doesn't play nicely with CSS hack to fix blurring
 			TransitionComponent={Fade}
 			title={title ?? ''}
+			enterTouchDelay={enterTouchDelay ?? 0}
 			{...{ arrow, open }}
 			{...htmlProps}
 		>
