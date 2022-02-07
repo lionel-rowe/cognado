@@ -13,7 +13,18 @@ const wrap = (...args: [x: TemplateStringsArray, ...rest: any[]]) =>
 // ...
 // {{trans-bottom}}
 const allTranslationsRegex = regex('gu')`
-	${wrap`trans-top(?:-also)?\|(?<meaning>[^|}]+)(?:[^}]+)?`}
+	${wrap`
+		trans-top(?:-also)? \|
+		(?:
+			id=[^|}]+ \|
+		)?
+		(?<meaning>
+			[^|}]+
+		)
+		(?:
+			\| [^}]+
+		)?
+	`}
 	(?<translations>[\s\S]+?)
 	${wrap`trans-bottom`}
 `
