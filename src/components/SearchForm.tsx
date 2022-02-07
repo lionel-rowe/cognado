@@ -11,6 +11,7 @@ import {
 import { UseFormReturn } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { urls } from '../config'
+import { useValidationMessages } from '../hooks/useValidationMessages'
 import { isMobile } from '../utils/device'
 import { makeCognateFinderUrl, toRelativeUrl } from '../utils/formatters'
 import { FormValues } from '../utils/setupQps'
@@ -120,6 +121,15 @@ export const CognateSearchForm: FC<{
 		[input, submit],
 	)
 
+	const { ref: wordFormRef, ...registerWord } = register('word')
+
+	const wordValidationRef = useValidationMessages(
+		{
+			valueMissing: () => 'Enter a word to search for',
+		},
+		false,
+	)
+
 	return (
 		<form
 			className='search-form y-gap-between'
@@ -133,11 +143,16 @@ export const CognateSearchForm: FC<{
 						required
 						onKeyDown={onKeyDown}
 						onInput={(e) => setInput(e.currentTarget.value)}
+						ref={(el) => {
+							wordFormRef(el)
+
+							Object.assign(wordValidationRef, { current: el })
+						}}
 						id='word'
 						type='search'
 						autoCapitalize='none'
 						value={word}
-						{...register('word')}
+						{...registerWord}
 						list='main-search'
 						placeholder='Search for definitions, cognates, and translations'
 						autoFocus
