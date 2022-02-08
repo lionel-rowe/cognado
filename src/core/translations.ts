@@ -5,6 +5,7 @@ type HasGroups<T extends string> = RegExpMatchArray & {
 }
 
 // {{xyz}} syntax, used for templates in MediaWiki
+// regexes with `u` flags set must escape all literal {braces}
 const wrap = (...args: [x: TemplateStringsArray, ...rest: any[]]) =>
 	regex`\{\{${regex(...args)}\}\}`
 

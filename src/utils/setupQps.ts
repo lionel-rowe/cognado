@@ -6,7 +6,7 @@ export const qpInit = {
 	word: qpType.string(''),
 	srcLang: qpType.string<LangCode>('spa'),
 	trgLang: qpType.string<LangCode>('eng'),
-	allowPrefixesAndSuffixes: qpType.boolean(false, { omitIfDefault: true }),
+	allowAffixes: qpType.boolean(false, { omitIfDefault: true }),
 
 	page: qpType.number(1, { omitIfDefault: true }),
 
@@ -21,10 +21,7 @@ export const initQps = (history?: History) => {
 export type Qps = ReturnType<typeof initQps>
 
 export const getFormValues = (qps: Qps) => {
-	return pick(
-		['word', 'srcLang', 'trgLang', 'allowPrefixesAndSuffixes'],
-		qps.getAll(),
-	)
+	return pick(['word', 'srcLang', 'trgLang', 'allowAffixes'], qps.getAll())
 }
 
 export type FormValues = ReturnType<typeof getFormValues>

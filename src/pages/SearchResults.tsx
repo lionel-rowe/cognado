@@ -72,7 +72,7 @@ export const SearchResults: FC<Props> = () => {
 
 	const { watch, reset } = form
 
-	const allowPrefixesAndSuffixes = watch('allowPrefixesAndSuffixes')
+	const allowAffixes = watch('allowAffixes')
 	const word = watch('word')
 
 	const [query, setQuery] = useState(
@@ -80,7 +80,7 @@ export const SearchResults: FC<Props> = () => {
 			ls.query ??
 			buildSparqlQuery({
 				...getFormValues(qps),
-				allowPrefixesAndSuffixes,
+				allowAffixes,
 			}).sparql,
 	)
 
@@ -110,7 +110,9 @@ export const SearchResults: FC<Props> = () => {
 	const [suggestedLangPairs, setSuggestedLangPairs] = useState<LangPair[]>([])
 
 	useEffect(() => {
-		if (loading) {
+		let canceled = false
+
+		if (canceled) {
 			return
 		}
 
@@ -120,7 +122,7 @@ export const SearchResults: FC<Props> = () => {
 			return
 		}
 
-		const { word, srcLang, trgLang, allowPrefixesAndSuffixes } = values
+		const { word, srcLang, trgLang, allowAffixes } = values
 
 		if (!word) {
 			return
@@ -129,12 +131,7 @@ export const SearchResults: FC<Props> = () => {
 		setLoading(true)
 
 		Promise.all([
-			fetchCognates(
-				word.trim(),
-				srcLang,
-				trgLang,
-				allowPrefixesAndSuffixes,
-			),
+			fetchCognates(word.trim(), srcLang, trgLang, allowAffixes),
 			fetchWiktionaryPageResult(word.trim()),
 			fetchWiktionaryDefinitionHtml(word, srcLang),
 		])
@@ -200,8 +197,15 @@ export const SearchResults: FC<Props> = () => {
 					reset(values)
 				}
 			})
-			.catch(() => setLoading(false))
-	}, [location, lastSubmitted, qps, reset, loading])
+			.catch((e) => {
+				setError(e)
+				setLoading(false)
+			})
+
+		return () => {
+			canceled = true
+		}
+	}, [location, lastSubmitted, qps, reset])
 
 	const onSubmit = useCallback(
 		async (values: FormValues) => {

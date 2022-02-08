@@ -215,12 +215,12 @@ export const CognateSearchForm: FC<{
 				probably hide behind "advanced options"
 			*/}
 			{/* <div>
-				<label htmlFor='allowPrefixesAndSuffixes'>
+				<label htmlFor='allowAffixes'>
 					Allow prefixes and suffixes{' '}
 					<input
 						type='checkbox'
-						id='allowPrefixesAndSuffixes'
-						{...register('allowPrefixesAndSuffixes')}
+						id='allowAffixes'
+						{...register('allowAffixes')}
 					/>
 				</label>
 			</div> */}
