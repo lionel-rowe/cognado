@@ -7,7 +7,7 @@ import {
 
 export const useValidationMessages = (
 	messages: CustomValidityMessages,
-	dynamic: boolean = true,
+	dynamic: boolean = false,
 ) => {
 	const validationRef = useRef<FormEl>(null)
 

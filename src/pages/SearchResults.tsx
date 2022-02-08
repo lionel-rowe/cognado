@@ -107,7 +107,9 @@ export const SearchResults: FC<Props> = () => {
 
 	const [definition, setDefinition] = useState(ls.definition ?? '')
 
-	const [suggestedLangPairs, setSuggestedLangPairs] = useState<LangPair[]>([])
+	const [suggestedLangPairs, setSuggestedLangPairs] = useState<LangPair[]>(
+		ls.suggestedLangPairs ?? [],
+	)
 
 	useEffect(() => {
 		let canceled = false

@@ -12,14 +12,18 @@ const setValidity = (messages: CustomValidityMessages) => (el: FormEl) => {
 	if (validity.valid) {
 		el.setCustomValidity('')
 
-		return
+		return ''
 	}
 
 	const fn = Object.entries(messages).find(
 		([key]) => validity[key as ValidityKey],
 	)?.[1]
 
-	el.setCustomValidity(fn?.(value) ?? '')
+	const customValidity = fn?.(value) ?? ''
+
+	el.setCustomValidity(customValidity)
+
+	return customValidity
 }
 
 export const attachCustomValidityMessages =
@@ -29,13 +33,15 @@ export const attachCustomValidityMessages =
 
 			setValidity_(el)
 
-			const listener = (e: Event) =>
-				setValidity_(e.currentTarget as FormEl)
+			const observer = new MutationObserver(() => setValidity_(el))
 
-			el.addEventListener('input', listener)
+			observer.observe(el, {
+				attributes: true,
+				attributeFilter: ['value'],
+			})
 
 			return function cleanup() {
-				el.removeEventListener('input', listener)
+				observer.disconnect()
 			}
 		}
 	}

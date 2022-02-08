@@ -125,12 +125,9 @@ export const CognateSearchForm: FC<{
 
 	const { ref: wordFormRef, ...registerWord } = register('word')
 
-	const wordValidationRef = useValidationMessages(
-		{
-			valueMissing: () => 'Enter a word to search for',
-		},
-		false,
-	)
+	const wordValidationRef = useValidationMessages({
+		valueMissing: () => 'Enter a word to search for',
+	})
 
 	return (
 		<form
