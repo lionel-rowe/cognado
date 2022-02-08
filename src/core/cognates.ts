@@ -5,7 +5,7 @@ import { pipe } from 'fp-ts/function'
 import { uniq } from '../utils/uniq'
 import { escapeForSparqlUrl } from './escapeSparqlUrlSegment'
 import { urls } from '../config'
-import { sparqlClient } from './sparql'
+import { ancestor, Branch, sparqlClient } from './sparql'
 import { regex } from 'fancy-regex'
 
 const toLangPathSegments = (lang: LangCode) =>
@@ -82,11 +82,6 @@ type SparqlParams = {
 	allowAffixes: boolean
 	depth?: number
 }
-
-type Branch = 'a' | 'b'
-
-const ancestor = 'ancestor'
-type Ancestor = typeof ancestor
 
 export const buildSparqlQuery = ({
 	word,
@@ -176,15 +171,12 @@ export const fetchCognates = async (
 
 	const res = await sparqlClient.fetch(sparql)
 
-	if (res.error) {
+	if (res.kind === 'error') {
 		console.error(res.error)
 
 		return { query: sparql, ...res }
 	} else {
-		const bindings = res.results.bindings as Record<
-			'target' | `${Ancestor}0` | `${Ancestor}${number}${Branch}`,
-			{ type: 'uri'; value: string }
-		>[]
+		const bindings = res.results.bindings
 
 		const etymologies = bindings.map((binding) => {
 			const { target, ancestor0 } = binding

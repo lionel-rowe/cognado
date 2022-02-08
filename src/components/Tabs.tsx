@@ -10,6 +10,8 @@ import { TabLink } from './TabLink'
 import { TranslationsTab } from './TranslationsTab'
 import { Tooltip } from './Tooltip'
 import { LangPair, ls } from '../utils/ls'
+import { clickInteraction } from '../utils/device'
+import { capitalize } from '../utils/formatters'
 
 type Props = {
 	lastSubmitted: FormValues
@@ -61,7 +63,13 @@ export const Tabs: FC<Props> = ({
 				<Tooltip
 					open={open}
 					arrow
-					title={open ? 'Cognates found! Click here to view' : ''}
+					title={
+						open
+							? `Cognates found! ${capitalize(
+									clickInteraction,
+							  )} here to view`
+							: ''
+					}
 					className='tooltip--emphasized'
 					onClick={dismissTooltip}
 				>

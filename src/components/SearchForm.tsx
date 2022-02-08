@@ -81,7 +81,7 @@ export const CognateSearchForm: FC<{
 			// is 'Unidentified' if event triggered by selecting an
 			// existing autocomplete option in desktop Chrome;
 			// however, mobile Chrome always returns 'Unidentified' (?!?!?)
-			const onAutocompleteSelectKeys = isMobile()
+			const onAutocompleteSelectKeys = isMobile
 				? ['Enter']
 				: ['Unidentified', 'Enter']
 
@@ -99,7 +99,9 @@ export const CognateSearchForm: FC<{
 			url.searchParams.set('action', 'opensearch')
 			url.searchParams.set('search', input)
 
-			fetch(url.href, controller)
+			fetch(url.href, {
+				signal: controller.signal,
+			})
 				.then(async (res) => {
 					const [, suggestions] =
 						(await res.json()) as WiktionaryOpenSearchSuggestions

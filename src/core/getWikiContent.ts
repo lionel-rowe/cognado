@@ -2,6 +2,7 @@ import { getLangName, LangCode, langNamesToCodes } from '../utils/langNames'
 import { makeCognateFinderUrl, unwikify, wikify } from '../utils/formatters'
 import { urls } from '../config'
 import { ls } from '../utils/ls'
+import { withCache } from '../utils/withCache'
 
 type Section = {
 	toclevel: number
@@ -63,11 +64,7 @@ const partsOfSpeech = [
 	'logogram',
 ]
 
-const wordSectionsCache = new Map<string, Section[]>()
-
-export const fetchWordSections = async (word: string) => {
-	if (wordSectionsCache.has(word)) return wordSectionsCache.get(word)!
-
+export const fetchWordSections = withCache(null, async (word: string) => {
 	const res = await fetch(
 		`${urls.wiktionaryRestApi}/rest_v1/page/mobile-sections/${wikify(
 			word,
@@ -82,10 +79,8 @@ export const fetchWordSections = async (word: string) => {
 
 	const sections = data.remaining?.sections ?? []
 
-	wordSectionsCache.set(word, sections)
-
 	return sections
-}
+})
 
 const getDefinitionDomForLanguage = (
 	word: string,
@@ -166,38 +161,37 @@ const getDefinitionDomForLanguage = (
 }
 
 const cache = new Map<string, string>()
+const keyGetter = (word: string, langCode: LangCode) =>
+	JSON.stringify([word, langCode])
 
 if (ls.lastSubmitted && ls.definition) {
 	const { word, srcLang } = ls.lastSubmitted
 
-	cache.set(JSON.stringify([word, srcLang]), ls.definition)
+	cache.set(keyGetter(word, srcLang), ls.definition)
 }
 
-export const fetchWiktionaryDefinitionHtml = async (
-	word: string,
-	langCode: LangCode,
-) => {
-	const key = JSON.stringify([word, langCode])
+export const fetchWiktionaryDefinitionHtml = withCache(
+	{
+		cache,
+		keyGetter,
+	},
+	async (word: string, langCode: LangCode) => {
+		let result: string
 
-	if (cache.has(key)) return cache.get(key)!
+		try {
+			const sections = await fetchWordSections(word)
 
-	let result: string
+			result =
+				getDefinitionDomForLanguage(
+					word,
+					sections,
+					getLangName(langCode),
+				).querySelector('ol')?.outerHTML ?? ''
+		} catch (e) {
+			console.error(e)
+			result = ''
+		}
 
-	try {
-		const sections = await fetchWordSections(word)
-
-		result =
-			getDefinitionDomForLanguage(
-				word,
-				sections,
-				getLangName(langCode),
-			).querySelector('ol')?.outerHTML ?? ''
-	} catch (e) {
-		console.error(e)
-		result = ''
-	}
-
-	cache.set(key, result)
-
-	return result
-}
+		return result
+	},
+)

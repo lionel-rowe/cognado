@@ -2,6 +2,8 @@ import { FC, useCallback, useContext } from 'react'
 import { CognateHydrated } from '../core/cognates'
 import { usePagination } from '../hooks/usePagination'
 import { QpsContext } from '../Routes'
+import { clickInteraction } from '../utils/device'
+import { capitalize } from '../utils/formatters'
 import { getExtendedLangName } from '../utils/langNames'
 import { FormValues } from '../utils/setupQps'
 import { CognatesList } from './CognatesList'
@@ -102,7 +104,7 @@ export const CognatesTab: FC<Props> = ({
 						'Enter a word to search for cognates'
 					)
 				) : (
-					'Click “Search” to find cognates'
+					`${capitalize(clickInteraction)} “Search” to find cognates`
 				)}
 
 				{cognates.length && word && query ? (

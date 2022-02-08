@@ -1,5 +1,6 @@
 import { urls } from '../config'
 import { forceCapitalize, underscorify } from '../utils/formatters'
+import { withCache } from '../utils/withCache'
 
 type WiktionaryApiSuccess = {
 	parse: {
@@ -40,25 +41,26 @@ type ErrorResult = {
 
 type Result = SuccessResult | ErrorResult
 
-const cache = new Map<string, Result>()
+const fetchFromApi = withCache(
+	null,
+	async (word: string): Promise<WikitextApiResponse> => {
+		const url = new URL(urls.wiktionaryActionApi)
 
-const fetchFromApi = async (word: string): Promise<WikitextApiResponse> => {
-	const url = new URL(urls.wiktionaryActionApi)
+		for (const [k, v] of [
+			['action', 'parse'],
+			['format', 'json'],
+			['prop', 'wikitext'],
+			['page', underscorify(word)],
+		]) {
+			url.searchParams.set(k, v)
+		}
 
-	for (const [k, v] of [
-		['action', 'parse'],
-		['format', 'json'],
-		['prop', 'wikitext'],
-		['page', underscorify(word)],
-	]) {
-		url.searchParams.set(k, v)
-	}
+		const res = await fetch(url.href)
+		const data: WikitextApiResponse = await res.json()
 
-	const res = await fetch(url.href)
-	const data: WikitextApiResponse = await res.json()
-
-	return data
-}
+		return data
+	},
+)
 
 const createSuccessResult = (
 	word: string,
@@ -72,8 +74,6 @@ const createSuccessResult = (
 export const fetchWiktionaryPageResult = async (
 	word: string,
 ): Promise<Result> => {
-	if (cache.has(word)) return cache.get(word)!
-
 	const data = await fetchFromApi(word)
 
 	if (isApiError(data)) {
@@ -94,8 +94,6 @@ export const fetchWiktionaryPageResult = async (
 				if (!isApiError(variantData)) {
 					const r = createSuccessResult(variant, variantData)
 
-					cache.set(variant, r)
-
 					prefetchedVariants.push(r)
 
 					// break early if 1 variant found
@@ -113,13 +111,9 @@ export const fetchWiktionaryPageResult = async (
 			prefetchedVariants,
 		}
 
-		cache.set(word, result)
-
 		return result
 	} else {
 		const result = createSuccessResult(word, data)
-
-		cache.set(word, result)
 
 		return result
 	}
