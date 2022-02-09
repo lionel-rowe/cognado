@@ -11,7 +11,6 @@ import {
 } from 'react'
 import { usePopper } from 'react-popper'
 import { Link, useHistory } from 'react-router-dom'
-import { WordData } from '../core/cognates'
 import { fetchWiktionaryDefinitionHtml } from '../core/getWikiContent'
 import { isLink, isSameOrigin } from '../utils/browser'
 import { isTouchDevice } from '../utils/device'
@@ -21,7 +20,7 @@ import {
 	makeWiktionaryUrl,
 	toRelativeUrl,
 } from '../utils/formatters'
-import { getExtendedLangName } from '../utils/langNames'
+import { getExtendedLangName, LangCode } from '../utils/langNames'
 import { Spinner } from './Spinner'
 import { WiktionaryHtml } from './WiktionaryHtml'
 import { WiktionaryTitleLink } from './WiktionaryTitleLink'
@@ -29,11 +28,20 @@ import { WiktionaryTitleLink } from './WiktionaryTitleLink'
 type ReactEventName = `on${Capitalize<string>}` &
 	keyof React.DOMAttributes<HTMLAnchorElement>
 
-export const CognateLink: FC<
-	Partial<WordData> &
-		Pick<WordData, 'word' | 'langCode'> &
-		HTMLProps<HTMLAnchorElement>
-> = ({ word, langCode, children, langName: _, className, ...htmlProps }) => {
+type Props = {
+	word: string
+	srcLang: LangCode
+	trgLang?: LangCode
+}
+
+export const CognateLink: FC<Props & HTMLProps<HTMLAnchorElement>> = ({
+	word,
+	srcLang,
+	trgLang,
+	children,
+	className,
+	...htmlProps
+}) => {
 	const [referenceElement, setReferenceElement] =
 		useState<HTMLElement | null>(null)
 	const [popperElement, setPopperElement] = useState<HTMLElement | null>(null)
@@ -85,21 +93,22 @@ export const CognateLink: FC<
 
 	const cognateFinderUrl = makeCognateFinderUrl({
 		word,
-		srcLang: langCode,
+		srcLang,
+		trgLang,
 	})
 
 	const wiktionaryUrl = useMemo(
 		() =>
 			popoverHtml === ''
 				? makeWiktionarySearchUrl({ word })
-				: makeWiktionaryUrl({ word, langCode }),
-		[word, langCode, popoverHtml],
+				: makeWiktionaryUrl({ word, langCode: srcLang }),
+		[word, srcLang, popoverHtml],
 	)
 
 	const [open, setOpen] = useState<boolean>(false)
 	const [loading, setLoading] = useState<boolean>(false)
 
-	const extendedLangName = getExtendedLangName(langCode)
+	const extendedLangName = getExtendedLangName(srcLang)
 
 	const title = `${word} (${extendedLangName})`
 
@@ -109,13 +118,13 @@ export const CognateLink: FC<
 		if (!popoverHtml) {
 			setLoading(true)
 
-			const html = await fetchWiktionaryDefinitionHtml(word, langCode)
+			const html = await fetchWiktionaryDefinitionHtml(word, srcLang)
 
 			setLoading(false)
 
 			setPopoverHtml(html ?? '')
 		}
-	}, [langCode, popoverHtml, word])
+	}, [srcLang, popoverHtml, word])
 
 	useEffect(() => {
 		forceUpdate?.()
@@ -233,7 +242,7 @@ export const CognateLink: FC<
 							/>
 
 							<WiktionaryHtml
-								{...{ word, langCode }}
+								{...{ word, langCode: srcLang }}
 								dangerousHtml={popoverHtml}
 							/>
 						</div>

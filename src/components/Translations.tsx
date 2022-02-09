@@ -23,7 +23,7 @@ export const Translations: FC<Props> = ({ translations }) => {
 									{translations.map((word) => (
 										<li key={word}>
 											<CognateLink
-												{...{ word, langCode: trgLang }}
+												{...{ word, srcLang: trgLang }}
 											>
 												{word}
 											</CognateLink>

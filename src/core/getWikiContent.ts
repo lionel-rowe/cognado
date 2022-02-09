@@ -157,7 +157,7 @@ const getDefinitionDomForLanguage = (
 		}
 	}
 
-	return doc.querySelector('body')!
+	return doc.body
 }
 
 const cache = new Map<string, string>()

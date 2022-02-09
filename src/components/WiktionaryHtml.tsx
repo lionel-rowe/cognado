@@ -16,10 +16,11 @@ export const customParse: DomNodeToReactParser = (node: Node) => {
 		const { searchParams } = new URL(node.href)
 
 		const word = searchParams.get('word') ?? ''
-		const langCode = (searchParams.get('langCode') as LangCode) ?? 'eng'
+		const srcLang = (searchParams.get('srcLang') as LangCode) ?? 'eng'
+		const trgLang = (searchParams.get('trgLang') as LangCode) ?? undefined
 
 		return (
-			<CognateLink {...{ word, langCode }}>
+			<CognateLink {...{ word, srcLang, trgLang }}>
 				{node.textContent ?? ''}
 			</CognateLink>
 		)

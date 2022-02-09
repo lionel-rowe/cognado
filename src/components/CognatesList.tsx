@@ -23,7 +23,8 @@ export const CognatesList: FC<{
 						>
 							<CognateLink
 								className='cognate-link--lowlighted'
-								{...ancestor}
+								srcLang={ancestor.langCode}
+								word={ancestor.word}
 							/>
 							<ul>
 								<li>
@@ -33,9 +34,10 @@ export const CognatesList: FC<{
 											→{' '}
 										</span>,
 										<CognateLink
-											className='cognate-link--lowlighted'
 											key={i}
-											{...x}
+											srcLang={x.langCode}
+											word={x.word}
+											className='cognate-link--lowlighted'
 										/>,
 									])}
 								</li>
@@ -48,14 +50,16 @@ export const CognatesList: FC<{
 										i === a.length - 1 ? (
 											<CognateLink
 												key={i}
+												srcLang={x.langCode}
+												word={x.word}
 												className='cognate-link--highlighted'
-												{...x}
 											/>
 										) : (
 											<CognateLink
 												key={i}
+												srcLang={x.langCode}
+												word={x.word}
 												className='cognate-link--lowlighted'
-												{...x}
 											/>
 										),
 									])}
