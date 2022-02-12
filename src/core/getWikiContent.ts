@@ -82,6 +82,13 @@ export const fetchWordSections = withCache(null, async (word: string) => {
 	return sections
 })
 
+const createElement = <K extends keyof HTMLElementTagNameMap>(
+	tag: K,
+	props?: Partial<HTMLElementTagNameMap[K]>,
+	document?: Document,
+): HTMLElementTagNameMap[K] =>
+	Object.assign((document ?? window.document).createElement(tag), props)
+
 const getDefinitionDomForLanguage = (
 	word: string,
 	sections: Section[],
@@ -103,10 +110,9 @@ const getDefinitionDomForLanguage = (
 
 	const doc = new DOMParser().parseFromString(text, 'text/html')
 
-	const base = doc.createElement('base')
-	base.href = urls.wiktionaryWeb
-
-	doc.head.appendChild(base)
+	doc.head.appendChild(
+		createElement('base', { href: urls.wiktionaryWeb }, doc),
+	)
 
 	for (const el of doc.body.querySelectorAll('.maintenance-line')) {
 		el.remove()

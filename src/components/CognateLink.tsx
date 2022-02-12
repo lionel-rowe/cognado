@@ -34,6 +34,12 @@ type Props = {
 	trgLang?: LangCode
 }
 
+const reactInteractionEventNames: ReactEventName[] = isTouchDevice
+	? ['onContextMenu' /* corresponds to long-press in mobile browsers */]
+	: ['onMouseOver']
+
+const htmlInteractionEventNames: (keyof HTMLElementEventMap)[] = ['mouseover']
+
 export const CognateLink: FC<Props & HTMLProps<HTMLAnchorElement>> = ({
 	word,
 	srcLang,
@@ -112,19 +118,24 @@ export const CognateLink: FC<Props & HTMLProps<HTMLAnchorElement>> = ({
 
 	const title = `${word} (${extendedLangName})`
 
-	const showPopover = useCallback(async () => {
-		setOpen(true)
+	const showPopover = useCallback(
+		async (e) => {
+			e.preventDefault()
 
-		if (!popoverHtml) {
-			setLoading(true)
+			setOpen(true)
 
-			const html = await fetchWiktionaryDefinitionHtml(word, srcLang)
+			if (!popoverHtml) {
+				setLoading(true)
 
-			setLoading(false)
+				const html = await fetchWiktionaryDefinitionHtml(word, srcLang)
 
-			setPopoverHtml(html ?? '')
-		}
-	}, [srcLang, popoverHtml, word])
+				setLoading(false)
+
+				setPopoverHtml(html ?? '')
+			}
+		},
+		[srcLang, popoverHtml, word],
+	)
 
 	useEffect(() => {
 		forceUpdate?.()
@@ -134,25 +145,11 @@ export const CognateLink: FC<Props & HTMLProps<HTMLAnchorElement>> = ({
 		setOpen(false)
 	}, [])
 
-	const reactHoverEventNames: ReactEventName[] = useMemo(
-		() =>
-			isTouchDevice() ? ['onMouseOver', 'onTouchStart'] : ['onMouseOver'],
-		[],
-	)
-
-	const htmlHoverEventNames = useMemo(
-		() =>
-			reactHoverEventNames.map((name) =>
-				name.slice(2).toLowerCase(),
-			) as (keyof HTMLElementEventMap)[],
-		[reactHoverEventNames],
-	)
-
 	const onEvents = useMemo(() => {
 		return Object.fromEntries(
-			reactHoverEventNames.map((k) => [k, showPopover]),
+			reactInteractionEventNames.map((k) => [k, showPopover]),
 		) as Record<ReactEventName, typeof showPopover>
-	}, [showPopover, reactHoverEventNames])
+	}, [showPopover])
 
 	const hidePopoverIfNotCurrentTarget = useCallback(
 		(e: Event) => {
@@ -165,9 +162,12 @@ export const CognateLink: FC<Props & HTMLProps<HTMLAnchorElement>> = ({
 
 	const offEvents = useMemo(() => {
 		return Object.fromEntries(
-			htmlHoverEventNames.map((k) => [k, hidePopoverIfNotCurrentTarget]),
+			htmlInteractionEventNames.map((k) => [
+				k,
+				hidePopoverIfNotCurrentTarget,
+			]),
 		) as Record<ReactEventName, typeof hidePopoverIfNotCurrentTarget>
-	}, [hidePopoverIfNotCurrentTarget, htmlHoverEventNames])
+	}, [hidePopoverIfNotCurrentTarget])
 
 	const suppressOnEsc = useCallback(
 		(e: KeyboardEvent) => {
