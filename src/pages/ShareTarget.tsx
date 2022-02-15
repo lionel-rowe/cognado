@@ -1,5 +1,6 @@
 import { FC, useContext, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
+import { Title } from '../components/Title'
 import { Path, QpsContext } from '../Routes'
 
 export const ShareTarget: FC = () => {
@@ -21,5 +22,5 @@ export const ShareTarget: FC = () => {
 		})
 	}, [history, qps])
 
-	return null
+	return <Title>Redirecting...</Title>
 }

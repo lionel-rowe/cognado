@@ -31,6 +31,7 @@ import clsx from 'clsx'
 import { SearchHeader } from '../components/SearchHeader'
 import { ExampleLinks } from '../components/ExampleLinks'
 import { fetchWiktionaryDefinitionHtml } from '../core/getWikiContent'
+import { Title } from '../components/Title'
 
 type Props = {}
 
@@ -247,51 +248,62 @@ export const SearchResults: FC<Props> = () => {
 	const isHome = checkIsHome(location)
 
 	return (
-		<div
-			className={clsx([
-				'search-results__ancestor',
-				isHome && 'search-results__ancestor--home-page',
-			])}
-		>
+		<>
+			<Title>
+				{isHome
+					? 'Home'
+					: loading || !lastSubmitted
+					? 'Loading...'
+					: `Results for “${lastSubmitted.word}” (${getLangName(
+							lastSubmitted.srcLang,
+					  )} → ${getLangName(lastSubmitted.trgLang)})`}
+			</Title>
 			<div
 				className={clsx([
-					'search-results__outer',
-					isHome && 'search-results__outer--home-page',
+					'search-results__ancestor',
+					isHome && 'search-results__ancestor--home-page',
 				])}
 			>
-				<SearchHeader />
+				<div
+					className={clsx([
+						'search-results__outer',
+						isHome && 'search-results__outer--home-page',
+					])}
+				>
+					<SearchHeader />
 
-				<CognateSearchForm
-					{...{
-						form,
-						onSubmit,
-						seeAlsos: isHome ? [] : seeAlsos,
-					}}
-				/>
-
-				{isHome ? (
-					<ExampleLinks />
-				) : loading ? (
-					<Spinner />
-				) : !lastSubmitted ? (
-					<div className='y-margins grayed-out'>
-						Enter a word to search for
-					</div>
-				) : (
-					<Tabs
+					<CognateSearchForm
 						{...{
-							definition,
-							word,
-							lastSubmitted,
-							translations: relevantTranslations,
-							cognates: hydrated,
-							query,
-							error,
-							suggestedLangPairs,
+							form,
+							onSubmit,
+							seeAlsos: isHome ? [] : seeAlsos,
 						}}
 					/>
-				)}
+
+					{isHome ? (
+						<ExampleLinks />
+					) : loading ? (
+						<Spinner />
+					) : !lastSubmitted ? (
+						<div className='y-margins grayed-out'>
+							Enter a word to search for
+						</div>
+					) : (
+						<Tabs
+							{...{
+								definition,
+								word,
+								lastSubmitted,
+								translations: relevantTranslations,
+								cognates: hydrated,
+								query,
+								error,
+								suggestedLangPairs,
+							}}
+						/>
+					)}
+				</div>
 			</div>
-		</div>
+		</>
 	)
 }
