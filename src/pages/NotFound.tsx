@@ -5,7 +5,7 @@ import { Path } from '../Routes'
 export const NotFound = () => {
 	return (
 		<>
-			<Title>Page Not Found</Title>
+			<Title title='Page Not Found' />
 			<h1>Page Not Found</h1>
 
 			<p>

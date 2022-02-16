@@ -28,9 +28,6 @@ export const DefinitionTab: FC<Props> = ({
 }) => {
 	const { word, srcLang, trgLang } = lastSubmitted
 
-	const langName = getLangName(srcLang)
-
-	const title = `${word} (${langName})`
 	const wiktionaryUrl = makeWiktionaryUrl({ word, langCode: srcLang })
 
 	const suggestTryFlipped = suggestedLangPairs.find(isFlipped(lastSubmitted))
@@ -45,7 +42,11 @@ export const DefinitionTab: FC<Props> = ({
 
 				{!definition && suggestTryFlipped ? null : (
 					<WiktionaryTitleLink
-						{...{ title: definition ? title : word, wiktionaryUrl }}
+						{...{
+							word,
+							langCode: definition ? srcLang : undefined,
+							wiktionaryUrl,
+						}}
 					/>
 				)}
 

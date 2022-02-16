@@ -236,7 +236,8 @@ export const CognateLink: FC<Props & HTMLProps<HTMLAnchorElement>> = ({
 						<div onClick={onClick}>
 							<WiktionaryTitleLink
 								{...{
-									title: popoverHtml ? title : word,
+									word,
+									langCode: popoverHtml ? srcLang : undefined,
 									wiktionaryUrl,
 								}}
 							/>

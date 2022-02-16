@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react'
 import { Route, Switch, useLocation } from 'react-router-dom'
 import { CognateHydrated } from '../core/cognates'
 import { Path } from '../Routes'
-import { LangCode } from '../utils/langNames'
+import { getLangName, LangCode } from '../utils/langNames'
 import { FormValues } from '../utils/setupQps'
 import { CognatesTab } from './CognatesTab'
 import { DefinitionTab } from './DefinitionTab'
@@ -12,6 +12,7 @@ import { Tooltip } from './Tooltip'
 import { LangPair, ls } from '../utils/ls'
 import { clickInteraction } from '../utils/device'
 import { capitalize } from '../utils/formatters'
+import { Title } from './Title'
 
 type Props = {
 	lastSubmitted: FormValues
@@ -52,6 +53,10 @@ export const Tabs: FC<Props> = ({
 			setOpen(Boolean(cognates.length))
 		}
 	}, [cognates])
+
+	const titleWordInfo = `“${lastSubmitted.word}” (${getLangName(
+		lastSubmitted.srcLang,
+	)} → ${getLangName(lastSubmitted.trgLang)})`
 
 	return (
 		<div className='y-margins tabs-outer'>
@@ -94,6 +99,8 @@ export const Tabs: FC<Props> = ({
 			<article translate='no'>
 				<Switch>
 					<Route exact path={Path.Definition}>
+						<Title title={`Definitions for ${titleWordInfo}`} />
+
 						<DefinitionTab
 							{...{
 								definition,
@@ -103,6 +110,8 @@ export const Tabs: FC<Props> = ({
 						/>
 					</Route>
 					<Route exact path={Path.Cognates}>
+						<Title title={`Cognates for ${titleWordInfo}`} />
+
 						{cognates.length ? (
 							<CognatesTab
 								{...{
@@ -116,6 +125,8 @@ export const Tabs: FC<Props> = ({
 						) : null}
 					</Route>
 					<Route exact path={Path.Translations}>
+						<Title title={`Translations for ${titleWordInfo}`} />
+
 						{translations.length ? (
 							<TranslationsTab {...{ translations }} />
 						) : null}

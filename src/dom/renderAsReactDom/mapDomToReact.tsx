@@ -34,6 +34,8 @@ const reactProps: Record<string, string> = {
 	class: 'className',
 }
 
+const blacklistedStyles = ['background', 'backgroundColor']
+
 const styleStrToObj = (style: string) =>
 	Object.fromEntries(
 		style
@@ -47,7 +49,7 @@ const styleStrToObj = (style: string) =>
 							i ? y.trim() : kebabToCamel(y.trim()),
 						) as [string, string | undefined],
 			)
-			.filter(Boolean),
+			.filter((x) => x && !blacklistedStyles.includes(x[0])),
 	)
 
 type StyleObj = ReturnType<typeof styleStrToObj>

@@ -64,6 +64,23 @@ const partsOfSpeech = [
 	'logogram',
 ]
 
+// TODO: re-consider logic to allow other sections (?)
+
+// const blacklistedSections = [
+// 	'translations',
+// 	'anagrams',
+// 	'inflection',
+// 	'coordinate terms',
+// 	'derived terms',
+// 	'related terms',
+// 	'descendants',
+// 	'see also',
+// 	'references',
+// 	'synonyms',
+// 	'antonyms',
+// 	'declension',
+// ]
+
 export const fetchWordSections = withCache(null, async (word: string) => {
 	const res = await fetch(
 		`${urls.wiktionaryRestApi}/rest_v1/page/mobile-sections/${wikify(
@@ -102,11 +119,26 @@ const getDefinitionDomForLanguage = (
 	const _end = sections.slice(start + 1).findIndex((s) => s.toclevel === 1)
 	const end = _end === -1 ? sections.length : _end + start + 1
 
-	const { text } = sections
-		.slice(start, end)
-		.find((x) => partsOfSpeech.includes(x.line.trim().toLowerCase())) ?? {
-		text: '',
-	}
+	const relevantSections = sections
+		.slice(
+			start + 1,
+			end,
+			// ).filter((x) => !blacklistedSections.includes(x.line.trim().toLowerCase()))
+		)
+		.filter((x) => partsOfSpeech.includes(x.line.trim().toLowerCase()))
+
+	const text = relevantSections
+		.map((x) => {
+			const hTag = 'h3'
+			// const hTag = `h${x.toclevel + 1}` // +1 as already under a h2
+
+			const headingHtml = createElement(hTag as 'h1', {
+				textContent: x.line,
+			}).outerHTML
+
+			return [headingHtml, x.text].join('\n')
+		})
+		.join('')
 
 	const doc = new DOMParser().parseFromString(text, 'text/html')
 
@@ -192,7 +224,7 @@ export const fetchWiktionaryDefinitionHtml = withCache(
 					word,
 					sections,
 					getLangName(langCode),
-				).querySelector('ol')?.outerHTML ?? ''
+				).innerHTML ?? ''
 		} catch (e) {
 			console.error(e)
 			result = ''

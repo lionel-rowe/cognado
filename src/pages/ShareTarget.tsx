@@ -22,5 +22,5 @@ export const ShareTarget: FC = () => {
 		})
 	}, [history, qps])
 
-	return <Title>Redirecting...</Title>
+	return <Title title='Redirecting...' />
 }

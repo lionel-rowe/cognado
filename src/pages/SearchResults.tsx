@@ -32,6 +32,7 @@ import { SearchHeader } from '../components/SearchHeader'
 import { ExampleLinks } from '../components/ExampleLinks'
 import { fetchWiktionaryDefinitionHtml } from '../core/getWikiContent'
 import { Title } from '../components/Title'
+import { timeOutAfter } from '../utils/timing'
 
 type Props = {}
 
@@ -133,10 +134,13 @@ export const SearchResults: FC<Props> = () => {
 
 		setLoading(true)
 
-		Promise.all([
-			fetchCognates(word.trim(), srcLang, trgLang, allowAffixes),
-			fetchWiktionaryPageResult(word.trim()),
-			fetchWiktionaryDefinitionHtml(word, srcLang),
+		Promise.race([
+			Promise.all([
+				fetchCognates(word.trim(), srcLang, trgLang, allowAffixes),
+				fetchWiktionaryPageResult(word.trim()),
+				fetchWiktionaryDefinitionHtml(word, srcLang),
+			]),
+			timeOutAfter(5_000, 'Timed out. Please refresh and try again.'),
 		])
 			.then(([result, wiktionaryResult, definition]) => {
 				const { wiktionaryText, seeAlsos } =
@@ -249,15 +253,7 @@ export const SearchResults: FC<Props> = () => {
 
 	return (
 		<>
-			<Title>
-				{isHome
-					? 'Home'
-					: loading || !lastSubmitted
-					? 'Loading...'
-					: `Results for “${lastSubmitted.word}” (${getLangName(
-							lastSubmitted.srcLang,
-					  )} → ${getLangName(lastSubmitted.trgLang)})`}
-			</Title>
+			{isHome && <Title title='Home' />}
 			<div
 				className={clsx([
 					'search-results__ancestor',
@@ -282,11 +278,15 @@ export const SearchResults: FC<Props> = () => {
 
 					{isHome ? (
 						<ExampleLinks />
+					) : error ? (
+						<div className='y-margins grayed-out'>
+							⚠️ {error.message}
+						</div>
 					) : loading ? (
 						<Spinner />
 					) : !lastSubmitted ? (
 						<div className='y-margins grayed-out'>
-							Enter a word to search for
+							Enter a word to search for.
 						</div>
 					) : (
 						<Tabs

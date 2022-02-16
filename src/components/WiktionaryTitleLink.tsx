@@ -1,11 +1,17 @@
 import { FC } from 'react'
+import { getExtendedLangName, LangCode } from '../utils/langNames'
 
 type Props = {
 	wiktionaryUrl: string
-	title: string
+	word: string
+	langCode?: LangCode
 }
 
-export const WiktionaryTitleLink: FC<Props> = ({ wiktionaryUrl, title }) => {
+export const WiktionaryTitleLink: FC<Props> = ({
+	wiktionaryUrl,
+	word,
+	langCode,
+}) => {
 	return (
 		<div>
 			<strong>
@@ -14,7 +20,14 @@ export const WiktionaryTitleLink: FC<Props> = ({ wiktionaryUrl, title }) => {
 					rel='noreferrer noopener'
 					href={wiktionaryUrl}
 				>
-					{title} — Wiktionary
+					View full entry for{' '}
+					{[
+						`“${word}”`,
+						langCode && `(${getExtendedLangName(langCode)})`,
+					]
+						.filter(Boolean)
+						.join(' ')}{' '}
+					on Wiktionary
 				</a>
 			</strong>
 		</div>

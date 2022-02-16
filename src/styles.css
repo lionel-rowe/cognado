@@ -122,7 +122,7 @@ nav a:hover {
 
 .popover {
 	position: absolute;
-	max-width: min(500px, calc(100vw - 16px));
+	max-width: min(550px, calc(100vw - 16px));
 	background: var(--bg-color);
 	border: 1px solid #aaa;
 	border-radius: 5px;
@@ -399,4 +399,48 @@ button.swap:hover {
 	color: var(--color-primary-emphasized);
 	font-weight: bold;
 	background-color: none;
+}
+
+h1 {
+	--font-size: 2em;
+}
+
+h2 {
+	--font-size: 1.75em;
+}
+
+h3 {
+	--font-size: 1.5em;
+}
+
+h4 {
+	--font-size: 1.25em;
+}
+
+h5 {
+	--font-size: 1em;
+}
+
+h6 {
+	--font-size: 0.85em;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	--margin-block-start: 0.35em;
+	--margin-block-end: 0.7em;
+
+	font-size: var(--font-size);
+	margin-block-start: var(--margin-block-start);
+	margin-block-end: var(--margin-block-end);
+}
+
+.popover :is(h1, h2, h3, h4, h5, h6) {
+	font-size: calc(var(--font-size) / 1.2);
+	margin-block-start: var(--margin-block-start);
+	margin-block-end: 0;
 }
